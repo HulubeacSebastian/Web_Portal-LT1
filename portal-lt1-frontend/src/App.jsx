@@ -10,19 +10,32 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
+import ActivityInsightsPage from './pages/ActivityInsightsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import logo from '../assets/logo-mov-vector.pdf.png';
 import { getCookie, setCookie } from './utils/cookies';
+import {
+  getActivitySnapshot,
+  getPreferences,
+  recordActivityEvent,
+  savePreference,
+  trackPageVisit
+} from './utils/activityCookies';
 
 function App() {
   const location = useLocation();
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
+  const [activity, setActivity] = useState(() => getActivitySnapshot());
 
   useEffect(() => {
     if (cookieConsent) {
       setCookie('portal_last_path', location.pathname, { maxAge: 60 * 60 * 24 * 30 });
+      const snapshot = trackPageVisit(location.pathname);
+      setActivity(snapshot);
+      savePreference('lastVisitedPath', location.pathname);
+      recordActivityEvent('route_change', { path: location.pathname });
     }
   }, [cookieConsent, location.pathname]);
 
@@ -31,7 +44,10 @@ function App() {
   const acceptCookies = () => {
     setCookie('portal_cookie_consent', 'accepted', { maxAge: 60 * 60 * 24 * 365 });
     setCookieConsent(true);
+    recordActivityEvent('cookie_consent_accepted');
   };
+
+  const preferenceCount = Object.keys(getPreferences()).length;
 
   return (
     <DocumentsProvider>
@@ -68,6 +84,12 @@ function App() {
                 >
                   Calendar
                 </NavLink>
+                <NavLink
+                  to="/activitate"
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                >
+                  Activitate
+                </NavLink>
               </nav>
             </div>
 
@@ -91,6 +113,15 @@ function App() {
           </div>
         ) : null}
 
+        {cookieConsent ? (
+          <div className="cookie-banner">
+            <span>
+              Monitorizare activa: {activity.totalVisits} navigari, ultima pagina {activity.lastPath}, preferinte salvate{' '}
+              {preferenceCount}.
+            </span>
+          </div>
+        ) : null}
+
         <main className="content">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -102,6 +133,7 @@ function App() {
             <Route path="/despre-noi" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/activitate" element={<ActivityInsightsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFoundPage />} />

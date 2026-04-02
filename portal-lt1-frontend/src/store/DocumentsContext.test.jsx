@@ -52,23 +52,32 @@ describe('DocumentsContext', () => {
       </DocumentsProvider>
     );
 
-    expect(screen.getByTestId('count')).toHaveTextContent('6');
-    expect(screen.getByTestId('first')).toHaveTextContent('Regulament intern 2026');
-    expect(screen.getByTestId('lookup')).toHaveTextContent('Regulament intern 2026');
+    expect(screen.getByTestId('count')).toHaveTextContent('12');
+    expect(screen.getByTestId('first')).toHaveTextContent('Regulament intern elevi 2026');
+    expect(screen.getByTestId('lookup')).toHaveTextContent('Regulament intern elevi 2026');
 
     await user.click(screen.getByRole('button', { name: 'add' }));
-    expect(screen.getByTestId('count')).toHaveTextContent('7');
+    expect(screen.getByTestId('count')).toHaveTextContent('13');
     expect(screen.getByTestId('first')).toHaveTextContent('Document nou');
 
     await user.click(screen.getByRole('button', { name: 'update' }));
     expect(screen.getByTestId('lookup')).toHaveTextContent('Actualizat');
 
     await user.click(screen.getByRole('button', { name: 'delete' }));
-    expect(screen.getByTestId('count')).toHaveTextContent('6');
+    expect(screen.getByTestId('count')).toHaveTextContent('12');
     expect(screen.getByTestId('lookup')).toHaveTextContent('none');
 
     await user.click(screen.getByRole('button', { name: 'lookup' }));
-    expect(screen.getByTestId('lookup')).toHaveTextContent('Procedura onboarding');
+    expect(screen.getByTestId('lookup')).toHaveTextContent('Procedura inscriere clasa a IX-a');
+  });
+
+  it('throws when hook is used outside DocumentsProvider', () => {
+    function InvalidHarness() {
+      useDocuments();
+      return null;
+    }
+
+    expect(() => render(<InvalidHarness />)).toThrow('useDocuments must be used inside DocumentsProvider');
   });
 });
 

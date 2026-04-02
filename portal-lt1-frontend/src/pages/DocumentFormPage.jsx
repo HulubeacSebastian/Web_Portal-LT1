@@ -41,11 +41,22 @@ function DocumentFormPage({ mode }) {
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const nextErrors = validateDocument(formData);
+    const normalizedData = {
+      ...formData,
+      title: formData.title.trim(),
+      category: formData.category.trim(),
+      issuer: formData.issuer.trim(),
+      description: formData.description.trim()
+    };
+
+    const nextErrors = validateDocument(normalizedData);
     setErrors(nextErrors);
 
     if (hasErrors(nextErrors)) {
@@ -53,12 +64,12 @@ function DocumentFormPage({ mode }) {
     }
 
     if (mode === 'edit') {
-      updateDocument(id, formData);
+      updateDocument(id, normalizedData);
       navigate(`/documente/${id}`);
       return;
     }
 
-    const newId = addDocument(formData);
+    const newId = addDocument(normalizedData);
     navigate(`/documente/${newId}`);
   };
 
@@ -80,6 +91,8 @@ function DocumentFormPage({ mode }) {
                 id="title"
                 value={formData.title}
                 onChange={(event) => handleChange('title', event.target.value)}
+                maxLength={120}
+                aria-invalid={Boolean(errors.title)}
               />
               {errors.title ? <p className="error">{errors.title}</p> : null}
             </div>
@@ -90,6 +103,8 @@ function DocumentFormPage({ mode }) {
                 id="category"
                 value={formData.category}
                 onChange={(event) => handleChange('category', event.target.value)}
+                maxLength={60}
+                aria-invalid={Boolean(errors.category)}
               />
               {errors.category ? <p className="error">{errors.category}</p> : null}
             </div>
@@ -100,6 +115,8 @@ function DocumentFormPage({ mode }) {
                 id="issuer"
                 value={formData.issuer}
                 onChange={(event) => handleChange('issuer', event.target.value)}
+                maxLength={80}
+                aria-invalid={Boolean(errors.issuer)}
               />
               {errors.issuer ? <p className="error">{errors.issuer}</p> : null}
             </div>
@@ -111,6 +128,7 @@ function DocumentFormPage({ mode }) {
                 type="date"
                 value={formData.issuedAt}
                 onChange={(event) => handleChange('issuedAt', event.target.value)}
+                aria-invalid={Boolean(errors.issuedAt)}
               />
               {errors.issuedAt ? <p className="error">{errors.issuedAt}</p> : null}
             </div>
@@ -121,6 +139,7 @@ function DocumentFormPage({ mode }) {
                 id="status"
                 value={formData.status}
                 onChange={(event) => handleChange('status', event.target.value)}
+                aria-invalid={Boolean(errors.status)}
               >
                 <option value="Activ">Activ</option>
                 <option value="Revizie">Revizie</option>
@@ -137,6 +156,8 @@ function DocumentFormPage({ mode }) {
               rows={5}
               value={formData.description}
               onChange={(event) => handleChange('description', event.target.value)}
+              maxLength={1000}
+              aria-invalid={Boolean(errors.description)}
             />
             {errors.description ? <p className="error">{errors.description}</p> : null}
           </div>

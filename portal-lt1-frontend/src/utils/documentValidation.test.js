@@ -34,5 +34,23 @@ describe('documentValidation', () => {
     expect(errors.description).toBe('Descrierea trebuie sa aiba minimum 10 caractere.');
     expect(hasErrors(errors)).toBe(true);
   });
+
+  it('flags invalid lengths, status and date format', () => {
+    const errors = validateDocument({
+      title: 'A',
+      category: 'X',
+      issuer: 'Y',
+      issuedAt: 'data-invalida',
+      status: 'Draft',
+      description: 'Descriere ok, dar restul campurilor nu respecta regulile.'
+    });
+
+    expect(errors.title).toBe('Titlul trebuie sa aiba minimum 3 caractere.');
+    expect(errors.category).toBe('Categoria trebuie sa aiba minimum 2 caractere.');
+    expect(errors.issuer).toBe('Emitentul trebuie sa aiba minimum 2 caractere.');
+    expect(errors.issuedAt).toBe('Data emiterii nu este valida.');
+    expect(errors.status).toBe('Statusul selectat nu este valid.');
+    expect(hasErrors(errors)).toBe(true);
+  });
 });
 

@@ -2,8 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDocuments } from '../store/DocumentsContext';
 import { getCookie, setCookie } from '../utils/cookies';
+import { recordActivityEvent, savePreference } from '../utils/activityCookies';
 
 const PAGE_SIZE = 5;
+const statusPalette = {
+  Activ: '#bfd4e6',
+  Revizie: '#7f648f',
+  Arhivat: '#a78bfa'
+};
+const monthlyLabels = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'];
 
 function DocumentListPage() {
   const { documents } = useDocuments();
@@ -48,15 +55,56 @@ function DocumentListPage() {
     [documents]
   );
   const totalDocs = documents.length || 1;
+  const analyticsStats = useMemo(() => {
+    const total = Math.max(1, statusCounts.Activ + statusCounts.Revizie + statusCounts.Arhivat);
+    const gradient = [
+      `${statusPalette.Activ} 0 ${(statusCounts.Activ / total) * 100}%`,
+      `${statusPalette.Revizie} ${(statusCounts.Activ / total) * 100}% ${((statusCounts.Activ + statusCounts.Revizie) / total) * 100}%`,
+      `${statusPalette.Arhivat} ${((statusCounts.Activ + statusCounts.Revizie) / total) * 100}% 100%`
+    ].join(', ');
+
+    const monthly = monthlyLabels.map((label, monthIndex) => {
+      const monthDocs = documents.filter((doc) => {
+        const date = new Date(doc.issuedAt);
+        return !Number.isNaN(date.getTime()) && date.getMonth() === monthIndex;
+      });
+
+      return {
+        label,
+        approved: monthDocs.filter((doc) => doc.status === 'Activ').length,
+        pending: monthDocs.filter((doc) => doc.status !== 'Activ').length
+      };
+    });
+
+    const maxBarValue = Math.max(1, ...monthly.flatMap((entry) => [entry.approved, entry.pending]));
+    return { gradient, monthly, maxBarValue };
+  }, [documents, statusCounts]);
 
   const handleFilterChange = (value, setter) => {
     setter(value);
     setPage(1);
+    recordActivityEvent('documents_filter_change', { value });
   };
 
   useEffect(() => {
     setCookie('portal_view_mode', viewMode, { maxAge: 60 * 60 * 24 * 30 });
+    savePreference('documentsViewMode', viewMode);
   }, [viewMode]);
+
+  useEffect(() => {
+    savePreference('documentsStatusFilter', status);
+  }, [status]);
+
+  useEffect(() => {
+    savePreference('documentsSearch', query.trim());
+  }, [query]);
+
+  useEffect(() => {
+    if (selectedId) {
+      setCookie('portal_last_document', selectedId, { maxAge: 60 * 60 * 24 * 30 });
+      savePreference('documentsSelectedId', selectedId);
+    }
+  }, [selectedId]);
 
   useEffect(() => {
     if (selectedDoc && selectedDoc.id !== selectedId) {
@@ -65,7 +113,11 @@ function DocumentListPage() {
   }, [selectedDoc, selectedId]);
 
   const toggleViewMode = () => {
-    setViewMode((prev) => (prev === 'table' ? 'cards' : 'table'));
+    setViewMode((prev) => {
+      const next = prev === 'table' ? 'cards' : 'table';
+      recordActivityEvent('documents_view_mode_change', { from: prev, to: next });
+      return next;
+    });
   };
 
   return (
@@ -134,7 +186,14 @@ function DocumentListPage() {
                       pageDocs.map((doc) => (
                         <tr key={doc.id} className={selectedId === doc.id ? 'is-selected' : ''}>
                           <td>
-                            <button type="button" className="table-link" onClick={() => setSelectedId(doc.id)}>
+                              <button
+                                type="button"
+                                className="table-link"
+                                onClick={() => {
+                                  setSelectedId(doc.id);
+                                  recordActivityEvent('documents_select_row', { id: doc.id });
+                                }}
+                              >
                               {doc.title}
                             </button>
                           </td>
@@ -168,7 +227,10 @@ function DocumentListPage() {
                       key={doc.id}
                       type="button"
                       className={`document-card-item${selectedId === doc.id ? ' selected' : ''}`}
-                      onClick={() => setSelectedId(doc.id)}
+                      onClick={() => {
+                        setSelectedId(doc.id);
+                        recordActivityEvent('documents_select_card', { id: doc.id });
+                      }}
                     >
                       <strong>{doc.title}</strong>
                       <span>{doc.issuer}</span>
@@ -183,7 +245,10 @@ function DocumentListPage() {
               <button
                 type="button"
                 className="secondary"
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                onClick={() => {
+                  setPage((prev) => Math.max(1, prev - 1));
+                  recordActivityEvent('documents_page_previous', { page: safePage });
+                }}
                 disabled={safePage === 1}
               >
                 Inapoi
@@ -194,7 +259,10 @@ function DocumentListPage() {
               <button
                 type="button"
                 className="secondary"
-                onClick={() => setPage((prev) => Math.min(maxPage, prev + 1))}
+                onClick={() => {
+                  setPage((prev) => Math.min(maxPage, prev + 1));
+                  recordActivityEvent('documents_page_next', { page: safePage });
+                }}
                 disabled={safePage === maxPage}
               >
                 Inainte
@@ -244,6 +312,47 @@ function DocumentListPage() {
                 </div>
               ))}
             </div>
+
+            <article className="analytics-pie-card">
+              <div className="analytics-legend">
+                <span>
+                  <i className="approved" /> Activ
+                </span>
+                <span>
+                  <i className="pending" /> Revizie/Arhivat
+                </span>
+              </div>
+
+              <div
+                className="analytics-pie"
+                style={{ background: `conic-gradient(${analyticsStats.gradient})` }}
+                role="img"
+                aria-label="Distribuirea documentelor dupa status"
+              />
+            </article>
+
+            <article className="analytics-bar-card">
+              <h3>Evolutia documentelor pe luni (live)</h3>
+              <div className="analytics-bars">
+                {analyticsStats.monthly.map((entry) => (
+                  <div key={entry.label} className="analytics-month">
+                    <div className="analytics-columns">
+                      <div
+                        className="analytics-col approved"
+                        style={{ height: `${(entry.approved / analyticsStats.maxBarValue) * 100}%` }}
+                        title={`Activ: ${entry.approved}`}
+                      />
+                      <div
+                        className="analytics-col pending"
+                        style={{ height: `${(entry.pending / analyticsStats.maxBarValue) * 100}%` }}
+                        title={`Revizie/Arhivat: ${entry.pending}`}
+                      />
+                    </div>
+                    <span>{entry.label}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
           </aside>
         </div>
       </div>

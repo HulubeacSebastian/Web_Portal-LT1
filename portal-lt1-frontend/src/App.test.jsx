@@ -18,6 +18,7 @@ describe('App routes', () => {
     ['/despre-noi', 'CINE SUNTEM?'],
     ['/contact', 'Nume și Prenume'],
     ['/calendar', 'Generare Orar'],
+    ['/activitate', 'Monitorizare activitate si preferinte'],
     ['/documente2', 'Evolutia documentelor incarcate (2026)'],
   ])('renders the %s route', (path, expectedText) => {
     render(

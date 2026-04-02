@@ -31,7 +31,7 @@ test('feature 2: login flow redirects to home and updates greeting', async ({ pa
 
   const banner = page.locator('.cookie-banner');
   if ((await banner.count()) > 0) {
-    await expect(banner).toContainText('elev@test.ro');
+    await expect(banner).toContainText('elev%40test.ro');
   }
 });
 

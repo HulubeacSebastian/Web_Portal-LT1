@@ -15,12 +15,10 @@ function LoginPage() {
   };
 
   return (
-    <section className="card auth-page">
-      <p className="eyebrow">Autentificare</p>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
+    <section className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-form" noValidate>
         <div>
-          <label htmlFor="login-email">Email</label>
+          <label htmlFor="login-email">Email/Username</label>
           <input
             id="login-email"
             type="email"
@@ -37,10 +35,10 @@ function LoginPage() {
             onChange={(event) => setFormData((prev) => ({ ...prev, password: event.target.value }))}
           />
         </div>
-        <button type="submit">Intra in cont</button>
+        <button type="submit" className="auth-submit">Autentificare</button>
       </form>
-      {message ? <p className="muted">{message}</p> : null}
-      <p className="muted">
+      {message ? <p className="auth-note">{message}</p> : null}
+      <p className="auth-note">
         Nu ai cont? <Link to="/register">Creeaza unul</Link>
       </p>
     </section>

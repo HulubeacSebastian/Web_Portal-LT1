@@ -248,7 +248,6 @@ function DocumentListPage() {
         </div>
       </div>
 
-      <img src="/assets/antet2@4x.png" alt="Antet liceu" className="documents-antet" />
     </section>
   );
 }

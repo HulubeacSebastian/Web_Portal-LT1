@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import SchoolFooter from '../components/SchoolFooter.jsx';
 
 const stats = [
   { label: 'Raport Elevi-Profesor', value: '10:1' },
@@ -45,7 +44,11 @@ function HomePage() {
         <img src="/assets/poza_liceu.jpeg" alt="Liceul Tehnologic Nr. 1" className="home-hero-image" />
 
         <div className="home-hero-overlay">
-          <h1>LICEUL TEHNOLOGIC NR. 1</h1>
+          <h1>
+            <span>LICEUL</span>
+            <span>TEHNOLOGIC</span>
+            <span>NR. 1</span>
+          </h1>
         </div>
 
         <div className="home-hero-banner">START ADMITERE 2026: INVATA O MESERIE DE VIITOR!</div>
@@ -121,7 +124,6 @@ function HomePage() {
         </div>
       </section>
 
-      <SchoolFooter />
     </section>
   );
 }

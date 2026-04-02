@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import SchoolFooter from '../components/SchoolFooter.jsx';
 import { useDocuments } from '../store/DocumentsContext';
 
 const statusPalette = {
@@ -117,8 +116,6 @@ function DocumentAnalyticsPage() {
           </div>
         </article>
       </section>
-
-      <SchoolFooter />
     </section>
   );
 }

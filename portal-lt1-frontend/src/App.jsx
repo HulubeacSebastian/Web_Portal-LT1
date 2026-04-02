@@ -11,6 +11,7 @@ import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+import SchoolFooter from './components/SchoolFooter.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import logo from '../assets/logo-mov-vector.pdf.png';
 import { getCookie, setCookie } from './utils/cookies';
@@ -106,6 +107,8 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
+
+        <SchoolFooter />
       </div>
     </DocumentsProvider>
   );

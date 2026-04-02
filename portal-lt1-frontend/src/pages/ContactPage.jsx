@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import SchoolFooter from '../components/SchoolFooter.jsx';
 
 function ContactPage() {
   const [statusMessage, setStatusMessage] = useState('');
@@ -39,8 +38,6 @@ function ContactPage() {
           {statusMessage ? <p className="contact-status">{statusMessage}</p> : null}
         </form>
       </section>
-
-      <SchoolFooter />
     </section>
   );
 }

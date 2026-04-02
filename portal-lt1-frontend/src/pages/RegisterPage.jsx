@@ -4,7 +4,7 @@ import { setCookie } from '../utils/cookies';
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -13,10 +13,8 @@ function RegisterPage() {
   };
 
   return (
-    <section className="card auth-page">
-      <p className="eyebrow">Inregistrare</p>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
+    <section className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-form" noValidate>
         <div>
           <label htmlFor="register-name">Nume</label>
           <input
@@ -26,7 +24,7 @@ function RegisterPage() {
           />
         </div>
         <div>
-          <label htmlFor="register-email">Email</label>
+          <label htmlFor="register-email">Email/Username</label>
           <input
             id="register-email"
             type="email"
@@ -43,9 +41,18 @@ function RegisterPage() {
             onChange={(event) => setFormData((prev) => ({ ...prev, password: event.target.value }))}
           />
         </div>
-        <button type="submit">Creeaza cont</button>
+        <div>
+          <label htmlFor="register-confirm-password">Confirmare Parola</label>
+          <input
+            id="register-confirm-password"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(event) => setFormData((prev) => ({ ...prev, confirmPassword: event.target.value }))}
+          />
+        </div>
+        <button type="submit" className="auth-submit">Creare cont</button>
       </form>
-      <p className="muted">
+      <p className="auth-note">
         Ai deja cont? <Link to="/login">Autentifica-te</Link>
       </p>
     </section>

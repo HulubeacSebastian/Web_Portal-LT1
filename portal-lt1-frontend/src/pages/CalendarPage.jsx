@@ -1,5 +1,3 @@
-import SchoolFooter from '../components/SchoolFooter.jsx';
-
 const days = [
   { day: 2, label: 'Lun' },
   { day: 3, label: 'Mar' },
@@ -179,8 +177,6 @@ function CalendarPage() {
           </div>
         </section>
       </div>
-
-      <SchoolFooter />
     </section>
   );
 }

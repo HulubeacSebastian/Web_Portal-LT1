@@ -1,5 +1,3 @@
-import SchoolFooter from '../components/SchoolFooter.jsx';
-
 function AboutPage() {
   return (
     <section className="page-shell about-page">
@@ -21,8 +19,6 @@ function AboutPage() {
           către studii superioare în domeniul tehnic.
         </p>
       </section>
-
-      <SchoolFooter />
     </section>
   );
 }

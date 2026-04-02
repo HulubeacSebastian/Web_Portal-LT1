@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import DocumentListPage from './pages/DocumentListPage.jsx';
+import DocumentAnalyticsPage from './pages/DocumentAnalyticsPage.jsx';
 import DocumentDetailPage from './pages/DocumentDetailPage.jsx';
 import DocumentFormPage from './pages/DocumentFormPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import AboutPage from './pages/AboutPage.jsx';
+import ContactPage from './pages/ContactPage.jsx';
+import CalendarPage from './pages/CalendarPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import logo from '../assets/logo-mov-vector.pdf.png';
@@ -45,9 +49,24 @@ function App() {
                 >
                   Documente
                 </NavLink>
-                <span className="nav-link nav-static">Despre Noi</span>
-                <span className="nav-link nav-static">Contact</span>
-                <span className="nav-link nav-static">Calendar</span>
+                <NavLink
+                  to="/despre-noi"
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                >
+                  Despre Noi
+                </NavLink>
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                >
+                  Contact
+                </NavLink>
+                <NavLink
+                  to="/calendar"
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                >
+                  Calendar
+                </NavLink>
               </nav>
             </div>
 
@@ -75,9 +94,13 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/documente" element={<DocumentListPage />} />
+            <Route path="/documente2" element={<DocumentAnalyticsPage />} />
             <Route path="/documente/adauga" element={<DocumentFormPage mode="create" />} />
             <Route path="/documente/:id" element={<DocumentDetailPage />} />
             <Route path="/documente/:id/edit" element={<DocumentFormPage mode="edit" />} />
+            <Route path="/despre-noi" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFoundPage />} />

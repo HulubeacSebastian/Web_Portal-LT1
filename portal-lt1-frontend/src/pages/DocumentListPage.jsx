@@ -73,7 +73,7 @@ function DocumentListPage() {
       <article className="documents-title-card">
         <h2>DOCUMENTE SCOLARE</h2>
         <p className="documents-subtitle">SCHIMBA VIZUALIZARE</p>
-        <button type="button" className="view-toggle" aria-label="Schimba vizualizare" />
+        <Link to="/documente2" className="view-toggle" aria-label="Schimba vizualizare" />
       </article>
 
       <div className="documents-stage">

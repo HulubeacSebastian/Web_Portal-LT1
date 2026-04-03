@@ -35,15 +35,29 @@ The core data model for this application is the `Document` entity, which include
 
 ## 🚦 Getting Started
 
-Follow these instructions to get a copy of the project up and running on your local machine.
-
 ### Prerequisites
 
-* Node.js (v16 or higher recommended)
-* npm or yarn
+* Node.js (v18 or higher recommended)
+* npm
 
-### Installation
+### Install Dependencies
 
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/your-username/portal-lt1-frontend.git](https://github.com/your-username/portal-lt1-frontend.git)
+From the workspace root:
+
+```bash
+npm install
+npm run install:all
+```
+
+### Run From JetBrains Run Button
+
+1. Open the root `package.json`.
+2. Use the Run icon next to script `run` (or `dev`).
+3. This starts both:
+   * frontend (Vite)
+   * backend (Express)
+
+Default URLs:
+
+* Frontend: `http://localhost:5173`
+* Backend: `http://localhost:3000`

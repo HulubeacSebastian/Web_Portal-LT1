@@ -50,7 +50,7 @@ function DocumentAnalyticsPage() {
       <article className="documents-title-card">
         <h2>DOCUMENTE SCOLARE</h2>
         <p className="documents-subtitle">SCHIMBA VIZUALIZARE</p>
-        <Link to="/documente" className="view-toggle analytics-toggle" aria-label="Inapoi la lista documente" />
+        <Link to="/documente" className="view-toggle analytics-toggle is-on" aria-label="Inapoi la lista documente" />
       </article>
 
       <section className="documents-analytics-stage">

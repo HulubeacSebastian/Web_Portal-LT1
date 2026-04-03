@@ -23,7 +23,7 @@ html {
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #3f3f3f;
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -1185,6 +1185,8 @@ a {
   border: 1px solid #d5d5d5;
   background: #ededf0;
   position: relative;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .view-toggle::after {
@@ -1197,6 +1199,16 @@ a {
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  transition: transform 0.18s ease;
+}
+
+.view-toggle.is-on {
+  background: #6c60bd;
+  border-color: #6c60bd;
+}
+
+.view-toggle.is-on::after {
+  transform: translateX(22px);
 }
 
 .documents-stage {
@@ -1264,8 +1276,27 @@ a {
   cursor: pointer;
 }
 
+.table-link:hover {
+  color: #3f248d;
+}
+
+.table-link:active {
+  color: #2f1f6f;
+  background: transparent;
+}
+
+.table-link:focus-visible {
+  outline: 2px solid #cfc4f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 tr.is-selected {
   background: #eef2ff;
+}
+
+.documents-master-card tbody tr:hover {
+  background: #f4f1ff;
 }
 
 .document-cards {
@@ -1283,11 +1314,23 @@ tr.is-selected {
   gap: 0.3rem;
   text-align: left;
   color: var(--text);
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.document-card-item:hover,
+.document-card-item:focus-visible {
+  background: #f8f6ff;
+  border-color: #cfc4f6;
 }
 
 .document-card-item.selected {
   border-color: #7059d1;
   box-shadow: 0 0 0 2px rgba(112, 89, 209, 0.12);
+}
+
+.document-card-item.selected:hover,
+.document-card-item.selected:focus-visible {
+  background: #f5f2ff;
 }
 
 .documents-detail-description {
@@ -1301,6 +1344,7 @@ tr.is-selected {
   display: grid;
   gap: 0.7rem;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .documents-chart-row {
@@ -1366,6 +1410,18 @@ tr.is-selected {
   height: 10px;
   border-radius: 2px;
   display: inline-block;
+}
+
+.analytics-legend .activ {
+  background: #dcfce7;
+}
+
+.analytics-legend .revizie {
+  background: #fef3c7;
+}
+
+.analytics-legend .arhivat {
+  background: #e2e8f0;
 }
 
 .analytics-pie {
@@ -1548,6 +1604,7 @@ button.ghost {
 
 .muted {
   color: var(--muted);
+  padding: 10px 10px;
 }
 
 .stats-grid {
@@ -1646,7 +1703,7 @@ textarea:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  min-width: 100px;
 }
 
 th,
@@ -1665,6 +1722,27 @@ th {
 .actions {
   display: flex;
   gap: 0.35rem;
+}
+
+.actions .btn,
+.actions button {
+  white-space: nowrap;
+}
+
+.actions .btn.secondary:hover,
+.actions button.secondary:hover {
+  background: #3f4a5d;
+}
+
+.actions .btn.danger:hover,
+.actions button.danger:hover {
+  background: #b91c1c;
+}
+
+.actions .btn.ghost:hover,
+.actions button.ghost:hover {
+  background: #e6edff;
+  color: #1e3a8a;
 }
 
 .status-pill {
@@ -1705,8 +1783,11 @@ th {
 }
 
 .pagination {
-  margin-top: 0.9rem;
+  margin-top: 1.15rem;
+  padding-top: 0.45rem;
+  padding-inline: 0.2rem;
   justify-content: space-between;
+  gap: 0.9rem;
 }
 
 .pagination button:disabled {

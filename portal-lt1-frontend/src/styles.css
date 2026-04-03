@@ -881,7 +881,7 @@ a {
 
 .home-hero {
   position: relative;
-  min-height: 392px;
+  min-height: 340px;
   padding: 0;
   border: 1px solid #c9ced8;
   background: #050505;
@@ -892,27 +892,27 @@ a {
   content: '';
   position: absolute;
   top: 0;
-  bottom: 42px;
-  left: 31%;
+  bottom: 36px;
+  left: 29%;
   width: 1px;
   background: rgba(255, 255, 255, 0.07);
 }
 
 .home-hero-image {
-  width: 69%;
-  height: 350px;
+  width: 68%;
+  height: 302px;
   object-fit: cover;
   display: block;
-  margin: 14px 14px 0 auto;
+  margin: 12px 12px 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
 .home-hero-overlay {
   position: absolute;
-  left: 2.2rem;
+  left: 1.7rem;
   top: 51%;
-  width: min(25%, 260px);
+  width: min(24%, 220px);
   transform: translateY(-50%);
 }
 
@@ -922,7 +922,7 @@ a {
   color: #fff;
   display: grid;
   gap: 0.12rem;
-  font-size: clamp(2.05rem, 2.95vw, 3rem);
+  font-size: clamp(1.7rem, 2.35vw, 2.4rem);
   font-weight: 900;
   letter-spacing: 0.018em;
   line-height: 0.9;
@@ -945,10 +945,10 @@ a {
   color: #fff;
   text-align: center;
   font-weight: 700;
-  font-size: 1.01rem;
+  font-size: 0.9rem;
   letter-spacing: 0.01em;
   line-height: 1.1;
-  padding: 0.72rem 0.8rem 0.7rem;
+  padding: 0.58rem 0.72rem 0.56rem;
   border-bottom: 3px solid #e4b541;
 }
 
@@ -962,22 +962,22 @@ a {
 }
 
 .home-intro-story {
-  padding: 2.2rem 1.55rem 2.05rem;
+  padding: 1.7rem 1.25rem 1.6rem;
 }
 
 .home-intro-story h2 {
   margin: 0;
   max-width: 640px;
   color: #3d2f98;
-  font-size: clamp(1.55rem, 3vw, 3.1rem);
+  font-size: clamp(1.3rem, 2.4vw, 2.5rem);
   line-height: 0.95;
 }
 
 .home-intro-story p {
-  margin: 1.35rem 0 0;
+  margin: 1rem 0 0;
   max-width: 660px;
   color: #4b5563;
-  font-size: 0.99rem;
+  font-size: 0.9rem;
   line-height: 1.45;
 }
 
@@ -987,7 +987,7 @@ a {
 }
 
 .home-intro-link {
-  min-height: 132px;
+  min-height: 104px;
   border-radius: 0;
   border-bottom: 1px solid #e2e5ef;
   display: grid;
@@ -999,11 +999,11 @@ a {
 
 .home-intro-link span {
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
 }
 
 .home-intro-link strong {
-  font-size: clamp(1.35rem, 2.1vw, 2rem);
+  font-size: clamp(1.1rem, 1.7vw, 1.6rem);
 }
 
 .home-intro-link.is-gold {
@@ -1028,8 +1028,8 @@ a {
 .home-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  padding: 1.7rem 1.4rem 1.5rem;
+  gap: 0.8rem;
+  padding: 1.2rem 1.15rem 1.15rem;
   border-left: 1px solid #e1e3e8;
   border-right: 1px solid #e1e3e8;
   border-bottom: 1px solid #e1e3e8;
@@ -1045,7 +1045,7 @@ a {
   margin: 0;
   color: #40349d;
   font-weight: 600;
-  font-size: 1.24rem;
+  font-size: 1.03rem;
   line-height: 1.05;
 }
 
@@ -1053,12 +1053,12 @@ a {
   margin-top: 0.2rem;
   display: block;
   color: #4731ad;
-  font-size: clamp(3.5rem, 8vw, 5.35rem);
+  font-size: clamp(2.75rem, 6.1vw, 4.15rem);
   line-height: 0.95;
 }
 
 .home-events {
-  padding: 2.1rem 1.45rem;
+  padding: 1.5rem 1.2rem;
   border-left: 1px solid #e1e3e8;
   border-right: 1px solid #e1e3e8;
   border-bottom: 1px solid #e1e3e8;
@@ -1070,19 +1070,19 @@ a {
   text-align: center;
   margin: 0;
   color: #40349d;
-  font-size: clamp(1.55rem, 3vw, 3rem);
+  font-size: clamp(1.3rem, 2.4vw, 2.35rem);
 }
 
 .home-events-grid {
-  margin-top: 1.5rem;
+  margin-top: 1.1rem;
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(220px, 0.6fr);
-  gap: 1.4rem;
+  gap: 1.05rem;
 }
 
 .home-events-list {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.1rem;
 }
 
 .home-event-item {
@@ -1093,13 +1093,13 @@ a {
   margin: 0;
   color: #4a34a4;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .home-event-text {
   margin: 0.25rem 0 0;
   color: #403f55;
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   line-height: 1.35;
 }
 
@@ -1114,8 +1114,8 @@ a {
   border-radius: 0;
   background: #4a2ca4;
   letter-spacing: 0.01em;
-  padding: 0.76rem 0.8rem;
-  font-size: 0.84rem;
+  padding: 0.64rem 0.72rem;
+  font-size: 0.75rem;
 }
 
 .home-event-btn:hover {
@@ -1123,17 +1123,17 @@ a {
 }
 
 .home-gallery {
-  padding: 1.9rem 1.45rem 1.5rem;
+  padding: 1.4rem 1.2rem 1.2rem;
   border-left: 1px solid #e1e3e8;
   border-right: 1px solid #e1e3e8;
   background: #f9f9fb;
 }
 
 .home-gallery-grid {
-  margin-top: 1.15rem;
+  margin-top: 0.9rem;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 0.5rem;
 }
 
 .home-gallery-item {
@@ -1146,7 +1146,7 @@ a {
 .home-gallery-item img {
   display: block;
   width: 100%;
-  height: 206px;
+  height: 170px;
   object-fit: cover;
 }
 
@@ -1879,25 +1879,25 @@ th {
 
   .home-hero-image {
     width: calc(100% - 1rem);
-    height: 248px;
+    height: 216px;
     margin: 0.5rem auto 0;
   }
 
   .home-hero-overlay {
-    left: 1.25rem;
-    top: 1.35rem;
-    width: 48%;
+    left: 1rem;
+    top: 1.05rem;
+    width: 44%;
     transform: none;
   }
 
   .home-hero-overlay h1,
   .home-hero-overlay h2 {
-    font-size: 1.85rem;
+    font-size: 1.55rem;
   }
 
   .home-hero-banner {
-    font-size: 0.88rem;
-    padding: 0.72rem 0.6rem;
+    font-size: 0.78rem;
+    padding: 0.56rem 0.55rem;
   }
 
   .home-intro {
@@ -1905,7 +1905,7 @@ th {
   }
 
   .home-intro-story {
-    padding: 1.35rem 0.95rem;
+    padding: 1.1rem 0.85rem;
   }
 
   .home-intro-story h2 {
@@ -1913,29 +1913,29 @@ th {
   }
 
   .home-intro-story p {
-    font-size: 0.88rem;
+    font-size: 0.8rem;
   }
 
   .home-intro-link {
-    min-height: 88px;
+    min-height: 74px;
   }
 
   .home-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 1rem 0.8rem;
+    padding: 0.85rem 0.65rem;
   }
 
   .home-stat-card p {
-    font-size: 0.98rem;
+    font-size: 0.88rem;
   }
 
   .home-stat-card strong {
-    font-size: 2.45rem;
+    font-size: 2.05rem;
   }
 
   .home-events,
   .home-gallery {
-    padding: 1.3rem 0.8rem;
+    padding: 1.05rem 0.7rem;
   }
 
   .home-events-grid {
@@ -1948,11 +1948,11 @@ th {
   }
 
   .home-event-date {
-    font-size: 0.94rem;
+    font-size: 0.84rem;
   }
 
   .home-event-text {
-    font-size: 0.84rem;
+    font-size: 0.76rem;
   }
 
   .home-gallery-grid {
@@ -1961,7 +1961,7 @@ th {
   }
 
   .home-gallery-item img {
-    height: 120px;
+    height: 102px;
   }
 
   .about-hero-image {

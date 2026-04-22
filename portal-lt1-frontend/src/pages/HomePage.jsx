@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const stats = [
@@ -37,21 +38,155 @@ const gallery = [
   '/assets/poza_liceu.jpeg',
 ];
 
+const heroTitleLines = ['LICEUL', 'TEHNOLOGIC', 'NR. 1'];
+
+const createInitialBinaryLines = () => heroTitleLines.map((line) => line.replace(/\S/g, '0'));
+
+const parseCounterTarget = (value) => {
+  if (value.includes(':')) {
+    const [mainValue, ...rest] = value.split(':');
+    return {
+      target: Number.parseInt(mainValue.replace(/\D/g, ''), 10) || 0,
+      prefix: '',
+      suffix: rest.length > 0 ? `:${rest.join(':')}` : '',
+    };
+  }
+
+  const numericPart = Number.parseInt(value.replace(/\D/g, ''), 10) || 0;
+  const prefixMatch = value.match(/^[^\d]+/);
+  const suffixMatch = value.match(/[^\d]+$/);
+
+  return {
+    target: numericPart,
+    prefix: prefixMatch ? prefixMatch[0] : '',
+    suffix: suffixMatch ? suffixMatch[0] : '',
+  };
+};
+
+const formatCounterValue = (meta, current) => `${meta.prefix}${current}${meta.suffix}`;
+
 function HomePage() {
+  const statMeta = useMemo(() => stats.map((item) => parseCounterTarget(item.value)), []);
+  const [binaryTitleLines, setBinaryTitleLines] = useState(() => createInitialBinaryLines());
+  const [displayStatValues, setDisplayStatValues] = useState(() => statMeta.map(() => '0'));
+
+  useEffect(() => {
+    const startDelay = 1500;
+    const duration = 920;
+    const baseLines = heroTitleLines.map((line) => line.split(''));
+    const totalChars = baseLines.reduce((count, line) => count + line.filter((char) => char !== ' ').length, 0);
+    const tickMs = 58;
+    let intervalId;
+
+    const startTimer = window.setTimeout(() => {
+      const startTime = Date.now();
+
+      intervalId = window.setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        let processedChars = 0;
+        const nextLines = baseLines.map((line) =>
+          line.map((char) => {
+            if (char === ' ') {
+              return ' ';
+            }
+
+            const threshold = (processedChars / Math.max(totalChars - 1, 1)) * 0.82;
+            processedChars += 1;
+
+            if (progress < threshold) {
+              return Math.random() > 0.5 ? '1' : '0';
+            }
+
+            if (char === '1' && progress < threshold + 0.09) {
+              return '0';
+            }
+
+            return char;
+          })
+        );
+
+        setBinaryTitleLines(nextLines.map((line) => line.join('')));
+
+        if (progress >= 1) {
+          window.clearInterval(intervalId);
+          setBinaryTitleLines(heroTitleLines);
+        }
+      }, tickMs);
+    }, startDelay);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const startDelay = 2500;
+    const duration = 760;
+    const tickMs = 72;
+    let intervalId;
+
+    const startTimer = window.setTimeout(() => {
+      const startTime = Date.now();
+
+      intervalId = window.setInterval(() => {
+        const progress = Math.min((Date.now() - startTime) / duration, 1);
+
+        if (progress >= 1) {
+          window.clearInterval(intervalId);
+          setDisplayStatValues(stats.map((item) => item.value));
+          return;
+        }
+
+        setDisplayStatValues(
+          statMeta.map((meta) => {
+            const randomValue = Math.max(0, Math.floor(Math.random() * (meta.target + 14)));
+            return formatCounterValue(meta, randomValue);
+          })
+        );
+      }, tickMs);
+    }, startDelay);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+    };
+  }, [statMeta]);
+
   return (
-    <section className="page-shell home-page">
+    <section className="page-shell home-page intro-sequence">
       <article className="home-hero">
         <img src="/assets/poza_liceu.jpeg" alt="Liceul Tehnologic Nr. 1" className="home-hero-image" />
 
         <div className="home-hero-overlay">
-          <h1>
-            <span>LICEUL</span>
-            <span>TEHNOLOGIC</span>
-            <span>NR. 1</span>
+          <h1 aria-label={heroTitleLines.join(' ')}>
+            {binaryTitleLines.map((line, lineIndex) => (
+              <span key={`line-${lineIndex}`} className="home-hero-title-line" aria-hidden="true">
+                {line.split('').map((character, characterIndex) => {
+                  const finalCharacter = heroTitleLines[lineIndex][characterIndex];
+                  const charKey = `${lineIndex}-${characterIndex}-${finalCharacter}`;
+                  const className = `home-hero-letter${character !== finalCharacter ? ' is-binary' : ''}`;
+
+                  return (
+                    <span key={charKey} className={className}>
+                      {character}
+                    </span>
+                  );
+                })}
+              </span>
+            ))}
           </h1>
         </div>
 
-        <div className="home-hero-banner">START ADMITERE 2026: INVATA O MESERIE DE VIITOR!</div>
+        <div className="home-hero-banner">
+          <span>START ADMITERE 2026: INVATA O MESERIE DE VIITOR!</span>
+        </div>
       </article>
 
       <section className="home-intro">
@@ -82,10 +217,10 @@ function HomePage() {
       </section>
 
       <section className="home-stats" aria-label="Statistici liceu">
-        {stats.map((item) => (
+        {stats.map((item, index) => (
           <article key={item.label} className="home-stat-card">
             <p>{item.label}</p>
-            <strong>{item.value}</strong>
+            <strong>{displayStatValues[index]}</strong>
           </article>
         ))}
       </section>

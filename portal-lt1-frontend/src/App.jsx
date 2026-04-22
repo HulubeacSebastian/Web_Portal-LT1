@@ -26,6 +26,7 @@ import {
 
 function App() {
   const location = useLocation();
+  const isHomeRoute = location.pathname === '/';
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
   const [activity, setActivity] = useState(() => getActivitySnapshot());
 
@@ -52,41 +53,51 @@ function App() {
   return (
     <DocumentsProvider>
       <div className="layout">
-        <header className="header">
+        <header className={`header${isHomeRoute ? ' header-home-intro' : ''}`}>
           <div className="header-inner">
             <div className="header-center">
               <img src={logo} alt="Logo LT1" className="brand-logo" />
               <nav className="nav nav-main">
-                <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  data-nav-order="1"
+                >
                   Acasa
                 </NavLink>
                 <NavLink
                   to="/documente"
                   className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  data-nav-order="2"
                 >
                   Documente
                 </NavLink>
                 <NavLink
                   to="/despre-noi"
                   className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  data-nav-order="3"
                 >
                   Despre Noi
                 </NavLink>
                 <NavLink
                   to="/contact"
                   className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  data-nav-order="4"
                 >
                   Contact
                 </NavLink>
                 <NavLink
                   to="/calendar"
                   className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  data-nav-order="5"
                 >
                   Calendar
                 </NavLink>
                 <NavLink
                   to="/activitate"
                   className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  data-nav-order="6"
                 >
                   Activitate
                 </NavLink>
@@ -105,7 +116,7 @@ function App() {
         </header>
 
         {!cookieConsent ? (
-          <div className="cookie-banner">
+          <div className={`cookie-banner${isHomeRoute ? ' home-data-stream' : ''}`}>
             <span>Folosim cookie-uri pentru preferinte si activitate. Bun venit, {userLabel}.</span>
             <button type="button" className="btn" onClick={acceptCookies}>
               Accept
@@ -114,7 +125,7 @@ function App() {
         ) : null}
 
         {cookieConsent ? (
-          <div className="cookie-banner">
+          <div className={`cookie-banner${isHomeRoute ? ' home-data-stream' : ''}`}>
             <span>
               Monitorizare activa: {activity.totalVisits} navigari, ultima pagina {activity.lastPath}, preferinte salvate{' '}
               {preferenceCount}.

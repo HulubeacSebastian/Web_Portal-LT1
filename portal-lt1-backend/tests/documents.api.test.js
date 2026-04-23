@@ -121,10 +121,29 @@ describe('Documents REST API', () => {
         image_url: ''
       });
     expect(createPostResponse.statusCode).toBe(201);
+    const createdPostId = createPostResponse.body.id;
+
+    const updatePostResponse = await request(app)
+      .put(`/api/posts/${createdPostId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Anunt nou (actualizat)',
+        content: 'Continut actualizat pentru anunt, suficient de lung.',
+        category_id: 'administrativ',
+        image_url: ''
+      });
+    expect(updatePostResponse.statusCode).toBe(200);
+    expect(updatePostResponse.body.title).toContain('actualizat');
 
     const listPostsResponse = await request(app).get('/api/posts');
     expect(listPostsResponse.statusCode).toBe(200);
     expect(Array.isArray(listPostsResponse.body)).toBe(true);
+    expect(listPostsResponse.body.some((post) => post.id === createdPostId)).toBe(true);
+
+    const deletePostResponse = await request(app)
+      .delete(`/api/posts/${createdPostId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(deletePostResponse.statusCode).toBe(204);
 
     const uploadResponse = await request(app)
       .post('/api/documents/upload')
@@ -142,5 +161,65 @@ describe('Documents REST API', () => {
       message: 'Buna ziua, unde gasesc orarul?'
     });
     expect(contactResponse.statusCode).toBe(201);
+  });
+
+  it('validates auth, posts, upload and contact inputs server-side', async () => {
+    const badLogin = await request(app).post('/api/auth/login').send({ email: 'bad', password: '1' });
+    expect(badLogin.statusCode).toBe(400);
+    expect(badLogin.body.errors.email).toBeDefined();
+    expect(badLogin.body.errors.password).toBeDefined();
+
+    const goodLogin = await request(app).post('/api/auth/login').send({ email: 'admin@lt1.ro', password: 'admin123' });
+    const token = goodLogin.body.token;
+
+    const badPost = await request(app)
+      .post('/api/posts')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'x', content: 'y', category_id: '' });
+    expect(badPost.statusCode).toBe(400);
+    expect(badPost.body.errors.title).toBeDefined();
+    expect(badPost.body.errors.content).toBeDefined();
+    expect(badPost.body.errors.category_id).toBeDefined();
+
+    const badUpload = await request(app)
+      .post('/api/documents/upload')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ file: 'not-a-pdf.txt', title: 'x', category: '' });
+    expect(badUpload.statusCode).toBe(400);
+    expect(badUpload.body.errors.file).toBeDefined();
+    expect(badUpload.body.errors.title).toBeDefined();
+    expect(badUpload.body.errors.category).toBeDefined();
+
+    const badContact = await request(app).post('/api/contact').send({ sender_email: 'bad', message: 'scurt' });
+    expect(badContact.statusCode).toBe(400);
+    expect(badContact.body.errors.sender_email).toBeDefined();
+    expect(badContact.body.errors.message).toBeDefined();
+  });
+
+  it('starts and stops the server-side document generator and receives websocket-ready batch additions', async () => {
+    const loginResponse = await request(app).post('/api/auth/login').send({
+      email: 'admin@lt1.ro',
+      password: 'admin123'
+    });
+    const token = loginResponse.body.token;
+
+    const startResponse = await request(app)
+      .post('/api/documents/generator/start')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ batchSize: 2, intervalMs: 300 });
+    expect(startResponse.statusCode).toBe(200);
+    expect(startResponse.body.running).toBe(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 700));
+
+    const statsResponse = await request(app).get('/api/statistics/documents');
+    expect(statsResponse.statusCode).toBe(200);
+    expect(statsResponse.body.totalDocuments).toBeGreaterThan(12);
+
+    const stopResponse = await request(app)
+      .post('/api/documents/generator/stop')
+      .set('Authorization', `Bearer ${token}`);
+    expect(stopResponse.statusCode).toBe(200);
+    expect(stopResponse.body.running).toBe(false);
   });
 });

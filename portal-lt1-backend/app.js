@@ -9,6 +9,7 @@ var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
 var postsRouter = require('./routes/posts');
 var contactRouter = require('./routes/contact');
+var documentsGeneratorRouter = require('./routes/documentsGenerator');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -20,6 +21,7 @@ app.get('/health', function (req, res) {
 });
 
 app.use('/api/documents', documentsRouter);
+app.use('/api/documents/generator', documentsGeneratorRouter);
 app.use('/api/statistics', statisticsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);

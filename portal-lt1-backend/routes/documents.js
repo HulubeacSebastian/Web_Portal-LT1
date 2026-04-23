@@ -66,18 +66,35 @@ router.delete('/:id', requireAuth, function (req, res) {
 
 router.post('/upload', requireAuth, function (req, res) {
   const { file, title, category } = req.body || {};
-  if (!file || !title || !category) {
-    return res.status(400).json({ message: 'file, title, category sunt obligatorii.' });
+  const errors = {};
+  const normalizedFile = typeof file === 'string' ? file.trim() : '';
+  const normalizedTitle = typeof title === 'string' ? title.trim() : '';
+  const normalizedCategory = typeof category === 'string' ? category.trim() : '';
+
+  if (!normalizedFile) errors.file = 'Fisierul este obligatoriu.';
+  if (!normalizedTitle) errors.title = 'Titlul este obligatoriu.';
+  if (!normalizedCategory) errors.category = 'Categoria este obligatorie.';
+
+  if (normalizedFile && !normalizedFile.toLowerCase().endsWith('.pdf')) {
+    errors.file = 'Doar fisiere PDF sunt acceptate.';
   }
 
-  if (!String(file).toLowerCase().endsWith('.pdf')) {
-    return res.status(400).json({ message: 'Doar fisiere PDF sunt acceptate.' });
+  if (normalizedTitle && (normalizedTitle.length < 3 || normalizedTitle.length > 120)) {
+    errors.title = 'Titlul trebuie sa aiba intre 3 si 120 de caractere.';
+  }
+
+  if (normalizedCategory && (normalizedCategory.length < 2 || normalizedCategory.length > 60)) {
+    errors.category = 'Categoria trebuie sa aiba intre 2 si 60 de caractere.';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({ message: 'Date invalide pentru upload.', errors });
   }
 
   const uploaded = service.addUploadedDocument({
-    file_path: `/uploads/${String(file).replace(/^.*[\\/]/, '')}`,
-    title: String(title).trim(),
-    category: String(category).trim(),
+    file_path: `/uploads/${normalizedFile.replace(/^.*[\\/]/, '')}`,
+    title: normalizedTitle,
+    category: normalizedCategory,
     issuer: req.user.email
   });
 

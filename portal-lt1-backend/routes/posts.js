@@ -1,6 +1,7 @@
 const express = require('express');
 const store = require('../data/extraStores');
 const { requireAuth } = require('../middleware/auth');
+const { validatePost } = require('../validation/postValidation');
 
 const router = express.Router();
 
@@ -10,16 +11,13 @@ router.get('/', function (req, res) {
 });
 
 router.post('/', requireAuth, function (req, res) {
-  const { title, content, category_id, image_url } = req.body || {};
-  if (!title || !content || !category_id) {
-    return res.status(400).json({ message: 'title, content, category_id sunt obligatorii.' });
+  const { errors, sanitized } = validatePost(req.body || {});
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({ message: 'Date invalide pentru creare.', errors });
   }
 
   const created = store.createPost({
-    title: String(title).trim(),
-    content: String(content).trim(),
-    category_id: String(category_id).trim(),
-    image_url: image_url ? String(image_url).trim() : '',
+    ...sanitized,
     author_id: req.user.sub
   });
 
@@ -27,7 +25,12 @@ router.post('/', requireAuth, function (req, res) {
 });
 
 router.put('/:id', requireAuth, function (req, res) {
-  const updated = store.updatePost(req.params.id, req.body || {});
+  const { errors, sanitized } = validatePost(req.body || {});
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({ message: 'Date invalide pentru actualizare.', errors });
+  }
+
+  const updated = store.updatePost(req.params.id, sanitized);
   if (!updated) {
     return res.status(404).json({ message: 'Postarea nu a fost gasita.' });
   }

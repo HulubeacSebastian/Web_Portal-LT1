@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import DocumentListPage from './pages/DocumentListPage.jsx';
 import DocumentAnalyticsPage from './pages/DocumentAnalyticsPage.jsx';
@@ -15,7 +15,7 @@ import NotFoundPage from './pages/NotFoundPage.jsx';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import logo from '../assets/logo-mov-vector.pdf.png';
-import { getCookie, setCookie } from './utils/cookies';
+import { deleteCookie, getCookie, setCookie } from './utils/cookies';
 import {
   getActivitySnapshot,
   getPreferences,
@@ -26,8 +26,10 @@ import {
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
   const [activity, setActivity] = useState(() => getActivitySnapshot());
+  const [authUser, setAuthUser] = useState(() => getCookie('portal_user') || '');
 
   useEffect(() => {
     if (cookieConsent) {
@@ -39,7 +41,20 @@ function App() {
     }
   }, [cookieConsent, location.pathname]);
 
-  const userLabel = getCookie('portal_user') || 'Vizitator';
+  useEffect(() => {
+    setAuthUser(getCookie('portal_user') || '');
+  }, [location.pathname]);
+
+  const isLoggedIn = Boolean(authUser);
+  const userLabel = useMemo(() => authUser || 'Vizitator', [authUser]);
+
+  const handleLogout = () => {
+    deleteCookie('portal_user');
+    localStorage.removeItem('portal_jwt');
+    setAuthUser('');
+    recordActivityEvent('logout');
+    navigate('/');
+  };
 
   const acceptCookies = () => {
     setCookie('portal_cookie_consent', 'accepted', { maxAge: 60 * 60 * 24 * 365 });
@@ -94,12 +109,20 @@ function App() {
             </div>
 
             <div className="header-auth">
-              <Link to="/login" className="auth-btn login-btn">
-                Login
-              </Link>
-              <Link to="/register" className="auth-btn register-btn">
-                Register
-              </Link>
+              {isLoggedIn ? (
+                <button type="button" className="auth-btn login-btn" onClick={handleLogout}>
+                  Deconectare
+                </button>
+              ) : (
+                <>
+                  <Link to="/login" className="auth-btn login-btn">
+                    Login
+                  </Link>
+                  <Link to="/register" className="auth-btn register-btn">
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </header>

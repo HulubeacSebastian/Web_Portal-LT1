@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDocuments } from '../store/DocumentsContext';
 import { hasErrors, validateDocument } from '../utils/documentValidation';
@@ -9,13 +9,15 @@ const defaultValues = {
   issuer: '',
   issuedAt: '',
   status: 'Activ',
-  description: ''
+  description: '',
+  file: null
 };
 
 function DocumentFormPage({ mode }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addDocument, updateDocument, getDocumentById } = useDocuments();
+  const fileInputRef = useRef(null);
 
   const existingDoc = useMemo(() => {
     if (mode !== 'edit') {
@@ -26,6 +28,7 @@ function DocumentFormPage({ mode }) {
 
   const [formData, setFormData] = useState(existingDoc ?? defaultValues);
   const [errors, setErrors] = useState({});
+  const [isDropping, setIsDropping] = useState(false);
 
   if (mode === 'edit' && !existingDoc) {
     return (
@@ -43,6 +46,34 @@ function DocumentFormPage({ mode }) {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleFile = (file) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+      setFormData((prev) => ({
+        ...prev,
+        file: dataUrl
+          ? {
+              name: file.name,
+              type: file.type || 'application/octet-stream',
+              size: file.size,
+              dataUrl
+            }
+          : null
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearFile = () => {
+    setFormData((prev) => ({ ...prev, file: null }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -160,6 +191,69 @@ function DocumentFormPage({ mode }) {
               aria-invalid={Boolean(errors.description)}
             />
             {errors.description ? <p className="error">{errors.description}</p> : null}
+          </div>
+
+          <div className="mt-12">
+            <label>Fisier (drop / incarcare)</label>
+            <div
+              role="button"
+              tabIndex={0}
+              className={`upload-dropzone${isDropping ? ' is-dropping' : ''}`}
+              onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setIsDropping(true);
+              }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setIsDropping(true);
+              }}
+              onDragLeave={() => setIsDropping(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setIsDropping(false);
+                const file = event.dataTransfer.files?.[0];
+                handleFile(file);
+              }}
+              aria-label="Drop fisier aici sau click pentru incarcare"
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                style={{ display: 'none' }}
+                accept="application/pdf,image/*"
+                onChange={(event) => handleFile(event.target.files?.[0])}
+              />
+
+              {formData.file ? (
+                <div className="upload-dropzone-info">
+                  <strong>{formData.file.name}</strong>
+                  <span className="muted">
+                    {Math.round((formData.file.size || 0) / 1024)} KB
+                    {formData.file.type ? ` • ${formData.file.type}` : ''}
+                  </span>
+                </div>
+              ) : (
+                <div className="upload-dropzone-info">
+                  <strong>Drop fisier aici</strong>
+                  <span className="muted">sau click pentru a selecta (PDF / imagini)</span>
+                </div>
+              )}
+            </div>
+
+            {formData.file ? (
+              <div className="row mt-8">
+                <button type="button" className="btn secondary" onClick={clearFile}>
+                  Elimina fisierul
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <div className="row mt-12">

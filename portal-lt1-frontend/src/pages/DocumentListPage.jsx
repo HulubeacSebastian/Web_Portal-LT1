@@ -18,6 +18,7 @@ function DocumentListPage() {
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState(() => getCookie('portal_last_document') || documents[0]?.id || '');
   const [viewMode, setViewMode] = useState(() => getCookie('portal_view_mode') || 'table');
+  const isLoggedIn = Boolean(getCookie('portal_user'));
 
   const filteredDocs = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -153,9 +154,11 @@ function DocumentListPage() {
               <button type="button" className="btn documents-add-btn view-toggle-btn" onClick={toggleViewMode}>
                 {viewMode === 'table' ? 'CARDURI' : 'TABEL'}
               </button>
-              <Link to="/documente/adauga" className="btn documents-add-btn">
-                ADAUGARE
-              </Link>
+              {isLoggedIn ? (
+                <Link to="/documente/adauga" className="btn documents-add-btn">
+                  ADAUGARE
+                </Link>
+              ) : null}
             </div>
 
             {viewMode === 'table' ? (
@@ -200,12 +203,20 @@ function DocumentListPage() {
                               <Link to={`/documente/${doc.id}`} className="btn ghost">
                                 Vezi
                               </Link>
-                              <Link to={`/documente/${doc.id}/edit`} className="btn secondary">
-                                Editeaza
-                              </Link>
-                              <button type="button" className="btn danger" onClick={() => handleDeleteFromList(doc.id)}>
-                                Sterge
-                              </button>
+                              {isLoggedIn ? (
+                                <>
+                                  <Link to={`/documente/${doc.id}/edit`} className="btn secondary">
+                                    Editeaza
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    className="btn danger"
+                                    onClick={() => handleDeleteFromList(doc.id)}
+                                  >
+                                    Sterge
+                                  </button>
+                                </>
+                              ) : null}
                             </div>
                           </td>
                         </tr>
@@ -288,9 +299,11 @@ function DocumentListPage() {
                   <Link to={`/documente/${selectedDoc.id}`} className="btn ghost">
                     Deschide
                   </Link>
-                  <Link to={`/documente/${selectedDoc.id}/edit`} className="btn secondary">
-                    Editeaza
-                  </Link>
+                  {isLoggedIn ? (
+                    <Link to={`/documente/${selectedDoc.id}/edit`} className="btn secondary">
+                      Editeaza
+                    </Link>
+                  ) : null}
                 </div>
               </>
             ) : null}

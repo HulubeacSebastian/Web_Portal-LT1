@@ -4,16 +4,15 @@ import { useDocuments } from '../store/DocumentsContext';
 import { getCookie, setCookie } from '../utils/cookies';
 import { recordActivityEvent, savePreference } from '../utils/activityCookies';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 const statusPalette = {
-  Activ: '#bfd4e6',
-  Revizie: '#7f648f',
-  Arhivat: '#a78bfa'
+  Activ: '#dcfce7',
+  Revizie: '#fef3c7',
+  Arhivat: '#e2e8f0'
 };
-const monthlyLabels = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'];
 
 function DocumentListPage() {
-  const { documents } = useDocuments();
+  const { documents, deleteDocument } = useDocuments();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Toate');
   const [page, setPage] = useState(1);
@@ -62,23 +61,8 @@ function DocumentListPage() {
       `${statusPalette.Revizie} ${(statusCounts.Activ / total) * 100}% ${((statusCounts.Activ + statusCounts.Revizie) / total) * 100}%`,
       `${statusPalette.Arhivat} ${((statusCounts.Activ + statusCounts.Revizie) / total) * 100}% 100%`
     ].join(', ');
-
-    const monthly = monthlyLabels.map((label, monthIndex) => {
-      const monthDocs = documents.filter((doc) => {
-        const date = new Date(doc.issuedAt);
-        return !Number.isNaN(date.getTime()) && date.getMonth() === monthIndex;
-      });
-
-      return {
-        label,
-        approved: monthDocs.filter((doc) => doc.status === 'Activ').length,
-        pending: monthDocs.filter((doc) => doc.status !== 'Activ').length
-      };
-    });
-
-    const maxBarValue = Math.max(1, ...monthly.flatMap((entry) => [entry.approved, entry.pending]));
-    return { gradient, monthly, maxBarValue };
-  }, [documents, statusCounts]);
+    return { gradient };
+  }, [statusCounts]);
 
   const handleFilterChange = (value, setter) => {
     setter(value);
@@ -118,6 +102,16 @@ function DocumentListPage() {
       recordActivityEvent('documents_view_mode_change', { from: prev, to: next });
       return next;
     });
+  };
+
+  const handleDeleteFromList = (id) => {
+    const confirmed = window.confirm('Esti sigur ca vrei sa stergi acest document?');
+    if (!confirmed) {
+      return;
+    }
+
+    deleteDocument(id);
+    recordActivityEvent('documents_delete_from_list', { id });
   };
 
   return (
@@ -209,6 +203,9 @@ function DocumentListPage() {
                               <Link to={`/documente/${doc.id}/edit`} className="btn secondary">
                                 Editeaza
                               </Link>
+                              <button type="button" className="btn danger" onClick={() => handleDeleteFromList(doc.id)}>
+                                Sterge
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -316,10 +313,13 @@ function DocumentListPage() {
             <article className="analytics-pie-card">
               <div className="analytics-legend">
                 <span>
-                  <i className="approved" /> Activ
+                  <i className="activ" /> Activ
                 </span>
                 <span>
-                  <i className="pending" /> Revizie/Arhivat
+                  <i className="revizie" /> Revizie
+                </span>
+                <span>
+                  <i className="arhivat" /> Arhivat
                 </span>
               </div>
 
@@ -331,28 +331,6 @@ function DocumentListPage() {
               />
             </article>
 
-            <article className="analytics-bar-card">
-              <h3>Evolutia documentelor pe luni (live)</h3>
-              <div className="analytics-bars">
-                {analyticsStats.monthly.map((entry) => (
-                  <div key={entry.label} className="analytics-month">
-                    <div className="analytics-columns">
-                      <div
-                        className="analytics-col approved"
-                        style={{ height: `${(entry.approved / analyticsStats.maxBarValue) * 100}%` }}
-                        title={`Activ: ${entry.approved}`}
-                      />
-                      <div
-                        className="analytics-col pending"
-                        style={{ height: `${(entry.pending / analyticsStats.maxBarValue) * 100}%` }}
-                        title={`Revizie/Arhivat: ${entry.pending}`}
-                      />
-                    </div>
-                    <span>{entry.label}</span>
-                  </div>
-                ))}
-              </div>
-            </article>
           </aside>
         </div>
       </div>

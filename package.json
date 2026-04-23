@@ -1,0 +1,15 @@
+{
+  "name": "webpage",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix portal-lt1-backend install && npm --prefix portal-lt1-frontend install",
+    "dev:backend": "npm --prefix portal-lt1-backend run start",
+    "dev:frontend": "npm --prefix portal-lt1-frontend run dev",
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "run": "npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
+

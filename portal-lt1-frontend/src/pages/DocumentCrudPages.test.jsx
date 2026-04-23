@@ -163,4 +163,3 @@ describe('CRUD pages', () => {
     expect(screen.getByText(/DOC-654321/)).toBeInTheDocument();
   });
 });
-

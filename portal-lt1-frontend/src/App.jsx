@@ -146,21 +146,23 @@ function App() {
         ) : null}
 
         <main className="content">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/documente" element={<DocumentListPage />} />
-            <Route path="/documente2" element={<DocumentAnalyticsPage />} />
-            <Route path="/documente/adauga" element={<DocumentFormPage mode="create" />} />
-            <Route path="/documente/:id" element={<DocumentDetailPage />} />
-            <Route path="/documente/:id/edit" element={<DocumentFormPage mode="edit" />} />
-            <Route path="/despre-noi" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/activitate" element={<ActivityInsightsPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <div className="page-transition" key={location.pathname}>
+            <Routes location={location}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/documente" element={<DocumentListPage />} />
+              <Route path="/documente2" element={<DocumentAnalyticsPage />} />
+              <Route path="/documente/adauga" element={<DocumentFormPage mode="create" />} />
+              <Route path="/documente/:id" element={<DocumentDetailPage />} />
+              <Route path="/documente/:id/edit" element={<DocumentFormPage mode="edit" />} />
+              <Route path="/despre-noi" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/activitate" element={<ActivityInsightsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </div>
         </main>
 
         <SchoolFooter />

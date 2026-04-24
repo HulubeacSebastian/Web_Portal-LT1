@@ -12,13 +12,14 @@ const statusPalette = {
 };
 
 function DocumentListPage() {
-  const { documents, deleteDocument } = useDocuments();
+  const { documents, deleteDocument, generator, isOffline, startGenerator, stopGenerator } = useDocuments();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Toate');
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState(() => getCookie('portal_last_document') || documents[0]?.id || '');
   const [viewMode, setViewMode] = useState(() => getCookie('portal_view_mode') || 'table');
   const isLoggedIn = Boolean(getCookie('portal_user'));
+  const [generatorBusy, setGeneratorBusy] = useState(false);
 
   const filteredDocs = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -115,6 +116,22 @@ function DocumentListPage() {
     recordActivityEvent('documents_delete_from_list', { id });
   };
 
+  const handleGeneratorToggle = async () => {
+    if (generatorBusy) return;
+    setGeneratorBusy(true);
+    try {
+      if (generator?.running) {
+        await stopGenerator();
+        recordActivityEvent('generator_stop');
+      } else {
+        await startGenerator({ batchSize: 1, intervalMs: 3000 });
+        recordActivityEvent('generator_start', { batchSize: 1, intervalMs: 3000 });
+      }
+    } finally {
+      setGeneratorBusy(false);
+    }
+  };
+
   return (
     <section className="documents-page">
       <article className="documents-title-card">
@@ -151,6 +168,15 @@ function DocumentListPage() {
                   </select>
                 </div>
               </div>
+              <button
+                type="button"
+                className={`btn ${generator?.running ? 'danger' : 'secondary'}`}
+                onClick={handleGeneratorToggle}
+                disabled={isOffline || generatorBusy}
+                title={isOffline ? 'Backend offline - generator indisponibil.' : 'Porneste/opreste generatorul de documente.'}
+              >
+                {generator?.running ? 'STOP GENERATOR' : 'START GENERATOR'}
+              </button>
               <button type="button" className="btn documents-add-btn view-toggle-btn" onClick={toggleViewMode}>
                 {viewMode === 'table' ? 'CARDURI' : 'TABEL'}
               </button>

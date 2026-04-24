@@ -18,6 +18,10 @@ html {
   --primary-dark: #1a48b0;
   --secondary: #475569;
   --danger: #dc2626;
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-springy: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
 }
 
 body {
@@ -29,6 +33,35 @@ body {
 
 a {
   color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.page-transition {
+  animation: pageIn var(--dur-med) var(--ease-springy);
+  will-change: transform, opacity, filter;
 }
 
 .layout {
@@ -1529,6 +1562,12 @@ tr.is-selected {
   border: 1px solid var(--line);
   padding: 1rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  transition: transform var(--dur-med) var(--ease-out-soft), box-shadow var(--dur-med) var(--ease-out-soft);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
 }
 
 .hero-card {
@@ -1577,12 +1616,30 @@ button,
   background: var(--primary);
   color: #fff;
   font-weight: 600;
-  transition: background 0.15s ease;
+  transition:
+    background var(--dur-fast) var(--ease-out-soft),
+    transform var(--dur-fast) var(--ease-out-soft),
+    box-shadow var(--dur-fast) var(--ease-out-soft),
+    filter var(--dur-fast) var(--ease-out-soft);
 }
 
 button:hover,
 .btn:hover {
   background: var(--primary-dark);
+  transform: translateY(-1px);
+  filter: saturate(1.03);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(0);
+  filter: saturate(1);
+}
+
+button:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid rgba(205, 218, 254, 0.95);
+  outline-offset: 2px;
 }
 
 .btn.secondary,

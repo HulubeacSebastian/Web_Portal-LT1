@@ -8,7 +8,9 @@ function DocumentDetailPage() {
   const { getDocumentById, deleteDocument } = useDocuments();
 
   const document = getDocumentById(id);
-  const isLoggedIn = Boolean(getCookie('portal_user'));
+  // UI actions are available locally even when offline/unauthenticated.
+  // Server-side auth is enforced during sync via JWT.
+  const _isLoggedIn = Boolean(getCookie('portal_user'));
 
   if (!document) {
     return (
@@ -44,16 +46,12 @@ function DocumentDetailPage() {
           <h2>{document.title}</h2>
         </div>
         <div className="actions">
-          {isLoggedIn ? (
-            <>
-              <Link to={`/documente/${document.id}/edit`} className="btn secondary">
-                Editeaza
-              </Link>
-              <button type="button" className="danger" onClick={handleDelete}>
-                Sterge
-              </button>
-            </>
-          ) : null}
+          <Link to={`/documente/${document.id}/edit`} className="btn secondary">
+            Editeaza
+          </Link>
+          <button type="button" className="danger" onClick={handleDelete}>
+            Sterge
+          </button>
         </div>
       </article>
 

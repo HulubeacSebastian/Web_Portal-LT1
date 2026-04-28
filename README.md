@@ -1,46 +1,47 @@
-# Document Management Portal - Assignment 1
+# 📄 Document Management Portal
 
-A front-end React application built for Assignment 1. This project implements a document management system featuring a master-detail interface, full CRUD operations, and form validations, utilizing entirely in-memory data storage as per the assignment requirements (Bronze level).
+![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff)
+![Node](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=fff)
+![License](https://img.shields.io/badge/License-MIT-informational)
 
-## 🚀 Features
+A React-based document management portal. It demonstrates a clean **master–detail UI**, **full CRUD**, and **client-side validation**, using **in-memory state** (no database) as required by the assignment scope.
 
-* **Presentation Page:** Landing page featuring the project logo, name, tagline, and a brief description.
-* **Master View (Document List):** A data table displaying all documents with **pagination** support.
-* **Detail View:** A dedicated page to view the complete details of a specific document.
-* **Full CRUD Functionality:** * Create new documents.
-  * Read (view list and details).
-  * Update existing documents.
-  * Delete documents.
-* **Form Validation:** Client-side validation for all data entry forms (Create/Edit).
-* **In-Memory Storage:** Data is managed entirely in RAM using React state/context (no external database), pre-loaded with seed data for testing.
-* **Separation of Concerns:** Clean architecture separating UI components from business logic and state management.
+## ✨ What you can do
 
-## 🛠️ Tech Stack
+- 📚 **Browse documents** in a paginated table (master view)
+- 🔎 **Open a document** to see full details (detail view)
+- ✍️ **Create, edit, and delete** documents (CRUD)
+- ✅ **Validate forms** on the client for Create/Edit flows
+- 🧠 **Work entirely in memory** with pre-seeded data for quick testing
 
-* **Frontend:** React.js
-* **State Management:** React Context API / Local State
-* **Routing:** React Router (handling `/`, `/documente`, `/documente/:id`, etc.)
-* **Testing:** Jest & React Testing Library (Unit & Component tests)
+## 🧰 Tech stack
 
-## 📦 Entity Structure
+- **React**
+- **React Router** (routes like `/`, `/documente`, `/documente/:id`)
+- **State management**: React Context API and local state
+- **Testing**: Jest + React Testing Library
 
-The core data model for this application is the `Document` entity, which includes the following properties:
-* `id` (Unique identifier)
-* `titlu` (Title)
-* `tip` (Type)
-* `emitent` (Issuer)
-* `data` (Date)
-* `status` (Status)
-* `descriere` (Description)
+## 🧾 Data model
 
-## 🚦 Getting Started
+The core entity is `Document`:
 
-### Prerequisites
+- `id` (unique identifier)
+- `titlu` (title)
+- `tip` (type)
+- `emitent` (issuer)
+- `data` (date)
+- `status` (status)
+- `descriere` (description)
 
-* Node.js (v18 or higher recommended)
-* npm
+## 🚀 Getting started
 
-### Install Dependencies
+### ✅ Prerequisites
+
+- Node.js (v18+ recommended)
+- npm
+
+### 📦 Install dependencies
 
 From the workspace root:
 
@@ -49,15 +50,20 @@ npm install
 npm run install:all
 ```
 
-### Run From JetBrains Run Button
+### ▶️ Run (JetBrains Run button)
 
 1. Open the root `package.json`.
 2. Use the Run icon next to script `run` (or `dev`).
 3. This starts both:
-   * frontend (Vite)
-   * backend (Express)
+   - frontend (Vite)
+   - backend (Express)
 
 Default URLs:
 
-* Frontend: `http://localhost:5173`
-* Backend: `http://localhost:3000`
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`
+
+## 📝 Notes
+
+- **Persistence**: data is intentionally **not persisted** (in-memory only).
+- **Goal**: showcase UI architecture, routing, CRUD flows, and validation within the assignment constraints.

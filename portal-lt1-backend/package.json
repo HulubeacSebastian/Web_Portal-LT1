@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --runInBand --coverage"
+    "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Documents" pattern="file[webpage]:portal-lt1-backend/Documentation/*||file[webpage]:portal-lt1-frontend/Documentation/*" />
+</component>

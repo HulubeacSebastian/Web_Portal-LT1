@@ -1,5 +1,3 @@
-import logoMark from '../../assets/logo-mov-vector.pdf.png';
-
 function SchoolFooter() {
   return (
     <footer className="school-footer">
@@ -10,7 +8,7 @@ function SchoolFooter() {
 
       <div className="school-footer-main">
         <div className="school-footer-brand">
-          <img src={logoMark} alt="Liceul Tehnologic Nr. 1" className="school-footer-logo" />
+          <img src="/assets/logo-mov-vector.pdf.png" alt="Liceul Tehnologic Nr. 1" className="school-footer-logo" />
           <div className="school-footer-brand-text">
             <strong>LICEUL TEHNOLOGIC NR. 1</strong>
             <span>Câmpulung Moldovenesc</span>

@@ -7,10 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test": "vitest run --config ../portal-lt1-Tests/frontend/vitest.config.cjs",
+    "test:coverage": "vitest run --config ../portal-lt1-Tests/frontend/vitest.config.cjs --coverage",
+    "test:watch": "vitest --config ../portal-lt1-Tests/frontend/vitest.config.cjs",
+    "test:e2e": "playwright test --config ../portal-lt1-Tests/frontend/playwright.config.cjs"
   },
   "dependencies": {
     "react": "^18.3.1",

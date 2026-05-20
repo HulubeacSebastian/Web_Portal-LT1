@@ -14,7 +14,6 @@ import ActivityInsightsPage from './pages/ActivityInsightsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
-import logo from '../assets/logo-mov-vector.pdf.png';
 import { deleteCookie, getCookie, setCookie } from './utils/cookies';
 import {
   getActivitySnapshot,
@@ -70,7 +69,7 @@ function App() {
         <header className="header">
           <div className="header-inner">
             <div className="header-center">
-              <img src={logo} alt="Logo LT1" className="brand-logo" />
+              <img src="/assets/logo-mov-vector.pdf.png" alt="Logo LT1" className="brand-logo" />
               <nav className="nav nav-main">
                 <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
                   Acasa

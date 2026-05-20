@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Tests All (Backend + Frontend)" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+    <toRun type="js.build_tools.npm" name="Test Backend" />
+    <toRun type="js.build_tools.npm" name="Test Frontend" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run All (Backend + Frontend)" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+    <toRun type="NodeJSConfigurationType" name="Backend (Express + WS)" />
+    <toRun type="js.build_tools.npm" name="Frontend (Vite)" />
+    <method v="2" />
+  </configuration>
+</component>
+

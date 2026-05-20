@@ -2,7 +2,19 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-backend/Documentation" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-backend/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-frontend/Documentation" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-frontend/public/assets" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-frontend/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-frontend/public" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/portal-lt1-Tests" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/portal-lt1-backend/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/portal-lt1-backend/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/portal-lt1-frontend/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/portal-lt1-frontend/test-results" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

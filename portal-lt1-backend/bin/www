@@ -4,11 +4,11 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var app = require('../src/app');
 var debug = require('debug')('portal-lt1-backend:server');
 var http = require('http');
 var WebSocket = require('ws');
-var hub = require('../realtime/wsHub');
+var hub = require('../src/realtime/wsHub');
 
 /**
  * Get port from environment and store in Express.

@@ -25,7 +25,12 @@ app.use(function (req, res, next) {
     })
     .filter(Boolean);
 
-  if (origin && allowed.includes(origin)) {
+  var lanHttpsOrigin =
+    origin &&
+    process.env.SSL_KEY_PATH &&
+    /^https:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}):5173$/.test(origin);
+
+  if (origin && (allowed.includes(origin) || lanHttpsOrigin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
   }

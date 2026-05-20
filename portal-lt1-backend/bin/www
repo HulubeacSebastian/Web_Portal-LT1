@@ -9,6 +9,7 @@ var debug = require('debug')('portal-lt1-backend:server');
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
+var path = require('path');
 var WebSocket = require('ws');
 var hub = require('../src/realtime/wsHub');
 var wsChat = require('../src/chat/wsChat');
@@ -29,9 +30,11 @@ function createAppServer(expressApp) {
   var certPath = process.env.SSL_CERT_PATH;
 
   if (keyPath && certPath) {
+    var resolvedKey = path.isAbsolute(keyPath) ? keyPath : path.resolve(process.cwd(), keyPath);
+    var resolvedCert = path.isAbsolute(certPath) ? certPath : path.resolve(process.cwd(), certPath);
     var sslOptions = {
-      key: fs.readFileSync(path.resolve(keyPath)),
-      cert: fs.readFileSync(path.resolve(certPath))
+      key: fs.readFileSync(resolvedKey),
+      cert: fs.readFileSync(resolvedCert)
     };
     return https.createServer(sslOptions, expressApp);
   }
@@ -123,5 +126,6 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var protocol = process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH ? 'https' : 'http';
+  debug('Listening on ' + protocol + '://0.0.0.0:' + bind);
 }

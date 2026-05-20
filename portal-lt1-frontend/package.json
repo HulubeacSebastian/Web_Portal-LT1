@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env VITE_DEV_HTTPS=true vite --host 0.0.0.0 --port 5173",
+    "predev": "npm run cert:generate --prefix ../portal-lt1-backend",
+    "dev": "cross-env VITE_DEV_HTTPS=true vite",
     "dev:https": "npm run dev",
     "build": "vite build",
     "preview": "vite preview",

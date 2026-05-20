@@ -38,6 +38,7 @@ function ChatPage() {
 
     ws.onopen = () => {
       if (cancelled) return;
+      setError('');
       setStatus('Conectat');
       ws.send(
         JSON.stringify({
@@ -74,7 +75,8 @@ function ChatPage() {
     };
 
     ws.onerror = () => {
-      setError(`Nu s-a putut conecta la ${wsUrl}. Verifica backend-ul si MongoDB.`);
+      if (cancelled || ws.readyState === WebSocket.OPEN) return;
+      setError(`Nu s-a putut conecta la ${wsUrl}. Verifica backend-ul (port 3000) si firewall-ul Windows.`);
       setStatus('Eroare');
     };
 

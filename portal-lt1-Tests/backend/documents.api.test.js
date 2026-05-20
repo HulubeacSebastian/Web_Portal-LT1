@@ -1,12 +1,10 @@
 const request = require('supertest');
 const app = require('../../portal-lt1-backend/src/app');
 const store = require('../../portal-lt1-backend/src/data/documentStore');
-const extraStore = require('../../portal-lt1-backend/src/data/extraStores');
 
 describe('Documents REST API', () => {
-  beforeEach(() => {
-    store.resetStore();
-    extraStore.resetExtraStores();
+  beforeEach(async () => {
+    await store.resetStore();
   });
 
   async function loginAndGetToken() {
@@ -24,6 +22,17 @@ describe('Documents REST API', () => {
     expect(response.body.items).toHaveLength(5);
     expect(response.body.pagination.totalItems).toBe(12);
     expect(response.body.pagination.totalPages).toBe(3);
+  });
+
+  it('filters documents by query and status from database', async () => {
+    const response = await request(app).get('/api/documents?query=regulament&status=Activ&page=1&limit=20');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.items.length).toBeGreaterThan(0);
+    expect(response.body.items.every((doc) => doc.status === 'Activ')).toBe(true);
+    expect(
+      response.body.items.every((doc) => doc.title.toLowerCase().includes('regulament') || doc.category.toLowerCase().includes('regulament'))
+    ).toBe(true);
   });
 
   it('returns validation error for invalid pagination', async () => {

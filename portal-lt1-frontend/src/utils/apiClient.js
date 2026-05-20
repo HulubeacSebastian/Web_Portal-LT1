@@ -1,4 +1,4 @@
-const DEFAULT_API_ORIGIN = 'http://localhost:3000';
+const DEFAULT_API_ORIGIN = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 function resolveUrl(path) {
   if (typeof path !== 'string') return DEFAULT_API_ORIGIN;

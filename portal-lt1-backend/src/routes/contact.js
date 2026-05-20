@@ -4,15 +4,19 @@ const { validateContactMessage } = require('../validation/contactValidation');
 
 const router = express.Router();
 
-router.post('/', function (req, res) {
-  const { errors, sanitized } = validateContactMessage(req.body || {});
-  if (Object.keys(errors).length > 0) {
-    return res.status(400).json({ message: 'Date invalide pentru contact.', errors });
+router.post('/', async function (req, res, next) {
+  try {
+    const { errors, sanitized } = validateContactMessage(req.body || {});
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ message: 'Date invalide pentru contact.', errors });
+    }
+
+    const created = await store.createContactMessage(sanitized);
+
+    return res.status(201).json(created);
+  } catch (error) {
+    return next(error);
   }
-
-  const created = store.createContactMessage(sanitized);
-
-  return res.status(201).json(created);
 });
 
 module.exports = router;

@@ -23,6 +23,10 @@ pnpm-debug.log*
 .env
 .env.*
 
+# SQLite databases (schema via Prisma migrations)
+portal-lt1-backend/prisma/*.db
+portal-lt1-backend/prisma/*.db-journal
+
 # OS / editor
 .DS_Store
 .vscode/*

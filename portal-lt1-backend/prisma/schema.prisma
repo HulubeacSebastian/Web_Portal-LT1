@@ -1,0 +1,78 @@
+// Assignment 3 — relational schema in 3NF (lookup tables for role, status, categories).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+}
+
+model User {
+  id       String @id
+  email    String @unique
+  password String
+  fullName String @map("full_name")
+  roleId   Int    @map("role_id")
+  role     Role   @relation(fields: [roleId], references: [id])
+  posts    Post[]
+}
+
+model PostCategory {
+  id    String @id
+  name  String
+  posts Post[]
+}
+
+model Post {
+  id          String       @id
+  title       String
+  content     String
+  categoryId  String       @map("category_id")
+  category    PostCategory @relation(fields: [categoryId], references: [id])
+  imageUrl    String       @default("") @map("image_url")
+  isPublished Boolean      @default(true) @map("is_published")
+  authorId    String       @map("author_id")
+  author      User         @relation(fields: [authorId], references: [id])
+  createdAt   DateTime     @default(now()) @map("created_at")
+}
+
+model DocumentCategory {
+  id        String     @id
+  name      String     @unique
+  documents Document[]
+}
+
+model DocumentStatus {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  documents Document[]
+}
+
+model Document {
+  id          String           @id
+  title       String
+  categoryId  String           @map("category_id")
+  category    DocumentCategory @relation(fields: [categoryId], references: [id])
+  issuer      String
+  issuedAt    String           @map("issued_at")
+  statusId    Int              @map("status_id")
+  status      DocumentStatus   @relation(fields: [statusId], references: [id])
+  description String
+  filePath    String?          @map("file_path")
+  uploadDate  DateTime?        @map("upload_date")
+}
+
+model ContactMessage {
+  id          String   @id
+  senderEmail String   @map("sender_email")
+  message     String
+  sentAt      DateTime @default(now()) @map("sent_at")
+}

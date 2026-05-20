@@ -13,10 +13,15 @@ var documentsGeneratorRouter = require('./routes/documentsGenerator');
 
 app.use(logger('dev'));
 
-// Basic CORS for local dev (Vite frontend).
+// CORS: configure ALLOWED_ORIGINS for VM deployment (client must not use localhost).
 app.use(function (req, res, next) {
   var origin = req.headers.origin;
-  var allowed = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174'];
+  var allowed = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173')
+    .split(',')
+    .map(function (value) {
+      return value.trim();
+    })
+    .filter(Boolean);
 
   if (origin && allowed.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -52,6 +57,11 @@ app.use(function (req, res) {
   res.status(404).json({
     message: 'Resource not found.'
   });
+});
+
+app.use(function (err, req, res, next) {
+  console.error(err);
+  res.status(500).json({ message: 'Eroare interna de server.' });
 });
 
 module.exports = app;

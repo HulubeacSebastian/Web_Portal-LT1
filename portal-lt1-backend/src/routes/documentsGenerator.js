@@ -126,10 +126,10 @@ function generateValidDocument() {
   return sanitized;
 }
 
-function tick() {
+async function tick() {
   const created = [];
   for (let i = 0; i < state.batchSize; i += 1) {
-    created.push(store.createDocument(generateValidDocument()));
+    created.push(await store.createDocument(generateValidDocument()));
   }
   state.createdTotal += created.length;
   hub.broadcast({ type: 'documents_batch_added', count: created.length, ids: created.map((d) => d.id) });
@@ -158,7 +158,11 @@ router.post('/start', requireAuth, function (req, res) {
   state.intervalMs = intervalMs;
 
   if (timer) clearInterval(timer);
-  timer = setInterval(tick, state.intervalMs);
+  timer = setInterval(function () {
+    tick().catch(function (error) {
+      console.error('Document generator tick failed:', error);
+    });
+  }, state.intervalMs);
   state.running = true;
   state.lastStartedAt = new Date().toISOString();
 

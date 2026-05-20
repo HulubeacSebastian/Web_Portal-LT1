@@ -4,9 +4,18 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage"
+    "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "node prisma/seed.js",
+    "db:reset": "prisma migrate reset --force"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "^6.8.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -17,6 +26,7 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "prisma": "^6.8.2",
     "supertest": "^7.1.4"
   }
 }

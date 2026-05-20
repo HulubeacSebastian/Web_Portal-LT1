@@ -52,6 +52,7 @@ async function handleWsMessage(ws, raw) {
 
     const history = await chatStore.listRecentMessages();
     ws.send(JSON.stringify({ type: 'chat_history', messages: history }));
+    ws.send(JSON.stringify({ type: 'chat_join_ok' }));
     return;
   }
 
@@ -74,7 +75,13 @@ async function handleWsMessage(ws, raw) {
       text
     });
 
-    hub.broadcast({ type: 'chat_message', message: saved });
+    const payload = { type: 'chat_message', message: saved };
+    try {
+      ws.send(JSON.stringify(payload));
+    } catch {
+      // ignore send errors for this client
+    }
+    hub.broadcast(payload);
   }
 }
 

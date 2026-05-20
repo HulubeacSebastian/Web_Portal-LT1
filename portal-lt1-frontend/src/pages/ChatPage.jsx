@@ -21,6 +21,7 @@ function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState('');
   const [status, setStatus] = useState('Deconectat');
+  const [chatReady, setChatReady] = useState(false);
   const [error, setError] = useState('');
   const wsRef = useRef(null);
 
@@ -34,6 +35,7 @@ function ChatPage() {
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
     setStatus('Conectare...');
+    setChatReady(false);
     setError('');
 
     ws.onopen = () => {
@@ -54,9 +56,16 @@ function ChatPage() {
         const payload = JSON.parse(event.data);
         if (payload.type === 'chat_history') {
           setMessages(payload.messages || []);
+          setChatReady(true);
+        }
+        if (payload.type === 'chat_join_ok') {
+          setChatReady(true);
         }
         if (payload.type === 'chat_message' && payload.message) {
-          setMessages((prev) => [...prev, payload.message]);
+          setMessages((prev) => {
+            if (prev.some((item) => item.id === payload.message.id)) return prev;
+            return [...prev, payload.message];
+          });
         }
         if (payload.type === 'chat_error') {
           setError(payload.message || 'Eroare chat.');
@@ -68,10 +77,13 @@ function ChatPage() {
     };
 
     ws.onclose = () => {
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
       if (!cancelled) {
+        setChatReady(false);
         setStatus('Deconectat');
       }
-      wsRef.current = null;
     };
 
     ws.onerror = () => {
@@ -89,9 +101,23 @@ function ChatPage() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const text = draft.trim();
-    if (!text || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+    const socket = wsRef.current;
 
-    wsRef.current.send(JSON.stringify({ type: 'chat_message', text }));
+    if (!text) return;
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      setError('Conexiunea s-a intrerupt. Reincarca pagina Chat.');
+      setChatReady(false);
+      setStatus('Deconectat');
+      return;
+    }
+
+    if (!chatReady) {
+      setError('Chat-ul se initializeaza. Asteapta cateva secunde si incearca din nou.');
+      return;
+    }
+
+    socket.send(JSON.stringify({ type: 'chat_message', text }));
     setDraft('');
     setError('');
   };
@@ -166,7 +192,7 @@ function ChatPage() {
             onChange={(event) => setDraft(event.target.value)}
             placeholder="Scrie un mesaj pentru ceilalti utilizatori conectati..."
           />
-          <button type="submit" className="btn" disabled={status !== 'Conectat'}>
+          <button type="submit" className="btn" disabled={status !== 'Conectat' || !chatReady}>
             Trimite
           </button>
         </form>

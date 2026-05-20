@@ -54,7 +54,6 @@ npm run db:migrate
 npm run db:seed
 ```
 
-Assignment 3 details (3NF schema, VM deployment, tests): see [docs/ASSIGNMENT3.md](docs/ASSIGNMENT3.md).
 
 ### ▶️ Run (JetBrains Run button)
 

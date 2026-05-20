@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "cert:generate": "node ./scripts/generate-dev-certs.js",
     "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -15,20 +16,21 @@
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@prisma/client": "^6.8.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
     "morgan": "~1.9.1",
-    "ws": "^8.18.3",
-    "@faker-js/faker": "^9.9.0",
-    "mongodb": "^6.16.0"
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "jest": "^29.7.0",
     "mongodb-memory-server": "^10.1.4",
     "prisma": "^6.8.2",
+    "selfsigned": "^2.4.1",
     "supertest": "^7.1.4"
   }
 }

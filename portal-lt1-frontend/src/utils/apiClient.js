@@ -1,4 +1,10 @@
-export const AUTH_TOKEN_KEY = 'portal_jwt';
+import { AUTH_TOKEN_KEY, clearAuthSession, getAuthToken } from './authSession';
+
+export { AUTH_TOKEN_KEY };
+export const AUTH_CHANGED_EVENT = 'portal-auth-changed';
+export const AUTH_EXPIRED_EVENT = 'portal-auth-expired';
+
+const PUBLIC_AUTH_PATHS = ['/api/auth/login', '/api/auth/register'];
 
 export function getApiOrigin() {
   return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
@@ -18,10 +24,36 @@ function resolveUrl(path) {
   return `${DEFAULT_API_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
+function normalizePath(path) {
+  if (typeof path !== 'string') return '';
+  try {
+    const url = path.startsWith('http://') || path.startsWith('https://') ? new URL(path) : new URL(path, DEFAULT_API_ORIGIN);
+    return url.pathname;
+  } catch {
+    return path.split('?')[0];
+  }
+}
+
+function isPublicAuthPath(path) {
+  return PUBLIC_AUTH_PATHS.includes(normalizePath(path));
+}
+
+function notifyAuthExpired() {
+  clearAuthSession();
+  window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+}
+
 export async function apiRequest(path, options = {}) {
   const url = resolveUrl(path);
   const method = options.method || 'GET';
   const headers = new Headers(options.headers || {});
+  const useAuth = options.auth !== false && !isPublicAuthPath(path);
+  const token = useAuth ? getAuthToken() : null;
+
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
   const init = { method, headers };
 
@@ -43,6 +75,10 @@ export async function apiRequest(path, options = {}) {
   }
 
   if (!response.ok) {
+    if (response.status === 401 && useAuth) {
+      notifyAuthExpired();
+    }
+
     const message =
       (data && typeof data === 'object' && 'message' in data && String(data.message)) ||
       (typeof data === 'string' && data) ||
@@ -55,4 +91,3 @@ export async function apiRequest(path, options = {}) {
 
   return data;
 }
-

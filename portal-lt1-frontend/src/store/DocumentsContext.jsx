@@ -1,19 +1,19 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { seedDocuments } from '../data/seedDocuments';
-import { apiRequest, AUTH_TOKEN_KEY, getWsOrigin } from '../utils/apiClient';
+import { apiRequest, getWsOrigin } from '../utils/apiClient';
+import { getAuthToken } from '../utils/authSession';
 import { clearQueue, enqueue, loadOfflineDocuments, loadQueue, replaceQueue, saveOfflineDocuments } from '../utils/offlineQueue';
 
 const DocumentsContext = createContext(null);
 
-async function ensureToken() {
-  const existing = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (existing) return existing;
-  const login = await apiRequest('/api/auth/login', {
-    method: 'POST',
-    body: { email: 'admin@lt1.ro', password: 'admin123' }
-  });
-  localStorage.setItem(AUTH_TOKEN_KEY, login.token);
-  return login.token;
+function requireAuthToken() {
+  const token = getAuthToken();
+  if (!token) {
+    const error = new Error('Autentificare necesara pentru aceasta operatie.');
+    error.status = 401;
+    throw error;
+  }
+  return token;
 }
 
 async function fetchAllDocuments() {
@@ -59,10 +59,9 @@ export function DocumentsProvider({ children }) {
     if (!remoteEnabled) return;
     if (!navigator.onLine) return;
     try {
-      const token = await ensureToken();
+      requireAuthToken();
       const status = await apiRequest('/api/documents/generator/status', {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` }
+        method: 'GET'
       });
       if (status && typeof status === 'object') {
         setGenerator((prev) => ({ ...prev, ...status }));
@@ -73,10 +72,9 @@ export function DocumentsProvider({ children }) {
   };
 
   const startGenerator = async ({ batchSize = 5, intervalMs = 2000 } = {}) => {
-    const token = await ensureToken();
+    requireAuthToken();
     const status = await apiRequest('/api/documents/generator/start', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
       body: { batchSize, intervalMs }
     });
     setGenerator((prev) => ({ ...prev, ...status }));
@@ -84,10 +82,9 @@ export function DocumentsProvider({ children }) {
   };
 
   const stopGenerator = async () => {
-    const token = await ensureToken();
+    requireAuthToken();
     const status = await apiRequest('/api/documents/generator/stop', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
+      method: 'POST'
     });
     setGenerator((prev) => ({ ...prev, ...status }));
     return status;
@@ -122,7 +119,7 @@ export function DocumentsProvider({ children }) {
     if (!navigator.onLine) return;
     syncingRef.current = true;
     try {
-      const token = await ensureToken();
+      requireAuthToken();
       let queue = loadQueue();
       if (queue.length === 0) return;
 
@@ -132,7 +129,6 @@ export function DocumentsProvider({ children }) {
         if (op.type === 'create') {
           const response = await apiRequest('/api/documents', {
             method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
             body: op.payload
           });
           if (op.tempId) {
@@ -143,7 +139,6 @@ export function DocumentsProvider({ children }) {
           try {
             await apiRequest(`/api/documents/${id}`, {
               method: 'PUT',
-              headers: { Authorization: `Bearer ${token}` },
               body: op.payload
             });
           } catch (error) {
@@ -155,8 +150,7 @@ export function DocumentsProvider({ children }) {
           const id = idMap.get(op.id) || op.id;
           try {
             await apiRequest(`/api/documents/${id}`, {
-              method: 'DELETE',
-              headers: { Authorization: `Bearer ${token}` }
+              method: 'DELETE'
             });
           } catch (error) {
             // DELETE should be idempotent for sync purposes.
@@ -172,10 +166,7 @@ export function DocumentsProvider({ children }) {
       queue = [];
       replaceQueue(queue);
     } catch (error) {
-      // If token is invalid/expired, clear it and retry once.
-      if (error?.status === 401 && !options.didRefreshToken) {
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        scheduleSyncRetry();
+      if (error?.status === 401) {
         return;
       }
 

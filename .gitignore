@@ -22,6 +22,9 @@ pnpm-debug.log*
 *.local
 .env
 
+# Dev TLS certificates
+portal-lt1-backend/certs/
+
 # SQLite databases (schema via Prisma migrations)
 portal-lt1-backend/prisma/*.db
 portal-lt1-backend/prisma/*.db-journal

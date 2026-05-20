@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
-import { apiRequest } from '../utils/apiClient';
+import { apiRequest, AUTH_CHANGED_EVENT } from '../utils/apiClient';
 import { saveAuthSession } from '../utils/authSession';
 import { setCookie } from '../utils/cookies';
 import { hasErrors } from '../utils/documentValidation';
@@ -50,8 +50,8 @@ function LoginPage() {
       });
 
       saveAuthSession({ token: response.token, user: response.user });
-      setCookie('portal_user', formData.email.trim(), { maxAge: 60 * 60 * 24 * 7 });
-      window.dispatchEvent(new Event('portal-auth-changed'));
+      setCookie('portal_user', response.user.email, { maxAge: 60 * 60 * 24 * 7 });
+      window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
       savePreference('lastLoginEmail', formData.email.trim());
       recordActivityEvent('login_success');
       setMessage('Autentificare reusita.');

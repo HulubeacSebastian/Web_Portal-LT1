@@ -32,6 +32,35 @@ async function getUserById(id) {
   return mapUser(row);
 }
 
+async function buildUserId() {
+  const last = await prisma.user.findFirst({
+    where: { id: { startsWith: 'USR-' } },
+    orderBy: { id: 'desc' }
+  });
+  const next = last ? Number.parseInt(last.id.replace('USR-', ''), 10) + 1 : 1;
+  return `USR-${String(next).padStart(3, '0')}`;
+}
+
+async function createUser({ email, password, fullName, roleName = 'user' }) {
+  const role = await prisma.role.findUnique({ where: { name: roleName } });
+  if (!role) {
+    throw new Error(`Rolul "${roleName}" nu exista.`);
+  }
+
+  const id = await buildUserId();
+  const row = await prisma.user.create({
+    data: {
+      id,
+      email: String(email).toLowerCase(),
+      password,
+      fullName,
+      roleId: role.id
+    },
+    include: userInclude
+  });
+  return mapUser(row);
+}
+
 async function listPosts(categoryId) {
   const rows = await prisma.post.findMany({
     where: categoryId ? { categoryId: String(categoryId) } : undefined,
@@ -138,6 +167,7 @@ module.exports = {
   resetExtraStores,
   getUserByEmail,
   getUserById,
+  createUser,
   listPosts,
   createPost,
   updatePost,

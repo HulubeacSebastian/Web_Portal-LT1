@@ -1,6 +1,15 @@
-import { AUTH_TOKEN_KEY } from './apiClient';
+import { clearAuthActivity, touchAuthActivity } from './sessionIdle';
 
+export const AUTH_TOKEN_KEY = 'portal_jwt';
 const USER_KEY = 'portal_user_profile';
+
+export function getAuthToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+export function hasAuthSession() {
+  return Boolean(getAuthToken() && loadAuthSession());
+}
 
 export function saveAuthSession({ token, user }) {
   if (token) {
@@ -9,11 +18,13 @@ export function saveAuthSession({ token, user }) {
   if (user) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   }
+  touchAuthActivity();
 }
 
 export function clearAuthSession() {
   localStorage.removeItem(AUTH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  clearAuthActivity();
 }
 
 export function loadAuthSession() {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import DocumentListPage from './pages/DocumentListPage.jsx';
@@ -13,7 +13,9 @@ import CalendarPage from './pages/CalendarPage.jsx';
 import ActivityInsightsPage from './pages/ActivityInsightsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ChatPage from './pages/ChatPage.jsx';
-import { clearAuthSession, loadAuthSession } from './utils/authSession';
+import { AUTH_CHANGED_EVENT, AUTH_EXPIRED_EVENT } from './utils/apiClient';
+import { clearAuthSession, hasAuthSession, loadAuthSession } from './utils/authSession';
+import { initSessionIdleWatch } from './utils/sessionIdle';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import { deleteCookie, getCookie, setCookie } from './utils/cookies';
@@ -30,8 +32,8 @@ function App() {
   const navigate = useNavigate();
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
   const [activity, setActivity] = useState(() => getActivitySnapshot());
-  const [authUser, setAuthUser] = useState(() => getCookie('portal_user') || '');
-  const authSession = loadAuthSession();
+  const [authSession, setAuthSession] = useState(() => loadAuthSession());
+  const authUser = authSession?.email || authSession?.fullName || getCookie('portal_user') || '';
 
   useEffect(() => {
     if (cookieConsent) {
@@ -43,21 +45,53 @@ function App() {
     }
   }, [cookieConsent, location.pathname]);
 
+  const refreshAuthState = () => {
+    setAuthSession(loadAuthSession());
+  };
+
   useEffect(() => {
-    setAuthUser(getCookie('portal_user') || '');
+    refreshAuthState();
   }, [location.pathname]);
 
-  const isLoggedIn = Boolean(authUser);
-  const userLabel = useMemo(() => authUser || 'Vizitator', [authUser]);
+  const handleLogout = useCallback(
+    ({ reason } = {}) => {
+      deleteCookie('portal_user');
+      clearAuthSession();
+      window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+      setAuthSession(null);
+      recordActivityEvent(reason === 'idle' ? 'logout_idle' : 'logout');
+      navigate('/');
+    },
+    [navigate]
+  );
 
-  const handleLogout = () => {
-    deleteCookie('portal_user');
-    clearAuthSession();
-    window.dispatchEvent(new Event('portal-auth-changed'));
-    setAuthUser('');
-    recordActivityEvent('logout');
-    navigate('/');
-  };
+  useEffect(() => {
+    const onAuthChange = () => refreshAuthState();
+    const onExpired = () => {
+      deleteCookie('portal_user');
+      setAuthSession(null);
+      recordActivityEvent('logout_expired');
+      navigate('/');
+    };
+    window.addEventListener(AUTH_CHANGED_EVENT, onAuthChange);
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, onAuthChange);
+      window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!hasAuthSession()) return undefined;
+
+    return initSessionIdleWatch(() => {
+      if (!hasAuthSession()) return;
+      handleLogout({ reason: 'idle' });
+    });
+  }, [authSession?.id, handleLogout]);
+
+  const isLoggedIn = hasAuthSession();
+  const userLabel = useMemo(() => authUser || 'Vizitator', [authUser]);
 
   const acceptCookies = () => {
     setCookie('portal_cookie_consent', 'accepted', { maxAge: 60 * 60 * 24 * 365 });

@@ -6,7 +6,9 @@
 
 var app = require('../src/app');
 var debug = require('debug')('portal-lt1-backend:server');
+var fs = require('fs');
 var http = require('http');
+var https = require('https');
 var WebSocket = require('ws');
 var hub = require('../src/realtime/wsHub');
 var wsChat = require('../src/chat/wsChat');
@@ -19,10 +21,25 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Create HTTP or HTTPS server (HTTPS when SSL_KEY_PATH + SSL_CERT_PATH are set).
  */
 
-var server = http.createServer(app);
+function createAppServer(expressApp) {
+  var keyPath = process.env.SSL_KEY_PATH;
+  var certPath = process.env.SSL_CERT_PATH;
+
+  if (keyPath && certPath) {
+    var sslOptions = {
+      key: fs.readFileSync(path.resolve(keyPath)),
+      cert: fs.readFileSync(path.resolve(certPath))
+    };
+    return https.createServer(sslOptions, expressApp);
+  }
+
+  return http.createServer(expressApp);
+}
+
+var server = createAppServer(app);
 
 var wss = new WebSocket.Server({ server });
 wss.on('connection', function connection(ws) {

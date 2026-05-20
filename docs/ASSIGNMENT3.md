@@ -69,7 +69,7 @@ VITE_API_BASE_URL=http://IP_VM1:3000
 ```bash
 cd portal-lt1-frontend
 npm install
-npm run dev -- --host 0.0.0.0 --port 5173
+npm run dev
 ```
 
 4. Deschide în browser pe VM2: `http://IP_VM2:5173` (sau de pe alt PC din rețea).

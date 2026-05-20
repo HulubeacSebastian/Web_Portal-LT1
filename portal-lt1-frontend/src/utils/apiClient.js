@@ -1,4 +1,16 @@
-const DEFAULT_API_ORIGIN = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+export const AUTH_TOKEN_KEY = 'portal_jwt';
+
+export function getApiOrigin() {
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+}
+
+export function getWsOrigin() {
+  const base = new URL(getApiOrigin());
+  base.protocol = base.protocol === 'https:' ? 'wss:' : 'ws:';
+  return base.origin;
+}
+
+const DEFAULT_API_ORIGIN = getApiOrigin();
 
 function resolveUrl(path) {
   if (typeof path !== 'string') return DEFAULT_API_ORIGIN;

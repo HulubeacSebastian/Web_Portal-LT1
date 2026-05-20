@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
+import { apiRequest, AUTH_TOKEN_KEY, getApiOrigin } from '../utils/apiClient';
 import { setCookie } from '../utils/cookies';
 import { hasErrors } from '../utils/documentValidation';
 import { validateLogin } from '../utils/formValidation';
@@ -28,7 +29,7 @@ function LoginPage() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validateLogin(formData);
     setErrors(nextErrors);
@@ -38,11 +39,25 @@ function LoginPage() {
       return;
     }
 
-    setCookie('portal_user', formData.email.trim(), { maxAge: 60 * 60 * 24 * 7 });
-    savePreference('lastLoginEmail', formData.email.trim());
-    recordActivityEvent('login_success');
-    setMessage('Autentificare simulata cu succes.');
-    navigate('/');
+    try {
+      const response = await apiRequest('/api/auth/login', {
+        method: 'POST',
+        body: {
+          email: formData.email.trim(),
+          password: formData.password
+        }
+      });
+
+      localStorage.setItem(AUTH_TOKEN_KEY, response.token);
+      setCookie('portal_user', formData.email.trim(), { maxAge: 60 * 60 * 24 * 7 });
+      savePreference('lastLoginEmail', formData.email.trim());
+      recordActivityEvent('login_success');
+      setMessage('Autentificare reusita.');
+      navigate('/');
+    } catch (error) {
+      recordActivityEvent('login_failed_validation');
+      setMessage(error?.message || 'Autentificare esuata. Verifica emailul si parola.');
+    }
   };
 
   return (
@@ -55,9 +70,19 @@ function LoginPage() {
       formTitle="Date de autentificare"
       formLead="Introdu emailul si parola asociate contului tau."
       footer={
-        <p className="auth-note">
-          Nu ai cont? <Link to="/register">Creeaza unul</Link>
-        </p>
+        <>
+          {import.meta.env.DEV ? (
+            <p className="auth-note" style={{ marginBottom: '0.75rem' }}>
+              Server API: <strong>{getApiOrigin()}</strong>
+              {getApiOrigin().includes('localhost')
+                ? ' — pe PC2 creeaza .env cu IP-ul PC1 si reporneste Vite'
+                : null}
+            </p>
+          ) : null}
+          <p className="auth-note">
+            Nu ai cont? <Link to="/register">Creeaza unul</Link>
+          </p>
+        </>
       }
     >
       <form onSubmit={handleSubmit} className="auth-form" noValidate>
@@ -93,7 +118,7 @@ function LoginPage() {
 
         <button type="submit" className="auth-submit">
           <span>Autentificare</span>
-          <small>Sesiune simulata — 7 zile</small>
+          <small>Conectare la server — 7 zile</small>
         </button>
 
         {message ? (

@@ -1,11 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { seedDocuments } from '../data/seedDocuments';
-import { apiRequest } from '../utils/apiClient';
+import { apiRequest, AUTH_TOKEN_KEY, getWsOrigin } from '../utils/apiClient';
 import { clearQueue, enqueue, loadOfflineDocuments, loadQueue, replaceQueue, saveOfflineDocuments } from '../utils/offlineQueue';
 
 const DocumentsContext = createContext(null);
-
-const AUTH_TOKEN_KEY = 'portal_jwt';
 
 async function ensureToken() {
   const existing = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -263,7 +261,7 @@ export function DocumentsProvider({ children }) {
     if (!remoteEnabled) return;
     if (isOffline) return;
 
-    const ws = new WebSocket('ws://localhost:3000');
+    const ws = new WebSocket(getWsOrigin());
     wsRef.current = ws;
 
     ws.onmessage = (event) => {

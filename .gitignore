@@ -21,7 +21,6 @@ pnpm-debug.log*
 # Local env
 *.local
 .env
-.env.*
 
 # SQLite databases (schema via Prisma migrations)
 portal-lt1-backend/prisma/*.db

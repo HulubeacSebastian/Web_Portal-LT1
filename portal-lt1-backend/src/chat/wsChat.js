@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const hub = require('../realtime/wsHub');
 const chatStore = require('./chatStore');
+const store = require('../data/extraStores');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'lt1-dev-secret';
 
@@ -12,10 +13,21 @@ function parseMessage(raw) {
   }
 }
 
-function verifyClientToken(token) {
+async function verifyClientToken(token) {
   if (!token) return null;
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET);
+    let permissions = payload.permissions || [];
+
+    if (permissions.length === 0 && payload.sub) {
+      const user = await store.getUserById(payload.sub);
+      permissions = user?.permissions || [];
+    }
+
+    return {
+      ...payload,
+      permissions
+    };
   } catch {
     return null;
   }
@@ -26,7 +38,7 @@ async function handleWsMessage(ws, raw) {
   if (!message || !message.type) return;
 
   if (message.type === 'chat_join') {
-    const user = verifyClientToken(message.token);
+    const user = await verifyClientToken(message.token);
     if (!user || !(user.permissions || []).includes('chat:use')) {
       ws.send(JSON.stringify({ type: 'chat_error', message: 'Autentificare necesara pentru chat.' }));
       return;

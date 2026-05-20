@@ -51,6 +51,7 @@ function LoginPage() {
 
       saveAuthSession({ token: response.token, user: response.user });
       setCookie('portal_user', formData.email.trim(), { maxAge: 60 * 60 * 24 * 7 });
+      window.dispatchEvent(new Event('portal-auth-changed'));
       savePreference('lastLoginEmail', formData.email.trim());
       recordActivityEvent('login_success');
       setMessage('Autentificare reusita.');

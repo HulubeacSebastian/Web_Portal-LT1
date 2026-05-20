@@ -1,14 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AUTH_TOKEN_KEY, getWsOrigin } from '../utils/apiClient';
 import { loadAuthSession } from '../utils/authSession';
 import { getCookie } from '../utils/cookies';
 
 function ChatPage() {
-  const session = loadAuthSession();
+  const [authVersion, setAuthVersion] = useState(0);
+  const session = useMemo(() => loadAuthSession(), [authVersion]);
+
+  useEffect(() => {
+    const onAuthChange = () => setAuthVersion((value) => value + 1);
+    window.addEventListener('portal-auth-changed', onAuthChange);
+    return () => window.removeEventListener('portal-auth-changed', onAuthChange);
+  }, []);
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const isLoggedIn = Boolean(getCookie('portal_user') && token && session);
   const canChat = Boolean(session?.permissions?.includes('chat:use'));
+  const wsUrl = getWsOrigin();
 
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState('');
@@ -16,14 +24,20 @@ function ChatPage() {
   const [error, setError] = useState('');
   const wsRef = useRef(null);
 
-  useEffect(() => {
-    if (!isLoggedIn || !canChat) return undefined;
+  const userId = session?.id ?? '';
+  const permissionsKey = (session?.permissions ?? []).join(',');
 
-    const ws = new WebSocket(getWsOrigin());
+  useEffect(() => {
+    if (!isLoggedIn || !canChat || !token) return undefined;
+
+    let cancelled = false;
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
     setStatus('Conectare...');
+    setError('');
 
     ws.onopen = () => {
+      if (cancelled) return;
       setStatus('Conectat');
       ws.send(
         JSON.stringify({
@@ -45,6 +59,7 @@ function ChatPage() {
         }
         if (payload.type === 'chat_error') {
           setError(payload.message || 'Eroare chat.');
+          setStatus('Eroare');
         }
       } catch {
         // ignore malformed payloads
@@ -52,19 +67,22 @@ function ChatPage() {
     };
 
     ws.onclose = () => {
-      setStatus('Deconectat');
+      if (!cancelled) {
+        setStatus('Deconectat');
+      }
       wsRef.current = null;
     };
 
     ws.onerror = () => {
-      setError('Nu s-a putut conecta la serverul de chat. Verifica MongoDB si backend-ul.');
+      setError(`Nu s-a putut conecta la ${wsUrl}. Verifica backend-ul si MongoDB.`);
       setStatus('Eroare');
     };
 
     return () => {
+      cancelled = true;
       ws.close();
     };
-  }, [isLoggedIn, canChat, token, session]);
+  }, [isLoggedIn, canChat, token, userId, permissionsKey, wsUrl, session?.fullName, session?.email]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -75,6 +93,18 @@ function ChatPage() {
     setDraft('');
     setError('');
   };
+
+  if (getCookie('portal_user') && token && !session) {
+    return (
+      <section className="page-shell">
+        <h1>Chat scolar</h1>
+        <p>Sesiunea e veche. Delogheaza-te si autentifica-te din nou pentru a activa chat-ul.</p>
+        <Link to="/login" className="btn">
+          Reautentificare
+        </Link>
+      </section>
+    );
+  }
 
   if (!isLoggedIn) {
     return (
@@ -92,7 +122,10 @@ function ChatPage() {
     return (
       <section className="page-shell">
         <h1>Chat scolar</h1>
-        <p>Contul tau nu are permisiunea <code>chat:use</code>.</p>
+        <p>Contul tau nu are permisiunea chat:use. Reautentifica-te dupa migrarea Silver.</p>
+        <Link to="/login" className="btn">
+          Autentificare
+        </Link>
       </section>
     );
   }
@@ -102,7 +135,10 @@ function ChatPage() {
       <header className="page-head">
         <h1>Chat in timp real</h1>
         <p>
-          Conectat ca <strong>{session.fullName}</strong> ({session.role}) — {status}
+          Conectat ca <strong>{session.fullName}</strong> ({session.role}) — <strong>{status}</strong>
+        </p>
+        <p className="muted" style={{ fontSize: '0.85rem' }}>
+          WebSocket: {wsUrl}
         </p>
       </header>
 
@@ -134,10 +170,6 @@ function ChatPage() {
         </form>
 
         {error ? <p className="error">{error}</p> : null}
-        <p className="auth-note">
-          Pentru demonstratie Silver: deschide chat-ul cu <strong>admin</strong> pe un PC si cu{' '}
-          <strong>user</strong> pe altul (ex. elev@lt1.ro dupa ce adaugi cont).
-        </p>
       </div>
     </section>
   );

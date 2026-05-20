@@ -53,6 +53,7 @@ function App() {
   const handleLogout = () => {
     deleteCookie('portal_user');
     clearAuthSession();
+    window.dispatchEvent(new Event('portal-auth-changed'));
     setAuthUser('');
     recordActivityEvent('logout');
     navigate('/');

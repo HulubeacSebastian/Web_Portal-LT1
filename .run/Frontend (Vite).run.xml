@@ -3,7 +3,7 @@
     <package-json value="$PROJECT_DIR$/portal-lt1-frontend/package.json" />
     <command value="run" />
     <scripts>
-      <script value="dev" />
+      <script value="dev:https" />
     </scripts>
     <method v="2" />
   </configuration>

@@ -6,7 +6,7 @@
     "install:frontend": "npm --prefix portal-lt1-frontend install",
     "install:all": "npm run install:backend && npm run install:frontend",
     "start:backend": "npm --prefix portal-lt1-backend start",
-    "start:frontend": "npm --prefix portal-lt1-frontend run dev",
+    "start:frontend": "npm --prefix portal-lt1-frontend run dev:https",
     "test:backend": "npm --prefix portal-lt1-backend test",
     "test:frontend": "npm --prefix portal-lt1-frontend test",
     "test:frontend:coverage": "npm --prefix portal-lt1-frontend run test:coverage",

@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 5173",
-    "dev:https": "cross-env VITE_DEV_HTTPS=true vite --host 0.0.0.0 --port 5173",
+    "dev": "cross-env VITE_DEV_HTTPS=true vite --host 0.0.0.0 --port 5173",
+    "dev:https": "npm run dev",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run --config ../portal-lt1-Tests/frontend/vitest.config.cjs",

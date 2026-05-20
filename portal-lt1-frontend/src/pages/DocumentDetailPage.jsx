@@ -1,5 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDocuments } from '../store/DocumentsContext';
+import { getCookie } from '../utils/cookies';
 
 function DocumentDetailPage() {
   const { id } = useParams();
@@ -7,6 +8,9 @@ function DocumentDetailPage() {
   const { getDocumentById, deleteDocument } = useDocuments();
 
   const document = getDocumentById(id);
+  // UI actions are available locally even when offline/unauthenticated.
+  // Server-side auth is enforced during sync via JWT.
+  const _isLoggedIn = Boolean(getCookie('portal_user'));
 
   if (!document) {
     return (
@@ -29,6 +33,10 @@ function DocumentDetailPage() {
     deleteDocument(document.id);
     navigate('/documente');
   };
+
+  const fileHref = document.file?.dataUrl || document.fileUrl || '';
+  const fileName = document.file?.name || 'document';
+  const isPdf = (document.file?.type || '').toLowerCase() === 'application/pdf' || fileHref.toLowerCase().includes('.pdf');
 
   return (
     <section className="page-stack">
@@ -64,12 +72,39 @@ function DocumentDetailPage() {
           <strong>Status:</strong>{' '}
           <span className={`status-pill status-${document.status.toLowerCase()}`}>{document.status}</span>
         </p>
+        {fileHref ? (
+          <div className="detail-file-cta">
+            <a
+              className="btn detail-file-btn"
+              href={fileHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              download={fileName}
+            >
+              <span className="detail-file-btn-icon" aria-hidden="true">
+                ⤓
+              </span>
+              <span className="detail-file-btn-text">Vezi fisierul</span>
+            </a>
+          </div>
+        ) : null}
       </article>
 
       <article className="card">
         <h3>Descriere</h3>
         <p>{document.description}</p>
       </article>
+
+      {fileHref && isPdf ? (
+        <article className="card">
+          <h3>Previzualizare</h3>
+          <iframe
+            title="Previzualizare document"
+            src={fileHref}
+            style={{ width: '100%', height: 640, border: '1px solid #e5e7eb', borderRadius: 12 }}
+          />
+        </article>
+      ) : null}
 
       <Link to="/documente" className="btn ghost">
         Inapoi la lista

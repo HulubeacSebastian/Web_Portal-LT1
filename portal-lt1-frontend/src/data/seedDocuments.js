@@ -6,7 +6,8 @@ export const seedDocuments = [
     issuer: 'Consiliul de administratie',
     issuedAt: '2026-01-12',
     status: 'Activ',
-    description: 'Reguli privind conduita, prezenta si evaluarea elevilor in anul scolar 2026.'
+    description: 'Reguli privind conduita, prezenta si evaluarea elevilor in anul scolar 2026.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-002',
@@ -15,7 +16,8 @@ export const seedDocuments = [
     issuer: 'Secretariat',
     issuedAt: '2026-02-05',
     status: 'Activ',
-    description: 'Etapele oficiale pentru depunerea dosarelor si validarea inscrierilor la liceu.'
+    description: 'Etapele oficiale pentru depunerea dosarelor si validarea inscrierilor la liceu.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-003',
@@ -24,7 +26,8 @@ export const seedDocuments = [
     issuer: 'Comisia IT',
     issuedAt: '2026-03-01',
     status: 'Revizie',
-    description: 'Masuri pentru protejarea datelor personale ale elevilor si personalului scolii.'
+    description: 'Masuri pentru protejarea datelor personale ale elevilor si personalului scolii.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-004',
@@ -33,7 +36,8 @@ export const seedDocuments = [
     issuer: 'Compartiment arhiva',
     issuedAt: '2025-12-20',
     status: 'Activ',
-    description: 'Norme pentru arhivarea cataloagelor si registrelor scolare in format fizic.'
+    description: 'Norme pentru arhivarea cataloagelor si registrelor scolare in format fizic.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-005',
@@ -42,7 +46,8 @@ export const seedDocuments = [
     issuer: 'Administrator platforma',
     issuedAt: '2026-01-30',
     status: 'Activ',
-    description: 'Instructiuni pentru completarea notelor, absentelor si rapoartelor in catalogul electronic.'
+    description: 'Instructiuni pentru completarea notelor, absentelor si rapoartelor in catalogul electronic.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-006',
@@ -51,7 +56,8 @@ export const seedDocuments = [
     issuer: 'Director adjunct',
     issuedAt: '2026-02-14',
     status: 'Activ',
-    description: 'Calendarul concursurilor, excursiilor si atelierelor organizate in anul scolar curent.'
+    description: 'Calendarul concursurilor, excursiilor si atelierelor organizate in anul scolar curent.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-007',
@@ -60,7 +66,8 @@ export const seedDocuments = [
     issuer: 'Comisia de orar',
     issuedAt: '2026-01-15',
     status: 'Activ',
-    description: 'Structura orelor pentru clasele de profil tehnic, semestrul al doilea.'
+    description: 'Structura orelor pentru clasele de profil tehnic, semestrul al doilea.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-008',
@@ -69,7 +76,8 @@ export const seedDocuments = [
     issuer: 'Comisia de burse',
     issuedAt: '2026-02-22',
     status: 'Revizie',
-    description: 'Conditii si documente necesare pentru acordarea burselor de merit si sociale.'
+    description: 'Conditii si documente necesare pentru acordarea burselor de merit si sociale.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-009',
@@ -78,7 +86,8 @@ export const seedDocuments = [
     issuer: 'Responsabil SSM',
     issuedAt: '2026-01-18',
     status: 'Activ',
-    description: 'Reguli de siguranta pentru orele practice desfasurate in laboratoarele scolii.'
+    description: 'Reguli de siguranta pentru orele practice desfasurate in laboratoarele scolii.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-010',
@@ -87,7 +96,8 @@ export const seedDocuments = [
     issuer: 'Biblioteca scolii',
     issuedAt: '2025-11-09',
     status: 'Arhivat',
-    description: 'Versiune arhivata a regulamentului de imprumut si utilizare a salii de lectura.'
+    description: 'Versiune arhivata a regulamentului de imprumut si utilizare a salii de lectura.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-011',
@@ -96,7 +106,8 @@ export const seedDocuments = [
     issuer: 'Coordonator practica',
     issuedAt: '2026-03-10',
     status: 'Activ',
-    description: 'Etape pentru repartizarea elevilor la practica si evaluarea competentelor dobandite.'
+    description: 'Etape pentru repartizarea elevilor la practica si evaluarea competentelor dobandite.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   },
   {
     id: 'DOC-012',
@@ -105,6 +116,7 @@ export const seedDocuments = [
     issuer: 'Consiliul profesoral',
     issuedAt: '2026-03-25',
     status: 'Revizie',
-    description: 'Masuri de prevenire si reducere a absentelor nemotivate in clasele cu risc ridicat.'
+    description: 'Masuri de prevenire si reducere a absentelor nemotivate in clasele cu risc ridicat.',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   }
 ];

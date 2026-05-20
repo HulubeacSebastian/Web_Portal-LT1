@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Backend (bin/www)" type="NodeJSConfigurationType" path-to-js-file="bin/www" working-dir="$PROJECT_DIR$/portal-lt1-backend">
+    <envs>
+      <env name="DEBUG" value="portal-lt1-backend:*" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

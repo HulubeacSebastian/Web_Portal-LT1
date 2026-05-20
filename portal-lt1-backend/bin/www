@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('portal-lt1-backend:server');
 var http = require('http');
+var WebSocket = require('ws');
+var hub = require('../realtime/wsHub');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +22,12 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+var wss = new WebSocket.Server({ server });
+wss.on('connection', function connection(ws) {
+  hub.addClient(ws);
+  ws.send(JSON.stringify({ type: 'connected' }));
+});
 
 /**
  * Listen on provided port, on all network interfaces.

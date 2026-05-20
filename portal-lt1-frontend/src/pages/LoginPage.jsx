@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
-import { apiRequest, AUTH_TOKEN_KEY, getApiOrigin } from '../utils/apiClient';
+import { apiRequest, AUTH_TOKEN_KEY } from '../utils/apiClient';
 import { setCookie } from '../utils/cookies';
 import { hasErrors } from '../utils/documentValidation';
 import { validateLogin } from '../utils/formValidation';
@@ -70,19 +70,9 @@ function LoginPage() {
       formTitle="Date de autentificare"
       formLead="Introdu emailul si parola asociate contului tau."
       footer={
-        <>
-          {import.meta.env.DEV ? (
-            <p className="auth-note" style={{ marginBottom: '0.75rem' }}>
-              Server API: <strong>{getApiOrigin()}</strong>
-              {getApiOrigin().includes('localhost')
-                ? ' — pe PC2 creeaza .env cu IP-ul PC1 si reporneste Vite'
-                : null}
-            </p>
-          ) : null}
-          <p className="auth-note">
-            Nu ai cont? <Link to="/register">Creeaza unul</Link>
-          </p>
-        </>
+        <p className="auth-note">
+          Nu ai cont? <Link to="/register">Creeaza unul</Link>
+        </p>
       }
     >
       <form onSubmit={handleSubmit} className="auth-form" noValidate>

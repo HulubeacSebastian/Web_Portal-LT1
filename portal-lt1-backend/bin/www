@@ -95,7 +95,4 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-  console.log('Backend ready on port ' + (typeof addr === 'object' ? addr.port : addr));
-  console.log('ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS || '(default localhost only)');
-  console.log('Health check: http://<IP-acest-PC>:' + (typeof addr === 'object' ? addr.port : '3000') + '/health');
 }

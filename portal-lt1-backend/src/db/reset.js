@@ -10,6 +10,8 @@ async function clearTables() {
   await prisma.postCategory.deleteMany();
   await prisma.documentCategory.deleteMany();
   await prisma.documentStatus.deleteMany();
+  await prisma.rolePermission.deleteMany();
+  await prisma.permission.deleteMany();
   await prisma.role.deleteMany();
 }
 

@@ -10,6 +10,8 @@ var usersRouter = require('./routes/users');
 var postsRouter = require('./routes/posts');
 var contactRouter = require('./routes/contact');
 var documentsGeneratorRouter = require('./routes/documentsGenerator');
+var rolesRouter = require('./routes/roles');
+var chatRouter = require('./routes/chat');
 
 app.use(logger('dev'));
 
@@ -52,6 +54,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/roles', rolesRouter);
+app.use('/api/chat', chatRouter);
 
 app.use(function (req, res) {
   res.status(404).json({

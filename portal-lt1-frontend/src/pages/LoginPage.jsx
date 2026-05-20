@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
-import { apiRequest, AUTH_TOKEN_KEY } from '../utils/apiClient';
+import { apiRequest } from '../utils/apiClient';
+import { saveAuthSession } from '../utils/authSession';
 import { setCookie } from '../utils/cookies';
 import { hasErrors } from '../utils/documentValidation';
 import { validateLogin } from '../utils/formValidation';
@@ -48,7 +49,7 @@ function LoginPage() {
         }
       });
 
-      localStorage.setItem(AUTH_TOKEN_KEY, response.token);
+      saveAuthSession({ token: response.token, user: response.user });
       setCookie('portal_user', formData.email.trim(), { maxAge: 60 * 60 * 24 * 7 });
       savePreference('lastLoginEmail', formData.email.trim());
       recordActivityEvent('login_success');

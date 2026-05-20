@@ -29,12 +29,16 @@ function mapPost(row) {
 
 function mapUser(row) {
   if (!row) return null;
+  const permissions =
+    row.role?.permissions?.map((entry) => entry.permission.code).filter(Boolean) || [];
+
   return {
     id: row.id,
     email: row.email,
     password: row.password,
     fullName: row.fullName,
-    role: row.role.name
+    role: row.role.name,
+    permissions
   };
 }
 

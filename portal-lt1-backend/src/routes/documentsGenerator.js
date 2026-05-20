@@ -3,6 +3,7 @@ const { faker } = require('@faker-js/faker');
 const store = require('../data/documentStore');
 const { allowedStatuses, validateDocument } = require('../validation/documentValidation');
 const { requireAuth } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 const hub = require('../realtime/wsHub');
 
 const router = express.Router();
@@ -135,7 +136,7 @@ async function tick() {
   hub.broadcast({ type: 'documents_batch_added', count: created.length, ids: created.map((d) => d.id) });
 }
 
-router.post('/start', requireAuth, function (req, res) {
+router.post('/start', requireAuth, requirePermission('generator:control'), function (req, res) {
   const batchSizeRaw = req.body?.batchSize;
   const intervalMsRaw = req.body?.intervalMs;
 
@@ -169,7 +170,7 @@ router.post('/start', requireAuth, function (req, res) {
   return res.json({ ...state });
 });
 
-router.post('/stop', requireAuth, function (req, res) {
+router.post('/stop', requireAuth, requirePermission('generator:control'), function (req, res) {
   if (timer) {
     clearInterval(timer);
     timer = null;
@@ -179,7 +180,7 @@ router.post('/stop', requireAuth, function (req, res) {
   return res.json({ ...state });
 });
 
-router.get('/status', requireAuth, function (req, res) {
+router.get('/status', requireAuth, requirePermission('generator:control'), function (req, res) {
   return res.json({ ...state });
 });
 

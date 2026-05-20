@@ -1,6 +1,7 @@
 const express = require('express');
 const store = require('../data/extraStores');
 const { requireAuth } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 const { validatePost } = require('../validation/postValidation');
 
 const router = express.Router();
@@ -14,7 +15,7 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-router.post('/', requireAuth, async function (req, res, next) {
+router.post('/', requireAuth, requirePermission('posts:create'), async function (req, res, next) {
   try {
     const { errors, sanitized } = validatePost(req.body || {});
     if (Object.keys(errors).length > 0) {
@@ -32,7 +33,7 @@ router.post('/', requireAuth, async function (req, res, next) {
   }
 });
 
-router.put('/:id', requireAuth, async function (req, res, next) {
+router.put('/:id', requireAuth, requirePermission('posts:update'), async function (req, res, next) {
   try {
     const { errors, sanitized } = validatePost(req.body || {});
     if (Object.keys(errors).length > 0) {
@@ -49,7 +50,7 @@ router.put('/:id', requireAuth, async function (req, res, next) {
   }
 });
 
-router.delete('/:id', requireAuth, async function (req, res, next) {
+router.delete('/:id', requireAuth, requirePermission('posts:delete'), async function (req, res, next) {
   try {
     const deleted = await store.deletePost(req.params.id);
     if (!deleted) {

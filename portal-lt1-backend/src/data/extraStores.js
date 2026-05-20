@@ -6,10 +6,20 @@ async function resetExtraStores() {
   await resetDatabase();
 }
 
+const userInclude = {
+  role: {
+    include: {
+      permissions: {
+        include: { permission: true }
+      }
+    }
+  }
+};
+
 async function getUserByEmail(email) {
   const row = await prisma.user.findUnique({
     where: { email: String(email).toLowerCase() },
-    include: { role: true }
+    include: userInclude
   });
   return mapUser(row);
 }
@@ -17,7 +27,7 @@ async function getUserByEmail(email) {
 async function getUserById(id) {
   const row = await prisma.user.findUnique({
     where: { id },
-    include: { role: true }
+    include: userInclude
   });
   return mapUser(row);
 }

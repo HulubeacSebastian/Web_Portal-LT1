@@ -7,7 +7,8 @@ function buildToken(user) {
     {
       sub: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      permissions: user.permissions || []
     },
     JWT_SECRET,
     { expiresIn: '8h' }

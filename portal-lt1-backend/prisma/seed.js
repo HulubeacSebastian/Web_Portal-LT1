@@ -1,10 +1,9 @@
 const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 const { seedDocuments } = require('../src/data/seedDocuments');
+const { PERMISSIONS, ROLE_DEFINITIONS } = require('../src/permissions/catalog');
 
 const prisma = new PrismaClient();
-
-const ROLES = ['admin', 'teacher'];
 const STATUSES = ['Activ', 'Revizie', 'Arhivat'];
 const POST_CATEGORIES = [
   { id: 'news', name: 'Noutati' },
@@ -25,7 +24,7 @@ const USERS = [
     email: 'profesor@lt1.ro',
     password: 'profesor123',
     fullName: 'Profesor LT1',
-    role: 'teacher'
+    role: 'user'
   }
 ];
 
@@ -51,14 +50,40 @@ function categoryIdFromName(name) {
     .replace(/^-|-$/g, '');
 }
 
-async function ensureLookups() {
-  for (const name of ROLES) {
-    await prisma.role.upsert({
-      where: { name },
-      update: {},
-      create: { name }
+async function seedPermissionsAndRoles() {
+  for (const permission of PERMISSIONS) {
+    await prisma.permission.upsert({
+      where: { code: permission.code },
+      update: { description: permission.description },
+      create: permission
     });
   }
+
+  const permissionRows = await prisma.permission.findMany();
+  const permissionIdByCode = Object.fromEntries(permissionRows.map((row) => [row.code, row.id]));
+
+  for (const roleDef of ROLE_DEFINITIONS) {
+    const role = await prisma.role.upsert({
+      where: { name: roleDef.name },
+      update: { description: roleDef.description },
+      create: { name: roleDef.name, description: roleDef.description }
+    });
+
+    await prisma.rolePermission.deleteMany({ where: { roleId: role.id } });
+
+    for (const code of roleDef.permissions) {
+      await prisma.rolePermission.create({
+        data: {
+          roleId: role.id,
+          permissionId: permissionIdByCode[code]
+        }
+      });
+    }
+  }
+}
+
+async function ensureLookups() {
+  await seedPermissionsAndRoles();
 
   for (const name of STATUSES) {
     await prisma.documentStatus.upsert({

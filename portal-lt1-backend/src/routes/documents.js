@@ -2,6 +2,7 @@ const express = require('express');
 const service = require('../services/documentService');
 const { validateDocument, validatePagination } = require('../validation/documentValidation');
 const { requireAuth } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get('/:id', async function (req, res, next) {
   }
 });
 
-router.post('/', requireAuth, async function (req, res, next) {
+router.post('/', requireAuth, requirePermission('documents:create'), async function (req, res, next) {
   try {
     const { errors, sanitized } = validateDocument(req.body || {});
     if (Object.keys(errors).length > 0) {
@@ -52,7 +53,7 @@ router.post('/', requireAuth, async function (req, res, next) {
   }
 });
 
-router.put('/:id', requireAuth, async function (req, res, next) {
+router.put('/:id', requireAuth, requirePermission('documents:update'), async function (req, res, next) {
   try {
     const existing = await service.getDocument(req.params.id);
     if (!existing) {
@@ -71,7 +72,7 @@ router.put('/:id', requireAuth, async function (req, res, next) {
   }
 });
 
-router.delete('/:id', requireAuth, async function (req, res, next) {
+router.delete('/:id', requireAuth, requirePermission('documents:delete'), async function (req, res, next) {
   try {
     const deleted = await service.removeDocument(req.params.id);
     if (!deleted) {
@@ -84,7 +85,7 @@ router.delete('/:id', requireAuth, async function (req, res, next) {
   }
 });
 
-router.post('/upload', requireAuth, async function (req, res, next) {
+router.post('/upload', requireAuth, requirePermission('documents:upload'), async function (req, res, next) {
   try {
     const { file, title, category } = req.body || {};
     const errors = {};

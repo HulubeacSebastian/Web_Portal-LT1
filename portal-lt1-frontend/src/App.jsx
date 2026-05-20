@@ -12,6 +12,8 @@ import ContactPage from './pages/ContactPage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
 import ActivityInsightsPage from './pages/ActivityInsightsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+import ChatPage from './pages/ChatPage.jsx';
+import { clearAuthSession, loadAuthSession } from './utils/authSession';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import { deleteCookie, getCookie, setCookie } from './utils/cookies';
@@ -29,6 +31,7 @@ function App() {
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
   const [activity, setActivity] = useState(() => getActivitySnapshot());
   const [authUser, setAuthUser] = useState(() => getCookie('portal_user') || '');
+  const authSession = loadAuthSession();
 
   useEffect(() => {
     if (cookieConsent) {
@@ -49,7 +52,7 @@ function App() {
 
   const handleLogout = () => {
     deleteCookie('portal_user');
-    localStorage.removeItem('portal_jwt');
+    clearAuthSession();
     setAuthUser('');
     recordActivityEvent('logout');
     navigate('/');
@@ -104,6 +107,14 @@ function App() {
                 >
                   Activitate
                 </NavLink>
+                {isLoggedIn && authSession?.permissions?.includes('chat:use') ? (
+                  <NavLink
+                    to="/chat"
+                    className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  >
+                    Chat
+                  </NavLink>
+                ) : null}
               </nav>
             </div>
 
@@ -157,6 +168,7 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/activitate" element={<ActivityInsightsPage />} />
+              <Route path="/chat" element={<ChatPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="*" element={<NotFoundPage />} />

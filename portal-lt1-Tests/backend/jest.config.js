@@ -11,6 +11,7 @@ module.exports = {
   globalSetup: path.join(testsRoot, 'globalSetup.js'),
   globalTeardown: path.join(testsRoot, 'globalTeardown.js'),
   testTimeout: 30000,
+  forceExit: true,
   modulePaths: [path.join(backendRoot, 'node_modules')],
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.js', '!node_modules/**'],

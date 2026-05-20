@@ -6,7 +6,7 @@ test.describe('Feature 1: public navigation and presentation', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'LICEUL TEHNOLOGIC NR. 1' })).toBeVisible();
 
     await page.getByRole('link', { name: 'Despre Noi' }).click();
-    await expect(page.getByRole('heading', { name: 'CINE SUNTEM?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Cine suntem' })).toBeVisible();
 
     await page.getByRole('link', { name: 'Calendar' }).click();
     await expect(page.getByRole('button', { name: 'Generare Orar' })).toBeVisible();

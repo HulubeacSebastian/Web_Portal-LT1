@@ -30,13 +30,6 @@ const events = [
   },
 ];
 
-const gallery = [
-  '/assets/antet2@4x.png',
-  '/assets/poza_liceu.jpeg',
-  '/assets/antet2@4x.png',
-  '/assets/poza_liceu.jpeg',
-];
-
 function HomePage() {
   return (
     <section className="page-shell home-page">
@@ -74,7 +67,7 @@ function HomePage() {
             <span>02.</span>
             <strong>EVENIMENTE VIITOARE</strong>
           </Link>
-          <Link to="/despre-noi" className="home-intro-link is-purple">
+          <Link to="/despre-noi#album-foto" className="home-intro-link is-purple">
             <span>03.</span>
             <strong>ALBUM FOTO</strong>
           </Link>
@@ -110,17 +103,6 @@ function HomePage() {
               </button>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="home-gallery" aria-label="Album foto">
-        <h2>ALBUM FOTO</h2>
-        <div className="home-gallery-grid">
-          {gallery.map((imagePath, index) => (
-            <figure key={`${imagePath}-${index}`} className="home-gallery-item">
-              <img src={imagePath} alt={`Galerie liceu ${index + 1}`} />
-            </figure>
-          ))}
         </div>
       </section>
 

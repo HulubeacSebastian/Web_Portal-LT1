@@ -15,7 +15,7 @@ describe('App routes', () => {
   });
 
   it.each([
-    ['/despre-noi', 'CINE SUNTEM?'],
+    ['/despre-noi', 'Cine suntem'],
     ['/contact', 'Nume și Prenume'],
     ['/calendar', 'Generare Orar'],
     ['/activitate', 'Monitorizare activitate si preferinte'],

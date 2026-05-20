@@ -3,6 +3,8 @@ const os = require('os');
 const path = require('path');
 const selfsigned = require('selfsigned');
 
+require('./load-dev-network-env').loadDevNetworkEnv();
+
 const certsDir = path.join(__dirname, '..', 'certs');
 
 function getLocalIPv4Addresses() {

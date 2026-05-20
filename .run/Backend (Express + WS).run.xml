@@ -5,7 +5,7 @@
       <env name="DEBUG" value="portal-lt1-backend:*" />
       <env name="SSL_KEY_PATH" value="certs/dev.key" />
       <env name="SSL_CERT_PATH" value="certs/dev.crt" />
-      <env name="ALLOWED_ORIGINS" value="https://localhost:5173,https://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:5173" />
+      <env name="ALLOWED_ORIGINS" value="https://192.168.0.94:5173,https://192.168.0.81:5173,https://localhost:5173,https://127.0.0.1:5173" />
     </envs>
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Generate Dev Certs" run_configuration_type="js.build_tools.npm" />

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "predev": "npm run cert:generate --prefix ../portal-lt1-backend",
+    "predev": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js",
     "dev": "cross-env VITE_DEV_HTTPS=true vite",
     "dev:https": "npm run dev",
     "build": "vite build",

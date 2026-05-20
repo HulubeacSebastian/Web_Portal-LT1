@@ -3,7 +3,7 @@
     <package-json value="$PROJECT_DIR$/portal-lt1-backend/package.json" />
     <command value="run" />
     <scripts>
-      <script value="cert:generate" />
+      <script value="prepare:dev-tls" />
     </scripts>
     <method v="2" />
   </configuration>

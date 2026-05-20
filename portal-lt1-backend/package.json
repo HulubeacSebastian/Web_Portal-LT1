@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "cert:generate": "node ./scripts/generate-dev-certs.js",
+    "prepare:dev-tls": "node ./scripts/prepare-dev-tls.js",
     "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

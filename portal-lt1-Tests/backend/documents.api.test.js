@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../../portal-lt1-backend/src/app');
 const store = require('../../portal-lt1-backend/src/data/documentStore');
+const { loginWithOtp } = require('./helpers/authLogin');
 
 describe('Documents REST API', () => {
   beforeEach(async () => {
@@ -8,7 +9,7 @@ describe('Documents REST API', () => {
   });
 
   async function loginAndGetToken() {
-    const response = await request(app).post('/api/auth/login').send({
+    const response = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });
@@ -108,7 +109,7 @@ describe('Documents REST API', () => {
   });
 
   it('implements auth, profile, posts and contact routes from project API', async () => {
-    const loginResponse = await request(app).post('/api/auth/login').send({
+    const loginResponse = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });
@@ -178,7 +179,7 @@ describe('Documents REST API', () => {
     expect(badLogin.body.errors.email).toBeDefined();
     expect(badLogin.body.errors.password).toBeDefined();
 
-    const goodLogin = await request(app).post('/api/auth/login').send({ email: 'admin@lt1.ro', password: 'admin123' });
+    const goodLogin = await loginWithOtp(app, { email: 'admin@lt1.ro', password: 'admin123' });
     const token = goodLogin.body.token;
 
     const badPost = await request(app)
@@ -206,7 +207,7 @@ describe('Documents REST API', () => {
   });
 
   it('starts and stops the server-side document generator and receives websocket-ready batch additions', async () => {
-    const loginResponse = await request(app).post('/api/auth/login').send({
+    const loginResponse = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });

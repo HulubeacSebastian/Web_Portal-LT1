@@ -7,13 +7,15 @@ import DocumentDetailPage from './pages/DocumentDetailPage.jsx';
 import DocumentFormPage from './pages/DocumentFormPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
 import ActivityInsightsPage from './pages/ActivityInsightsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ChatPage from './pages/ChatPage.jsx';
-import { AUTH_CHANGED_EVENT, AUTH_EXPIRED_EVENT } from './utils/apiClient';
+import { AUTH_CHANGED_EVENT, AUTH_EXPIRED_EVENT, logoutOnServer } from './utils/apiClient';
 import { clearAuthSession, hasAuthSession, loadAuthSession } from './utils/authSession';
 import { initSessionIdleWatch } from './utils/sessionIdle';
 import SchoolFooter from './components/SchoolFooter.jsx';
@@ -54,7 +56,8 @@ function App() {
   }, [location.pathname]);
 
   const handleLogout = useCallback(
-    ({ reason } = {}) => {
+    async ({ reason } = {}) => {
+      await logoutOnServer();
       deleteCookie('portal_user');
       clearAuthSession();
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
@@ -206,6 +209,8 @@ function App() {
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>

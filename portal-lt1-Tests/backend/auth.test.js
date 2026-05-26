@@ -1,13 +1,14 @@
 const request = require('supertest');
 const app = require('../../portal-lt1-backend/src/app');
 const { resetExtraStores } = require('../../portal-lt1-backend/src/data/extraStores');
+const { loginWithOtp } = require('./helpers/authLogin');
 
 describe('Auth API', () => {
   beforeEach(async () => {
     await resetExtraStores();
   });
 
-  it('registers a new user with role user and returns a JWT', async () => {
+  it('registers a new user with role user and returns tokens', async () => {
     const response = await request(app).post('/api/auth/register').send({
       fullName: 'Elev Nou',
       email: 'elevnou@test.ro',
@@ -16,13 +17,14 @@ describe('Auth API', () => {
 
     expect(response.statusCode).toBe(201);
     expect(response.body.token).toBeDefined();
+    expect(response.body.refreshToken).toBeDefined();
     expect(response.body.user.role).toBe('user');
     expect(response.body.user.permissions).toEqual(
       expect.arrayContaining(['documents:read', 'chat:use'])
     );
     expect(response.body.user.permissions).not.toContain('documents:create');
 
-    const loginResponse = await request(app).post('/api/auth/login').send({
+    const loginResponse = await loginWithOtp(app, {
       email: 'elevnou@test.ro',
       password: 'parola123'
     });
@@ -57,7 +59,7 @@ describe('Auth API', () => {
   });
 
   it('logs in seeded users and rejects invalid credentials', async () => {
-    const loginResponse = await request(app).post('/api/auth/login').send({
+    const loginResponse = await loginWithOtp(app, {
       email: 'profesor@lt1.ro',
       password: 'profesor123'
     });

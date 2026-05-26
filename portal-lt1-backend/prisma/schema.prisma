@@ -34,13 +34,41 @@ model RolePermission {
 }
 
 model User {
-  id       String @id
-  email    String @unique
-  password String
-  fullName String @map("full_name")
-  roleId   Int    @map("role_id")
-  role     Role   @relation(fields: [roleId], references: [id])
-  posts    Post[]
+  id              String          @id
+  email           String          @unique
+  password        String
+  fullName        String          @map("full_name")
+  roleId          Int             @map("role_id")
+  role            Role            @relation(fields: [roleId], references: [id])
+  posts           Post[]
+  sessions        UserSession[]
+  authChallenges  AuthChallenge[]
+}
+
+model UserSession {
+  id               String    @id
+  userId           String    @map("user_id")
+  refreshTokenHash String    @map("refresh_token_hash")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  lastUsedAt       DateTime? @map("last_used_at")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuthChallenge {
+  id        String    @id
+  userId    String    @map("user_id")
+  purpose   String
+  codeHash  String    @map("code_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
 }
 
 model PostCategory {

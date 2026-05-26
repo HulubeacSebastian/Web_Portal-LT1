@@ -1,13 +1,36 @@
-import { AUTH_TOKEN_KEY, clearAuthSession, getAuthToken } from './authSession';
+import {
+  AUTH_TOKEN_KEY,
+  clearAuthSession,
+  getAuthToken,
+  getRefreshToken,
+  saveAuthSession
+} from './authSession';
 
 export { AUTH_TOKEN_KEY };
 export const AUTH_CHANGED_EVENT = 'portal-auth-changed';
 export const AUTH_EXPIRED_EVENT = 'portal-auth-expired';
 
-const PUBLIC_AUTH_PATHS = ['/api/auth/login', '/api/auth/register'];
+const PUBLIC_AUTH_PATHS = [
+  '/api/auth/login',
+  '/api/auth/verify-otp',
+  '/api/auth/register',
+  '/api/auth/refresh',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password'
+];
 
 export function getApiOrigin() {
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+  const configured = import.meta.env.VITE_API_BASE_URL?.trim();
+  if (configured) {
+    return configured.replace(/\/$/, '');
+  }
+
+  if (import.meta.env.DEV && typeof window !== 'undefined') {
+    const { protocol, hostname } = window.location;
+    return `${protocol}//${hostname}:3000`;
+  }
+
+  return 'http://localhost:3000';
 }
 
 export function getWsOrigin() {
@@ -16,18 +39,19 @@ export function getWsOrigin() {
   return base.origin;
 }
 
-const DEFAULT_API_ORIGIN = getApiOrigin();
-
 function resolveUrl(path) {
-  if (typeof path !== 'string') return DEFAULT_API_ORIGIN;
+  const origin = getApiOrigin();
+  if (typeof path !== 'string') return origin;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return `${DEFAULT_API_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
+  return `${origin}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
 function normalizePath(path) {
+  const origin = getApiOrigin();
   if (typeof path !== 'string') return '';
   try {
-    const url = path.startsWith('http://') || path.startsWith('https://') ? new URL(path) : new URL(path, DEFAULT_API_ORIGIN);
+    const url =
+      path.startsWith('http://') || path.startsWith('https://') ? new URL(path) : new URL(path, origin);
     return url.pathname;
   } catch {
     return path.split('?')[0];
@@ -42,6 +66,33 @@ function notifyAuthExpired() {
   clearAuthSession();
   window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
   window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+}
+
+async function tryRefreshToken() {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+
+  try {
+    const response = await fetch(`${getApiOrigin()}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken })
+    });
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    if (!data.token) return false;
+
+    saveAuthSession({
+      token: data.token,
+      refreshToken,
+      user: data.user || undefined
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function apiRequest(path, options = {}) {
@@ -64,8 +115,16 @@ export async function apiRequest(path, options = {}) {
     init.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
   }
 
-  const response = await fetch(url, init);
+  let response = await fetch(url, init);
   const contentType = response.headers.get('content-type') || '';
+
+  if (response.status === 401 && useAuth && !options._retried) {
+    const refreshed = await tryRefreshToken();
+    if (refreshed) {
+      return apiRequest(path, { ...options, _retried: true });
+    }
+    notifyAuthExpired();
+  }
 
   let data;
   if (contentType.includes('application/json')) {
@@ -75,10 +134,6 @@ export async function apiRequest(path, options = {}) {
   }
 
   if (!response.ok) {
-    if (response.status === 401 && useAuth) {
-      notifyAuthExpired();
-    }
-
     const message =
       (data && typeof data === 'object' && 'message' in data && String(data.message)) ||
       (typeof data === 'string' && data) ||
@@ -90,4 +145,19 @@ export async function apiRequest(path, options = {}) {
   }
 
   return data;
+}
+
+export async function logoutOnServer() {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return;
+
+  try {
+    await apiRequest('/api/auth/logout', {
+      method: 'POST',
+      body: { refreshToken },
+      auth: false
+    });
+  } catch {
+    // ignore — client session cleared anyway
+  }
 }

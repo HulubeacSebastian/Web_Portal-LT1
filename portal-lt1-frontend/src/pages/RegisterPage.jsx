@@ -50,7 +50,11 @@ function RegisterPage() {
         }
       });
 
-      saveAuthSession({ token: response.token, user: response.user });
+      saveAuthSession({
+        token: response.token,
+        refreshToken: response.refreshToken,
+        user: response.user
+      });
       setCookie('portal_user', response.user.email, { maxAge: 60 * 60 * 24 * 7 });
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
       savePreference('lastRegisteredName', formData.name.trim());

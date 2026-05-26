@@ -36,13 +36,19 @@ test.describe('Feature 2: authentication flows', () => {
   test('login validation and successful login flow work', async ({ page }) => {
     await page.goto('/login');
 
-    await page.getByRole('button', { name: 'Autentificare' }).click();
+    await page.getByRole('button', { name: 'Continua' }).click();
     await expect(page.getByText('Email-ul este obligatoriu.')).toBeVisible();
     await expect(page.getByText('Parola este obligatorie.')).toBeVisible();
 
     await page.getByLabel('Email/Username').fill('admin@lt1.ro');
     await page.getByLabel('Parola').fill('admin123');
-    await page.getByRole('button', { name: 'Autentificare' }).click();
+    await page.getByRole('button', { name: 'Continua' }).click();
+
+    const devCodeText = page.locator('.auth-hint strong');
+    await expect(devCodeText).toBeVisible();
+    const otp = await devCodeText.textContent();
+    await page.getByLabel('Cod verificare').fill(otp || '');
+    await page.getByRole('button', { name: 'Finalizeaza autentificarea' }).click();
 
     await expect(page).toHaveURL(/\/$/);
     const cookies = await page.context().cookies();

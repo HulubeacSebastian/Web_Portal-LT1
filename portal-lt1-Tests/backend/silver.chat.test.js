@@ -3,6 +3,7 @@ const WebSocket = require('ws');
 const app = require('../../portal-lt1-backend/src/app');
 const store = require('../../portal-lt1-backend/src/data/documentStore');
 const { startTestServer, stopTestServer } = require('./helpers/testServer');
+const { loginWithOtp } = require('./helpers/authLogin');
 
 function waitForMessage(ws, predicate, timeoutMs = 5000) {
   return new Promise((resolve, reject) => {
@@ -37,11 +38,11 @@ describe('Silver — MongoDB chat over WebSocket', () => {
   });
 
   it('stores and broadcasts chat messages between two users', async () => {
-    const adminLogin = await request(app).post('/api/auth/login').send({
+    const adminLogin = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });
-    const userLogin = await request(app).post('/api/auth/login').send({
+    const userLogin = await loginWithOtp(app, {
       email: 'profesor@lt1.ro',
       password: 'profesor123'
     });

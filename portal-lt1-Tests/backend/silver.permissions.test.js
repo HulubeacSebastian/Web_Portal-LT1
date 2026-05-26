@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../../portal-lt1-backend/src/app');
 const store = require('../../portal-lt1-backend/src/data/documentStore');
+const { loginWithOtp } = require('./helpers/authLogin');
 
 describe('Silver — roles and permissions', () => {
   beforeEach(async () => {
@@ -8,8 +9,7 @@ describe('Silver — roles and permissions', () => {
   });
 
   async function login(email, password) {
-    const response = await request(app).post('/api/auth/login').send({ email, password });
-    return response;
+    return loginWithOtp(app, { email, password });
   }
 
   it('returns role permissions matrix from database', async () => {

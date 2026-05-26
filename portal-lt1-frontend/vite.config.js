@@ -67,6 +67,18 @@ function printLanUrls() {
   };
 }
 
+function resolveApiBaseUrl() {
+  if (process.env.VITE_API_BASE_URL?.trim()) {
+    return process.env.VITE_API_BASE_URL.trim().replace(/\/$/, '');
+  }
+  const serverIp = networkEnv.SERVER_IP?.trim();
+  if (serverIp) {
+    return `${useHttps ? 'https' : 'http'}://${serverIp}:3000`;
+  }
+  return '';
+}
+
+const apiBaseFromNetwork = resolveApiBaseUrl();
 const httpsOptions = useHttps ? loadHttpsOptions() : false;
 const hmrHost = lanHost && getLocalIPv4Addresses().includes(lanHost) ? lanHost : getLocalIPv4Addresses()[0];
 const hmrConfig =
@@ -80,6 +92,9 @@ const hmrConfig =
 
 export default defineConfig({
   plugins: [react(), printLanUrls()],
+  define: apiBaseFromNetwork
+    ? { 'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseFromNetwork) }
+    : {},
   server: {
     host: '0.0.0.0',
     port: 5173,

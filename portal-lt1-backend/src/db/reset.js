@@ -6,6 +6,8 @@ async function clearTables() {
   await prisma.contactMessage.deleteMany();
   await prisma.post.deleteMany();
   await prisma.document.deleteMany();
+  await prisma.userSession.deleteMany();
+  await prisma.authChallenge.deleteMany();
   await prisma.user.deleteMany();
   await prisma.postCategory.deleteMany();
   await prisma.documentCategory.deleteMany();

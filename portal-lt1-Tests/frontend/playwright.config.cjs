@@ -17,7 +17,12 @@ module.exports = defineConfig({
       url: 'http://127.0.0.1:3000/health',
       cwd: path.resolve(testsRoot, '../../portal-lt1-backend'),
       reuseExistingServer: !process.env.CI,
-      timeout: 120000
+      timeout: 120000,
+      env: {
+        ...process.env,
+        AUTH_EXPOSE_DEV_CODES: 'true',
+        NODE_ENV: 'test'
+      }
     },
     {
       command: 'npm run dev -- --host 127.0.0.1 --port 4173',

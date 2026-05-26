@@ -1,5 +1,6 @@
 const { prisma } = require('../db/prisma');
 const { mapUser, mapPost, mapContactMessage } = require('../db/mappers');
+const { hashPassword } = require('../auth/password');
 
 async function resetExtraStores() {
   const { resetDatabase } = require('../db/reset');
@@ -48,11 +49,12 @@ async function createUser({ email, password, fullName, roleName = 'user' }) {
   }
 
   const id = await buildUserId();
+  const passwordHash = await hashPassword(password);
   const row = await prisma.user.create({
     data: {
       id,
       email: String(email).toLowerCase(),
-      password,
+      password: passwordHash,
       fullName,
       roleId: role.id
     },

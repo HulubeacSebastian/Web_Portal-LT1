@@ -1,19 +1,27 @@
 import { clearAuthActivity, touchAuthActivity } from './sessionIdle';
 
 export const AUTH_TOKEN_KEY = 'portal_jwt';
+export const REFRESH_TOKEN_KEY = 'portal_refresh';
 const USER_KEY = 'portal_user_profile';
 
 export function getAuthToken() {
   return localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
+export function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
 export function hasAuthSession() {
   return Boolean(getAuthToken() && loadAuthSession());
 }
 
-export function saveAuthSession({ token, user }) {
+export function saveAuthSession({ token, refreshToken, user }) {
   if (token) {
     localStorage.setItem(AUTH_TOKEN_KEY, token);
+  }
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
   }
   if (user) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -23,6 +31,7 @@ export function saveAuthSession({ token, user }) {
 
 export function clearAuthSession() {
   localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   clearAuthActivity();
 }

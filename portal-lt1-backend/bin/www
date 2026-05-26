@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+require('../scripts/load-dev-network-env').loadDevNetworkEnv();
 var app = require('../src/app');
 var debug = require('debug')('portal-lt1-backend:server');
 var fs = require('fs');

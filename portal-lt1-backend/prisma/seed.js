@@ -2,6 +2,7 @@ const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 const { seedDocuments } = require('../src/data/seedDocuments');
 const { PERMISSIONS, ROLE_DEFINITIONS } = require('../src/permissions/catalog');
+const { hashPassword } = require('../src/auth/password');
 
 const prisma = new PrismaClient();
 const STATUSES = ['Activ', 'Revizie', 'Arhivat'];
@@ -107,18 +108,19 @@ async function seedUsers() {
   const roleByName = Object.fromEntries(roles.map((role) => [role.name, role.id]));
 
   for (const user of USERS) {
+    const passwordHash = await hashPassword(user.password);
     await prisma.user.upsert({
       where: { id: user.id },
       update: {
         email: user.email,
-        password: user.password,
+        password: passwordHash,
         fullName: user.fullName,
         roleId: roleByName[user.role]
       },
       create: {
         id: user.id,
         email: user.email,
-        password: user.password,
+        password: passwordHash,
         fullName: user.fullName,
         roleId: roleByName[user.role]
       }

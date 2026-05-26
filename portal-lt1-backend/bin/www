@@ -4,11 +4,33 @@
  * Module dependencies.
  */
 
+require('../scripts/load-dotenv').loadAppEnv();
+require('../scripts/load-dev-network-env').loadDevNetworkEnv();
+
+if (process.env.CLIENT_IP) {
+  var clientOrigin = 'https://' + process.env.CLIENT_IP.trim() + ':5173';
+  var origins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(function (value) {
+      return value.trim();
+    })
+    .filter(Boolean);
+  if (!origins.includes(clientOrigin)) {
+    origins.push(clientOrigin);
+    process.env.ALLOWED_ORIGINS = origins.join(',');
+  }
+}
+
 var app = require('../src/app');
 var debug = require('debug')('portal-lt1-backend:server');
+var fs = require('fs');
 var http = require('http');
+var https = require('https');
+var os = require('os');
+var path = require('path');
 var WebSocket = require('ws');
 var hub = require('../src/realtime/wsHub');
+var wsChat = require('../src/chat/wsChat');
 
 /**
  * Get port from environment and store in Express.
@@ -18,15 +40,44 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Create HTTP or HTTPS server (HTTPS when SSL_KEY_PATH + SSL_CERT_PATH are set).
  */
 
-var server = http.createServer(app);
+function createAppServer(expressApp) {
+  var keyPath = process.env.SSL_KEY_PATH;
+  var certPath = process.env.SSL_CERT_PATH;
+  var forceHttp = process.env.PORTAL_DEV_HTTP === 'true';
+
+  if (!forceHttp && keyPath && certPath) {
+    var resolvedKey = path.isAbsolute(keyPath) ? keyPath : path.resolve(process.cwd(), keyPath);
+    var resolvedCert = path.isAbsolute(certPath) ? certPath : path.resolve(process.cwd(), certPath);
+    var sslOptions = {
+      key: fs.readFileSync(resolvedKey),
+      cert: fs.readFileSync(resolvedCert)
+    };
+    return https.createServer(sslOptions, expressApp);
+  }
+
+  return http.createServer(expressApp);
+}
+
+var server = createAppServer(app);
 
 var wss = new WebSocket.Server({ server });
 wss.on('connection', function connection(ws) {
   hub.addClient(ws);
   ws.send(JSON.stringify({ type: 'connected' }));
+
+  ws.on('message', function incoming(raw) {
+    wsChat.handleWsMessage(ws, raw).catch(function (error) {
+      console.error('WebSocket chat error:', error);
+      try {
+        ws.send(JSON.stringify({ type: 'chat_error', message: 'Eroare interna chat.' }));
+      } catch {
+        // ignore
+      }
+    });
+  });
 });
 
 /**
@@ -89,10 +140,42 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
+function getLanIPv4Addresses() {
+  var addresses = [];
+  for (var iface of Object.values(os.networkInterfaces())) {
+    for (var entry of iface || []) {
+      if (entry.family === 'IPv4' && !entry.internal) {
+        addresses.push(entry.address);
+      }
+    }
+  }
+  return addresses;
+}
+
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var forceHttp = process.env.PORTAL_DEV_HTTP === 'true';
+  var useTls =
+    !forceHttp && process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH;
+  var protocol = useTls ? 'https' : 'http';
+
+  if (typeof addr === 'string') {
+    debug('Listening on ' + protocol + ' pipe ' + addr);
+    return;
+  }
+
+  var port = addr.port;
+  debug('Listening on ' + protocol + '://0.0.0.0:' + port);
+
+  var lines = ['\n  Backend API (' + protocol + ') — deschide in browser:'];
+  lines.push('    ' + protocol + '://127.0.0.1:' + port + '/health');
+  for (var ip of getLanIPv4Addresses()) {
+    lines.push('    ' + protocol + '://' + ip + ':' + port + '/health');
+  }
+  lines.push('  Portal UI (CLIENT): https://' + (process.env.CLIENT_IP || '<CLIENT_IP>') + ':5173');
+  if (process.env.CLIENT_IP) {
+    lines.push('  CORS permite: https://' + process.env.CLIENT_IP.trim() + ':5173');
+  }
+  lines.push('  Pe Windows: permite port 3000 in Firewall pentru retea privata\n');
+  console.log(lines.join('\n'));
 }

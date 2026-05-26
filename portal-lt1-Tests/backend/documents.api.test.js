@@ -1,16 +1,15 @@
 const request = require('supertest');
 const app = require('../../portal-lt1-backend/src/app');
 const store = require('../../portal-lt1-backend/src/data/documentStore');
-const extraStore = require('../../portal-lt1-backend/src/data/extraStores');
+const { loginWithOtp } = require('./helpers/authLogin');
 
 describe('Documents REST API', () => {
-  beforeEach(() => {
-    store.resetStore();
-    extraStore.resetExtraStores();
+  beforeEach(async () => {
+    await store.resetStore();
   });
 
   async function loginAndGetToken() {
-    const response = await request(app).post('/api/auth/login').send({
+    const response = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });
@@ -24,6 +23,17 @@ describe('Documents REST API', () => {
     expect(response.body.items).toHaveLength(5);
     expect(response.body.pagination.totalItems).toBe(12);
     expect(response.body.pagination.totalPages).toBe(3);
+  });
+
+  it('filters documents by query and status from database', async () => {
+    const response = await request(app).get('/api/documents?query=regulament&status=Activ&page=1&limit=20');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.items.length).toBeGreaterThan(0);
+    expect(response.body.items.every((doc) => doc.status === 'Activ')).toBe(true);
+    expect(
+      response.body.items.every((doc) => doc.title.toLowerCase().includes('regulament') || doc.category.toLowerCase().includes('regulament'))
+    ).toBe(true);
   });
 
   it('returns validation error for invalid pagination', async () => {
@@ -99,7 +109,7 @@ describe('Documents REST API', () => {
   });
 
   it('implements auth, profile, posts and contact routes from project API', async () => {
-    const loginResponse = await request(app).post('/api/auth/login').send({
+    const loginResponse = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });
@@ -169,7 +179,7 @@ describe('Documents REST API', () => {
     expect(badLogin.body.errors.email).toBeDefined();
     expect(badLogin.body.errors.password).toBeDefined();
 
-    const goodLogin = await request(app).post('/api/auth/login').send({ email: 'admin@lt1.ro', password: 'admin123' });
+    const goodLogin = await loginWithOtp(app, { email: 'admin@lt1.ro', password: 'admin123' });
     const token = goodLogin.body.token;
 
     const badPost = await request(app)
@@ -197,7 +207,7 @@ describe('Documents REST API', () => {
   });
 
   it('starts and stops the server-side document generator and receives websocket-ready batch additions', async () => {
-    const loginResponse = await request(app).post('/api/auth/login').send({
+    const loginResponse = await loginWithOtp(app, {
       email: 'admin@lt1.ro',
       password: 'admin123'
     });

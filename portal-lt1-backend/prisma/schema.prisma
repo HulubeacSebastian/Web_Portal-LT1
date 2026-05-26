@@ -1,0 +1,124 @@
+// Assignment 3 — relational schema in 3NF (lookup tables for role, status, categories).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  description String           @default("")
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement())
+  code        String           @unique
+  description String
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       Int        @map("role_id")
+  permissionId Int        @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id              String          @id
+  email           String          @unique
+  password        String
+  fullName        String          @map("full_name")
+  roleId          Int             @map("role_id")
+  role            Role            @relation(fields: [roleId], references: [id])
+  posts           Post[]
+  sessions        UserSession[]
+  authChallenges  AuthChallenge[]
+}
+
+model UserSession {
+  id               String    @id
+  userId           String    @map("user_id")
+  refreshTokenHash String    @map("refresh_token_hash")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  lastUsedAt       DateTime? @map("last_used_at")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuthChallenge {
+  id        String    @id
+  userId    String    @map("user_id")
+  purpose   String
+  codeHash  String    @map("code_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+}
+
+model PostCategory {
+  id    String @id
+  name  String
+  posts Post[]
+}
+
+model Post {
+  id          String       @id
+  title       String
+  content     String
+  categoryId  String       @map("category_id")
+  category    PostCategory @relation(fields: [categoryId], references: [id])
+  imageUrl    String       @default("") @map("image_url")
+  isPublished Boolean      @default(true) @map("is_published")
+  authorId    String       @map("author_id")
+  author      User         @relation(fields: [authorId], references: [id])
+  createdAt   DateTime     @default(now()) @map("created_at")
+}
+
+model DocumentCategory {
+  id        String     @id
+  name      String     @unique
+  documents Document[]
+}
+
+model DocumentStatus {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  documents Document[]
+}
+
+model Document {
+  id          String           @id
+  title       String
+  categoryId  String           @map("category_id")
+  category    DocumentCategory @relation(fields: [categoryId], references: [id])
+  issuer      String
+  issuedAt    String           @map("issued_at")
+  statusId    Int              @map("status_id")
+  status      DocumentStatus   @relation(fields: [statusId], references: [id])
+  description String
+  filePath    String?          @map("file_path")
+  uploadDate  DateTime?        @map("upload_date")
+}
+
+model ContactMessage {
+  id          String   @id
+  senderEmail String   @map("sender_email")
+  message     String
+  sentAt      DateTime @default(now()) @map("sent_at")
+}

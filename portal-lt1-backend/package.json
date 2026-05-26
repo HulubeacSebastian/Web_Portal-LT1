@@ -4,19 +4,37 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage"
+    "start:dev": "node ./scripts/run-dev-http.js",
+    "cert:generate": "node ./scripts/generate-dev-certs.js",
+    "prepare:dev-tls": "node ./scripts/prepare-dev-tls.js",
+    "test": "jest --config ../portal-lt1-Tests/backend/jest.config.js --runInBand --coverage",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "node prisma/seed.js",
+    "db:reset": "prisma migrate reset --force"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "dotenv": "^16.6.1",
+    "@faker-js/faker": "^9.9.0",
+    "@prisma/client": "^6.8.2",
+    "bcryptjs": "^3.0.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
     "morgan": "~1.9.1",
-    "ws": "^8.18.3",
-    "@faker-js/faker": "^9.9.0"
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "prisma": "^6.8.2",
+    "selfsigned": "^2.4.1",
     "supertest": "^7.1.4"
   }
 }

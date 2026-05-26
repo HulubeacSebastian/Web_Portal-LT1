@@ -18,10 +18,20 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Local env
+# Local env (fiecare masina isi are .env; in git raman doar .env.example / .env.production)
 *.local
-.env
-.env.*
+.env.local
+dev-network.local.env
+portal-lt1-frontend/dev-network.env
+portal-lt1-backend/.env
+portal-lt1-frontend/.env
+
+# Dev TLS certificates
+portal-lt1-backend/certs/
+
+# SQLite databases (schema via Prisma migrations)
+portal-lt1-backend/prisma/*.db
+portal-lt1-backend/prisma/*.db-journal
 
 # OS / editor
 .DS_Store

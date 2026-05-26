@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDocuments } from '../store/DocumentsContext';
 import { getCookie, setCookie } from '../utils/cookies';
 import { recordActivityEvent, savePreference } from '../utils/activityCookies';
+import { hasPermission } from '../utils/authSession';
 
 const PAGE_SIZE = 10;
 const statusPalette = {
@@ -19,6 +20,10 @@ function DocumentListPage() {
   const [selectedId, setSelectedId] = useState(() => getCookie('portal_last_document') || documents[0]?.id || '');
   const [viewMode, setViewMode] = useState(() => getCookie('portal_view_mode') || 'table');
   const isLoggedIn = Boolean(getCookie('portal_user'));
+  const canCreate = hasPermission('documents:create');
+  const canUpdate = hasPermission('documents:update');
+  const canDelete = hasPermission('documents:delete');
+  const canControlGenerator = hasPermission('generator:control');
   const [generatorBusy, setGeneratorBusy] = useState(false);
 
   const filteredDocs = useMemo(() => {
@@ -168,19 +173,21 @@ function DocumentListPage() {
                   </select>
                 </div>
               </div>
-              <button
-                type="button"
-                className={`btn ${generator?.running ? 'danger' : 'secondary'}`}
-                onClick={handleGeneratorToggle}
-                disabled={isOffline || generatorBusy}
-                title={isOffline ? 'Backend offline - generator indisponibil.' : 'Porneste/opreste generatorul de documente.'}
-              >
-                {generator?.running ? 'STOP GENERATOR' : 'START GENERATOR'}
-              </button>
+              {canControlGenerator ? (
+                <button
+                  type="button"
+                  className={`btn ${generator?.running ? 'danger' : 'secondary'}`}
+                  onClick={handleGeneratorToggle}
+                  disabled={isOffline || generatorBusy}
+                  title={isOffline ? 'Backend offline - generator indisponibil.' : 'Porneste/opreste generatorul de documente.'}
+                >
+                  {generator?.running ? 'STOP GENERATOR' : 'START GENERATOR'}
+                </button>
+              ) : null}
               <button type="button" className="btn documents-add-btn view-toggle-btn" onClick={toggleViewMode}>
                 {viewMode === 'table' ? 'CARDURI' : 'TABEL'}
               </button>
-              {isLoggedIn ? (
+              {isLoggedIn && canCreate ? (
                 <Link to="/documente/adauga" className="btn documents-add-btn">
                   ADAUGARE
                 </Link>
@@ -229,19 +236,19 @@ function DocumentListPage() {
                               <Link to={`/documente/${doc.id}`} className="btn ghost">
                                 Vezi
                               </Link>
-                              {isLoggedIn ? (
-                                <>
-                                  <Link to={`/documente/${doc.id}/edit`} className="btn secondary">
-                                    Editeaza
-                                  </Link>
-                                  <button
-                                    type="button"
-                                    className="btn danger"
-                                    onClick={() => handleDeleteFromList(doc.id)}
-                                  >
-                                    Sterge
-                                  </button>
-                                </>
+                              {isLoggedIn && canUpdate ? (
+                                <Link to={`/documente/${doc.id}/edit`} className="btn secondary">
+                                  Editeaza
+                                </Link>
+                              ) : null}
+                              {isLoggedIn && canDelete ? (
+                                <button
+                                  type="button"
+                                  className="btn danger"
+                                  onClick={() => handleDeleteFromList(doc.id)}
+                                >
+                                  Sterge
+                                </button>
                               ) : null}
                             </div>
                           </td>
@@ -325,7 +332,7 @@ function DocumentListPage() {
                   <Link to={`/documente/${selectedDoc.id}`} className="btn ghost">
                     Deschide
                   </Link>
-                  {isLoggedIn ? (
+                  {isLoggedIn && canUpdate ? (
                     <Link to={`/documente/${selectedDoc.id}/edit`} className="btn secondary">
                       Editeaza
                     </Link>

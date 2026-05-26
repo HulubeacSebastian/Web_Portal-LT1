@@ -5,7 +5,7 @@
 ![Node](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=fff)
 ![License](https://img.shields.io/badge/License-MIT-informational)
 
-A React-based document management portal. It demonstrates a clean **master–detail UI**, **full CRUD**, and **client-side validation**, using **in-memory state** (no database) as required by the assignment scope.
+A React-based document management portal for Liceul Tehnologic Nr. 1. It demonstrates **master–detail UI**, **full CRUD**, **client-side validation**, and **server-side persistence** with Prisma ORM (Assignment 3).
 
 ## ✨ What you can do
 
@@ -13,7 +13,7 @@ A React-based document management portal. It demonstrates a clean **master–det
 - 🔎 **Open a document** to see full details (detail view)
 - ✍️ **Create, edit, and delete** documents (CRUD)
 - ✅ **Validate forms** on the client for Create/Edit flows
-- 🧠 **Work entirely in memory** with pre-seeded data for quick testing
+- 🗄️ **Persist data** in a relational SQLite database via Prisma migrations
 
 ## 🧰 Tech stack
 
@@ -48,22 +48,55 @@ From the workspace root:
 ```bash
 npm install
 npm run install:all
+cd portal-lt1-backend
+npm run db:generate
+npm run db:migrate
+npm run db:seed
 ```
+
 
 ### ▶️ Run (JetBrains Run button)
 
-1. Open the root `package.json`.
-2. Use the Run icon next to script `run` (or `dev`).
-3. This starts both:
-   - frontend (Vite)
-   - backend (Express)
+**Prima dată (offline pe PC):**
 
-Default URLs:
+```bash
+copy dev-network.local.env.example dev-network.local.env
+npm install
+npm run install:all
+cd portal-lt1-backend
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+```
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:3000`
+`dev-network.local.env` are prioritate față de `dev-network.env` — nu strică deploy-ul pe cloud.
+
+**Pornire locală (backend + frontend):**
+
+1. Deschide `package.json` din rădăcină.
+2. Apasă **Run** lângă scriptul **`dev`** (sau **`run`** — același lucru).
+3. Sau din dropdown Run: **`dev (local offline)`** / **`dev (npm run)`**.
+
+Default URLs (offline):
+
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3000
+
+Pentru backend pe cloud în timp ce lucrezi local, șterge/redenumește `dev-network.local.env` și folosește `dev-network.env` (vezi [DEPLOY.md](./DEPLOY.md)).
+
+## ☁️ Deploy pe Oracle Cloud (producție)
+
+Frontend și backend pe cloud, HTTPS cu Let's Encrypt (DuckDNS, Nginx, pm2).
+
+- **Deploy / update:** [DEPLOY.md](./DEPLOY.md)
+- **`.env` PC vs server:** [ENV.md](./ENV.md)
+
+| Serviciu | URL |
+|----------|-----|
+| Site | https://portal-lt1.duckdns.org |
+| API | https://api-lt1.duckdns.org/health |
 
 ## 📝 Notes
 
-- **Persistence**: data is intentionally **not persisted** (in-memory only).
-- **Goal**: showcase UI architecture, routing, CRUD flows, and validation within the assignment constraints.
+- **Persistence**: Prisma + SQLite (`portal-lt1-backend/prisma/`). Use `npm run db:reset` in backend to reseed.
+- **Remote demo**: set `VITE_API_BASE_URL` on the frontend VM and `ALLOWED_ORIGINS` on the backend (see [DEPLOY.md](./DEPLOY.md)).

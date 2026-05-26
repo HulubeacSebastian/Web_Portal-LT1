@@ -1,42 +1,74 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
+import { apiRequest, AUTH_CHANGED_EVENT } from '../utils/apiClient';
+import { saveAuthSession } from '../utils/authSession';
 import { setCookie } from '../utils/cookies';
 import { hasErrors } from '../utils/documentValidation';
 import { validateRegister } from '../utils/formValidation';
 import { recordActivityEvent, savePreference } from '../utils/activityCookies';
 
 const highlights = [
-  'Creare rapida a unui cont local in portal',
-  'Acces la documente, calendar si pagina Despre',
-  'Datele contului sunt pastrate doar in browser',
+  'Cont nou salvat securizat pe server',
+  'Rol utilizator cu permisiuni restrictionate',
+  'Autentificare automata dupa inregistrare',
 ];
 
 function RegisterPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+    if (message) {
+      setMessage('');
+    }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validateRegister(formData);
     setErrors(nextErrors);
     if (hasErrors(nextErrors)) {
       recordActivityEvent('register_failed_validation');
+      setMessage('');
       return;
     }
 
-    setCookie('portal_user', formData.name.trim(), { maxAge: 60 * 60 * 24 * 7 });
-    savePreference('lastRegisteredName', formData.name.trim());
-    recordActivityEvent('register_success');
-    navigate('/');
+    try {
+      const response = await apiRequest('/api/auth/register', {
+        method: 'POST',
+        body: {
+          fullName: formData.name.trim(),
+          email: formData.email.trim(),
+          password: formData.password
+        }
+      });
+
+      saveAuthSession({
+        token: response.token,
+        refreshToken: response.refreshToken,
+        user: response.user
+      });
+      setCookie('portal_user', response.user.email, { maxAge: 60 * 60 * 24 * 7 });
+      window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+      savePreference('lastRegisteredName', formData.name.trim());
+      recordActivityEvent('register_success');
+      setMessage('Cont creat cu succes.');
+      navigate('/');
+    } catch (error) {
+      recordActivityEvent('register_failed_validation');
+      const serverErrors = error?.data?.errors;
+      if (serverErrors && typeof serverErrors === 'object') {
+        setErrors((prev) => ({ ...prev, ...serverErrors }));
+      }
+      setMessage(error?.message || 'Inregistrarea a esuat. Incearca din nou.');
+    }
   };
 
   return (
@@ -114,9 +146,11 @@ function RegisterPage() {
           {errors.confirmPassword ? <p className="error">{errors.confirmPassword}</p> : null}
         </div>
 
+        {message ? <p className="auth-message">{message}</p> : null}
+
         <button type="submit" className="auth-submit auth-submit--register">
           <span>Creare cont</span>
-          <small>Cont simulat pentru proiectul educational</small>
+          <small>Cont salvat pe server cu rol utilizator</small>
         </button>
       </form>
     </AuthPageLayout>

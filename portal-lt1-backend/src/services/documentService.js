@@ -1,31 +1,51 @@
 const store = require('../data/documentStore');
+const { prisma } = require('../db/prisma');
 const { allowedStatuses } = require('../validation/documentValidation');
 
-function listDocuments(options) {
+async function listDocuments(options) {
   const query = options.query ? String(options.query).trim().toLowerCase() : '';
   const status = options.status ? String(options.status).trim() : '';
 
-  let filtered = store.getAllDocuments();
+  const where = {};
+  if (status && allowedStatuses.includes(status)) {
+    const statusRow = await prisma.documentStatus.findUnique({ where: { name: status } });
+    if (statusRow) {
+      where.statusId = statusRow.id;
+    }
+  }
 
   if (query) {
-    filtered = filtered.filter((document) => {
-      return (
-        document.title.toLowerCase().includes(query) ||
-        document.category.toLowerCase().includes(query) ||
-        document.issuer.toLowerCase().includes(query) ||
-        document.description.toLowerCase().includes(query)
-      );
-    });
+    where.OR = [
+      { title: { contains: query } },
+      { issuer: { contains: query } },
+      { description: { contains: query } },
+      { category: { name: { contains: query } } }
+    ];
   }
 
-  if (status && allowedStatuses.includes(status)) {
-    filtered = filtered.filter((document) => document.status === status);
-  }
-
-  const totalItems = filtered.length;
+  const totalItems = await prisma.document.count({ where });
   const totalPages = totalItems === 0 ? 0 : Math.ceil(totalItems / options.limit);
   const offset = (options.page - 1) * options.limit;
-  const items = filtered.slice(offset, offset + options.limit);
+
+  const rows = await prisma.document.findMany({
+    where,
+    include: { category: true, status: true },
+    orderBy: { id: 'asc' },
+    skip: offset,
+    take: options.limit
+  });
+
+  const items = rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    category: row.category.name,
+    issuer: row.issuer,
+    issuedAt: row.issuedAt,
+    status: row.status.name,
+    description: row.description,
+    ...(row.filePath ? { file_path: row.filePath } : {}),
+    ...(row.uploadDate ? { upload_date: row.uploadDate.toISOString() } : {})
+  }));
 
   return {
     items,
@@ -40,15 +60,15 @@ function listDocuments(options) {
   };
 }
 
-function getDocument(id) {
+async function getDocument(id) {
   return store.getDocumentById(id);
 }
 
-function addDocument(payload) {
+async function addDocument(payload) {
   return store.createDocument(payload);
 }
 
-function addUploadedDocument(payload) {
+async function addUploadedDocument(payload) {
   return store.createDocument({
     title: payload.title,
     category: payload.category,
@@ -61,31 +81,46 @@ function addUploadedDocument(payload) {
   });
 }
 
-function editDocument(id, payload) {
+async function editDocument(id, payload) {
   return store.updateDocument(id, payload);
 }
 
-function removeDocument(id) {
+async function removeDocument(id) {
   return store.deleteDocument(id);
 }
 
-function buildStatistics() {
-  const documents = store.getAllDocuments();
-  const byStatus = documents.reduce(
-    (acc, document) => {
-      acc[document.status] = (acc[document.status] || 0) + 1;
-      return acc;
-    },
-    {}
-  );
+async function buildStatistics() {
+  const [totalDocuments, statusGroups, categoryGroups] = await Promise.all([
+    prisma.document.count(),
+    prisma.document.groupBy({
+      by: ['statusId'],
+      _count: { _all: true }
+    }),
+    prisma.document.groupBy({
+      by: ['categoryId'],
+      _count: { _all: true }
+    })
+  ]);
 
-  const byCategory = documents.reduce((acc, document) => {
-    acc[document.category] = (acc[document.category] || 0) + 1;
+  const statuses = await prisma.documentStatus.findMany();
+  const categories = await prisma.documentCategory.findMany();
+  const statusNameById = Object.fromEntries(statuses.map((row) => [row.id, row.name]));
+  const categoryNameById = Object.fromEntries(categories.map((row) => [row.id, row.name]));
+
+  const byStatus = statusGroups.reduce((acc, group) => {
+    const name = statusNameById[group.statusId];
+    if (name) acc[name] = group._count._all;
+    return acc;
+  }, {});
+
+  const byCategory = categoryGroups.reduce((acc, group) => {
+    const name = categoryNameById[group.categoryId];
+    if (name) acc[name] = group._count._all;
     return acc;
   }, {});
 
   return {
-    totalDocuments: documents.length,
+    totalDocuments,
     byStatus,
     byCategory
   };

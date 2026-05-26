@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Generate Dev Certs" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/portal-lt1-backend/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="prepare:dev-tls" />
+    </scripts>
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,4 +1,14 @@
-function AuthPageLayout({ variant, eyebrow, title, lead, highlights, formTitle, formLead, children, footer }) {
+function AuthPageLayout({
+  variant,
+  eyebrow,
+  title,
+  lead,
+  highlights = [],
+  formTitle,
+  formLead,
+  children,
+  footer
+}) {
   return (
     <section className={`page-shell auth-page auth-page--${variant}`}>
       <header className="auth-hero" aria-labelledby="auth-hero-title">
@@ -12,14 +22,16 @@ function AuthPageLayout({ variant, eyebrow, title, lead, highlights, formTitle, 
 
       <div className="auth-body">
         <aside className="auth-aside auth-reveal" aria-label="Beneficii portal">
-          <h2>De ce un cont in portal?</h2>
-          <ul className="auth-highlight-list">
-            {highlights.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <h2>{highlights.length > 0 ? 'De ce un cont in portal?' : 'Portal LT1'}</h2>
+          {highlights.length > 0 ? (
+            <ul className="auth-highlight-list">
+              {highlights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          ) : null}
           <p className="auth-aside-note">
-            Autentificarea este simulata in acest proiect educational — datele raman in browserul tau.
+            Recuperarea parolei foloseste token securizat pe server (Assignment 4).
           </p>
         </aside>
 

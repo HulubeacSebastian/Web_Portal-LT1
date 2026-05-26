@@ -10,15 +10,27 @@ var usersRouter = require('./routes/users');
 var postsRouter = require('./routes/posts');
 var contactRouter = require('./routes/contact');
 var documentsGeneratorRouter = require('./routes/documentsGenerator');
+var rolesRouter = require('./routes/roles');
+var chatRouter = require('./routes/chat');
 
 app.use(logger('dev'));
 
-// Basic CORS for local dev (Vite frontend).
+// CORS: configure ALLOWED_ORIGINS for VM deployment (client must not use localhost).
 app.use(function (req, res, next) {
   var origin = req.headers.origin;
-  var allowed = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174'];
+  var allowed = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173')
+    .split(',')
+    .map(function (value) {
+      return value.trim();
+    })
+    .filter(Boolean);
 
-  if (origin && allowed.includes(origin)) {
+  var lanHttpsOrigin =
+    origin &&
+    process.env.SSL_KEY_PATH &&
+    /^https:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}):5173$/.test(origin);
+
+  if (origin && (allowed.includes(origin) || lanHttpsOrigin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
   }
@@ -36,6 +48,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.get('/', function (req, res) {
+  res.json({
+    service: 'Portal LT1 API',
+    status: 'running',
+    health: '/health',
+    auth: '/api/auth/login',
+    hint: 'Portalul web ruleaza pe frontend (port 5173), nu pe 3000.'
+  });
+});
+
 app.get('/health', function (req, res) {
   res.json({ status: 'ok' });
 });
@@ -47,11 +69,18 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/roles', rolesRouter);
+app.use('/api/chat', chatRouter);
 
 app.use(function (req, res) {
   res.status(404).json({
     message: 'Resource not found.'
   });
+});
+
+app.use(function (err, req, res, next) {
+  console.error(err);
+  res.status(500).json({ message: 'Eroare interna de server.' });
 });
 
 module.exports = app;

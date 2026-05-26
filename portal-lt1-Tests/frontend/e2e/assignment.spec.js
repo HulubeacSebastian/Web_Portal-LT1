@@ -36,17 +36,23 @@ test.describe('Feature 2: authentication flows', () => {
   test('login validation and successful login flow work', async ({ page }) => {
     await page.goto('/login');
 
-    await page.getByRole('button', { name: 'Autentificare' }).click();
+    await page.getByRole('button', { name: 'Continua' }).click();
     await expect(page.getByText('Email-ul este obligatoriu.')).toBeVisible();
     await expect(page.getByText('Parola este obligatorie.')).toBeVisible();
 
-    await page.getByLabel('Email/Username').fill('elev@test.ro');
-    await page.getByLabel('Parola').fill('parola123');
-    await page.getByRole('button', { name: 'Autentificare' }).click();
+    await page.getByLabel('Email/Username').fill('admin@lt1.ro');
+    await page.getByLabel('Parola').fill('admin123');
+    await page.getByRole('button', { name: 'Continua' }).click();
+
+    const devCodeText = page.locator('.auth-hint strong');
+    await expect(devCodeText).toBeVisible();
+    const otp = await devCodeText.textContent();
+    await page.getByLabel('Cod verificare').fill(otp || '');
+    await page.getByRole('button', { name: 'Finalizeaza autentificarea' }).click();
 
     await expect(page).toHaveURL(/\/$/);
     const cookies = await page.context().cookies();
-    expect(cookies.some((cookie) => cookie.name === 'portal_user' && cookie.value === 'elev%40test.ro')).toBeTruthy();
+    expect(cookies.some((cookie) => cookie.name === 'portal_user' && cookie.value === 'admin%40lt1.ro')).toBeTruthy();
   });
 
   test('register validation and successful register flow work', async ({ page }) => {
@@ -57,7 +63,8 @@ test.describe('Feature 2: authentication flows', () => {
     await expect(page.getByText('Email-ul este obligatoriu.')).toBeVisible();
 
     await page.getByLabel('Nume').fill('Elev Nou');
-    await page.getByLabel('Email/Username').fill('elevnou@test.ro');
+    const uniqueEmail = `elevnou${Date.now()}@test.ro`;
+    await page.getByLabel('Email/Username').fill(uniqueEmail);
     await page.locator('#register-password').fill('parola123');
     await page.locator('#register-confirm-password').fill('parola123');
     await page.getByRole('button', { name: 'Creare cont' }).click();

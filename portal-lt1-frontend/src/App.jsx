@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import DocumentListPage from './pages/DocumentListPage.jsx';
 import DocumentAnalyticsPage from './pages/DocumentAnalyticsPage.jsx';
@@ -13,12 +13,21 @@ import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
 import ActivityInsightsPage from './pages/ActivityInsightsPage.jsx';
+import AccountPage from './pages/AccountPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ChatPage from './pages/ChatPage.jsx';
 import { AUTH_CHANGED_EVENT, AUTH_EXPIRED_EVENT, logoutOnServer } from './utils/apiClient';
-import { clearAuthSession, hasAuthSession, loadAuthSession } from './utils/authSession';
+import {
+  clearAuthSession,
+  getDisplayName,
+  hasAuthSession,
+  isAdmin,
+  loadAuthSession
+} from './utils/authSession';
 import { initSessionIdleWatch } from './utils/sessionIdle';
 import SchoolFooter from './components/SchoolFooter.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
+import SiteHeader from './components/SiteHeader.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import { deleteCookie, getCookie, setCookie } from './utils/cookies';
 import {
@@ -35,7 +44,7 @@ function App() {
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
   const [activity, setActivity] = useState(() => getActivitySnapshot());
   const [authSession, setAuthSession] = useState(() => loadAuthSession());
-  const authUser = authSession?.email || authSession?.fullName || getCookie('portal_user') || '';
+  const visitorLabel = getCookie('portal_user') || 'Vizitator';
 
   useEffect(() => {
     if (cookieConsent) {
@@ -94,7 +103,11 @@ function App() {
   }, [authSession?.id, handleLogout]);
 
   const isLoggedIn = hasAuthSession();
-  const userLabel = useMemo(() => authUser || 'Vizitator', [authUser]);
+  const userIsAdmin = isLoggedIn && isAdmin();
+  const displayName = useMemo(
+    () => (isLoggedIn ? getDisplayName(authSession) : visitorLabel),
+    [authSession, isLoggedIn, visitorLabel]
+  );
 
   const acceptCookies = () => {
     setCookie('portal_cookie_consent', 'accepted', { maxAge: 60 * 60 * 24 * 365 });
@@ -107,84 +120,24 @@ function App() {
   return (
     <DocumentsProvider>
       <div className="layout">
-        <header className="header">
-          <div className="header-inner">
-            <div className="header-center">
-              <img src="/assets/logo-mov-vector.pdf.png" alt="Logo LT1" className="brand-logo" />
-              <nav className="nav nav-main">
-                <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
-                  Acasa
-                </NavLink>
-                <NavLink
-                  to="/documente"
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  Documente
-                </NavLink>
-                <NavLink
-                  to="/despre-noi"
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  Despre Noi
-                </NavLink>
-                <NavLink
-                  to="/contact"
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  Contact
-                </NavLink>
-                <NavLink
-                  to="/calendar"
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  Calendar
-                </NavLink>
-                <NavLink
-                  to="/activitate"
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  Activitate
-                </NavLink>
-                {isLoggedIn && authSession?.permissions?.includes('chat:use') ? (
-                  <NavLink
-                    to="/chat"
-                    className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                  >
-                    Chat
-                  </NavLink>
-                ) : null}
-              </nav>
-            </div>
-
-            <div className="header-auth">
-              {isLoggedIn ? (
-                <button type="button" className="auth-btn login-btn" onClick={handleLogout}>
-                  Deconectare
-                </button>
-              ) : (
-                <>
-                  <Link to="/login" className="auth-btn login-btn">
-                    Login
-                  </Link>
-                  <Link to="/register" className="auth-btn register-btn">
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
+        <SiteHeader
+          isLoggedIn={isLoggedIn}
+          displayName={displayName}
+          showChat={isLoggedIn && authSession?.permissions?.includes('chat:use')}
+          showActivity={userIsAdmin}
+          onLogout={handleLogout}
+        />
 
         {!cookieConsent ? (
           <div className="cookie-banner">
-            <span>Folosim cookie-uri pentru preferinte si activitate. Bun venit, {userLabel}.</span>
+            <span>Folosim cookie-uri pentru preferinte si activitate. Bun venit, {displayName}.</span>
             <button type="button" className="btn" onClick={acceptCookies}>
               Accept
             </button>
           </div>
         ) : null}
 
-        {cookieConsent ? (
+        {cookieConsent && userIsAdmin ? (
           <div className="cookie-banner">
             <span>
               Monitorizare activa: {activity.totalVisits} navigari, ultima pagina {activity.lastPath}, preferinte salvate{' '}
@@ -205,7 +158,15 @@ function App() {
               <Route path="/despre-noi" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/activitate" element={<ActivityInsightsPage />} />
+              <Route
+                path="/activitate"
+                element={
+                  <AdminRoute>
+                    <ActivityInsightsPage />
+                  </AdminRoute>
+                }
+              />
+              <Route path="/cont" element={<AccountPage onLogout={handleLogout} />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

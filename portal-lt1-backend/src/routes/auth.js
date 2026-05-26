@@ -42,7 +42,9 @@ function toPublicUser(user) {
     id: user.id,
     email: user.email,
     fullName: user.fullName,
+    nickname: user.nickname,
     role: user.role,
+    roleDescription: user.roleDescription,
     permissions: user.permissions
   };
 }

@@ -37,7 +37,9 @@ function mapUser(row) {
     email: row.email,
     password: row.password,
     fullName: row.fullName,
+    nickname: row.nickname || null,
     role: row.role.name,
+    roleDescription: row.role?.description || '',
     permissions
   };
 }

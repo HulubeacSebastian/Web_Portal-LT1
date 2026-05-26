@@ -38,6 +38,7 @@ model User {
   email           String          @unique
   password        String
   fullName        String          @map("full_name")
+  nickname        String?
   roleId          Int             @map("role_id")
   role            Role            @relation(fields: [roleId], references: [id])
   posts           Post[]

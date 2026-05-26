@@ -10,10 +10,6 @@ test.describe('Feature 1: public navigation and presentation', () => {
 
     await page.getByRole('link', { name: 'Calendar' }).click();
     await expect(page.getByRole('button', { name: 'Generare Orar' })).toBeVisible();
-
-    await page.getByRole('link', { name: 'Activitate' }).click();
-    await expect(page.getByRole('heading', { name: 'Monitorizare activitate si preferinte' })).toBeVisible();
-    await expect(page.getByText('Total navigari:')).toBeVisible();
   });
 
   test('contact form blocks invalid and accepts valid message', async ({ page }) => {

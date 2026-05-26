@@ -20,7 +20,6 @@ pnpm-debug.log*
 
 # Local env
 *.local
-.env
 dev-network.env
 
 # Dev TLS certificates

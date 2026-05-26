@@ -47,11 +47,14 @@ const clientValidationError = validateClientNetworkEnv(networkEnv, localIps);
 if (clientValidationError) {
   throw new Error(clientValidationError);
 }
-if (useDevProxy && !networkEnv.SERVER_IP?.trim()) {
-  const proxyTargetPreview = resolveProxyTargetPreview();
-  if (proxyTargetPreview.includes('127.0.0.1')) {
+if (useDevProxy) {
+  const serverIp = networkEnv.SERVER_IP?.trim();
+  const badServer =
+    !serverIp || serverIp === '127.0.0.1' || serverIp === 'localhost';
+  if (badServer && resolveProxyTargetPreview().includes('127.0.0.1')) {
     throw new Error(
-      'dev-network.env: seteaza SERVER_IP=IP_PC (ex. 192.168.0.81). Pe Mac nu folosi 127.0.0.1 pentru backend.'
+      'dev-network.env (radacina repo): SERVER_IP trebuie IP-ul PC-ului, ex. SERVER_IP=192.168.0.81\n' +
+        '  Pe Mac nu folosi 127.0.0.1. Copiaza dev-network.env.example de pe PC si reporneste npm run dev:https'
     );
   }
 }

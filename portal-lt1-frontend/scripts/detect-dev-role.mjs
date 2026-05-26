@@ -43,7 +43,13 @@ export function validateClientNetworkEnv(networkEnv, localIps = getLocalIPv4Addr
   if (!serverIp) {
     return (
       'Pe CLIENT (Mac): lipseste SERVER_IP in dev-network.env.\n' +
-      '  Copiaza fisierul complet de pe PC (ex. SERVER_IP=192.168.0.81).'
+      '  Adauga: SERVER_IP=192.168.0.81  (IP-ul PC-ului cu backend, nu 127.0.0.1).'
+    );
+  }
+  if (serverIp === '127.0.0.1' || serverIp === 'localhost') {
+    return (
+      'SERVER_IP=127.0.0.1 este gresit pe Mac.\n' +
+      '  Backend-ul e pe PC: SERVER_IP=192.168.0.81 (ipconfig pe Windows).'
     );
   }
   return null;

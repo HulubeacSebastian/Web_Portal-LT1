@@ -7,22 +7,33 @@ import {
   isClientMachine,
   validateClientNetworkEnv
 } from './detect-dev-role.mjs';
-import { loadDevNetworkEnv } from './load-dev-network-env.mjs';
+import {
+  findDevNetworkEnvPath,
+  loadDevNetworkEnv,
+  resolveDevNetworkEnvPaths
+} from './load-dev-network-env.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendDir = path.resolve(scriptDir, '..');
-const devNetworkPath = path.resolve(frontendDir, '../dev-network.env');
+const devNetworkPath = findDevNetworkEnvPath();
 const networkEnv = loadDevNetworkEnv();
 const localIps = getLocalIPv4Addresses();
 const onClient = isClientMachine(networkEnv, localIps);
 
-if (!fs.existsSync(devNetworkPath)) {
+if (!devNetworkPath) {
   console.error(
-    '\n  EROARE: lipseste dev-network.env in radacina proiectului.\n' +
-      '  Copiaza dev-network.env.example → dev-network.env si completeaza IP-urile.\n'
+    '\n  EROARE: lipseste dev-network.env.\n' +
+      '  Salveaza fisierul la una din locatiile:\n' +
+      resolveDevNetworkEnvPaths()
+        .map((p) => `    - ${p}`)
+        .join('\n') +
+      '\n'
   );
   process.exit(1);
 }
+
+console.log(`\n  dev-network.env: ${devNetworkPath}`);
+console.log(`  SERVER_IP=${networkEnv.SERVER_IP || '(lipseste)'}\n`);
 
 const validationError = validateClientNetworkEnv(networkEnv, localIps);
 if (validationError) {

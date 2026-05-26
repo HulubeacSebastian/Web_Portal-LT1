@@ -4,12 +4,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { loadDevNetworkEnv } from './scripts/load-dev-network-env.mjs';
+import {
+  findDevNetworkEnvPath,
+  loadDevNetworkEnv,
+  resolveDevNetworkEnvPaths
+} from './scripts/load-dev-network-env.mjs';
 import { isClientMachine, validateClientNetworkEnv } from './scripts/detect-dev-role.mjs';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const certDir = path.resolve(rootDir, '../portal-lt1-backend/certs');
-const devNetworkPath = path.resolve(rootDir, '../dev-network.env');
+const devNetworkPath = findDevNetworkEnvPath() || resolveDevNetworkEnvPaths()[0];
 const networkEnv = loadDevNetworkEnv();
 const useHttps = process.env.VITE_DEV_HTTPS === 'true';
 const lanHost = process.env.VITE_LAN_HOST || networkEnv.VITE_LAN_HOST || networkEnv.CLIENT_IP || '';
@@ -47,24 +51,30 @@ const clientValidationError = validateClientNetworkEnv(networkEnv, localIps);
 if (clientValidationError) {
   throw new Error(clientValidationError);
 }
-if (useDevProxy) {
-  const serverIp = networkEnv.SERVER_IP?.trim();
-  const badServer =
-    !serverIp || serverIp === '127.0.0.1' || serverIp === 'localhost';
-  if (badServer && resolveProxyTargetPreview().includes('127.0.0.1')) {
-    throw new Error(
-      'dev-network.env (radacina repo): SERVER_IP trebuie IP-ul PC-ului, ex. SERVER_IP=192.168.0.81\n' +
-        '  Pe Mac nu folosi 127.0.0.1. Copiaza dev-network.env.example de pe PC si reporneste npm run dev:https'
-    );
-  }
+
+if (!findDevNetworkEnvPath()) {
+  throw new Error(
+    'Nu gasesc dev-network.env.\n' +
+      '  Salveaza fisierul la: ' +
+      resolveDevNetworkEnvPaths()[0] +
+      '\n' +
+      '  (sau in portal-lt1-frontend/dev-network.env)'
+  );
 }
 
-function resolveProxyTargetPreview() {
-  const serverIp = networkEnv.SERVER_IP?.trim() || '127.0.0.1';
-  const backendHttp =
-    networkEnv.BACKEND_HTTP === 'true' || process.env.BACKEND_HTTP === 'true';
-  const protocol = backendHttp ? 'http' : 'https';
-  return `${protocol}://${serverIp}:3000`;
+const serverIpFromEnv = networkEnv.SERVER_IP?.trim();
+if (
+  !serverIpFromEnv &&
+  (isClientMachine(networkEnv, localIps) || process.env.VITE_USE_DEV_PROXY === 'false')
+) {
+  throw new Error(
+    'dev-network.env exista dar SERVER_IP lipseste. Adauga: SERVER_IP=192.168.0.81'
+  );
+}
+if (serverIpFromEnv === '127.0.0.1' || serverIpFromEnv === 'localhost') {
+  throw new Error(
+    'SERVER_IP=127.0.0.1 este gresit pe Mac. Foloseste IP-ul PC-ului (ex. 192.168.0.81).'
+  );
 }
 
 function loadHttpsOptions() {
@@ -170,10 +180,10 @@ function printLanUrls() {
         if (primaryIp) {
           lines.push(`  Retea (acelasi PC / LAN): ${protocol}://${primaryIp}:${port}/`);
         }
-        if (!fs.existsSync(devNetworkPath)) {
-          lines.push(
-            '  ATENTIE: lipseste dev-network.env in radacina repo — copiaza-l de pe PC.'
-          );
+        if (!findDevNetworkEnvPath()) {
+          lines.push('  ATENTIE: lipseste dev-network.env — copiaza-l de pe PC.');
+        } else {
+          lines.push(`  dev-network.env: ${findDevNetworkEnvPath()}`);
         }
         if (useDevProxy) {
           lines.push(`  API proxy → ${proxyTarget}`);

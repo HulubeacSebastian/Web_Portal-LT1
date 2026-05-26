@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { getDailyMotivation } from '../utils/dailyMotivation.js';
 
-const MAX_PULL = 248;
-const SNAP_OPEN = 108;
-/** Ciucurelul dispare înainte ca headerul să ajungă la dimensiune minimă. */
+const ROLL_HEIGHT_PX = 26;
+const PAPER_EXTRA_PX = 8;
+const MAX_OPEN_CAP_PX = 340;
 const TASSEL_RETRACT_AT = 0.32;
 
 function collapseRetractAmount(collapseProgress) {
@@ -11,7 +11,11 @@ function collapseRetractAmount(collapseProgress) {
   return t ** 1.28;
 }
 
-function TasselSvg() {
+function formatMessageDate(date = new Date()) {
+  return date.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long' });
+}
+
+function TasselSvg({ compact = false }) {
   const uid = useId().replace(/:/g, '');
   const cord = `htCord-${uid}`;
   const band = `htBand-${uid}`;
@@ -21,7 +25,13 @@ function TasselSvg() {
   const glow = `htGlow-${uid}`;
 
   return (
-    <svg className="site-header-tassel-svg" viewBox="0 0 52 104" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg
+      className={`site-header-tassel-svg${compact ? ' site-header-tassel-svg--compact' : ''}`}
+      viewBox="0 0 52 104"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
       <defs>
         <linearGradient id={cord} x1="26" y1="0" x2="26" y2="50" gradientUnits="userSpaceOnUse">
           <stop stopColor="#9a8bd8" />
@@ -37,7 +47,7 @@ function TasselSvg() {
         <radialGradient id={knot} cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(26 58.5) scale(8.5 5.5)">
           <stop stopColor="#8a78c8" />
           <stop offset="0.5" stopColor="#4b2978" />
-          <stop offset="1" stopColor="#2a1642" />
+          <stop offset="1" stopColor="#2a1648" />
         </radialGradient>
         <linearGradient id={fringeA} x1="26" y1="64" x2="26" y2="98" gradientUnits="userSpaceOnUse">
           <stop stopColor="#f2dc7a" />
@@ -60,13 +70,7 @@ function TasselSvg() {
         <rect x="14" y="47.8" width="24" height="1.6" rx="0.8" fill="#fff" opacity="0.5" />
         <ellipse cx="26" cy="58.5" rx="8.2" ry="5" fill={`url(#${knot})`} />
         <ellipse cx="24.5" cy="57.2" rx="2.8" ry="1.4" fill="#fff" opacity="0.22" />
-        <path
-          d="M15.5 63.8 Q26 62.2 36.5 63.8"
-          stroke="#b88928"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          fill="none"
-        />
+        <path d="M15.5 63.8 Q26 62.2 36.5 63.8" stroke="#b88928" strokeWidth="1.4" strokeLinecap="round" fill="none" />
         <g strokeLinecap="round">
           <path d="M26 64.5 Q25.2 80 26 97" stroke={`url(#${fringeA})`} strokeWidth="2.3" />
           <path d="M22.5 65 Q21.5 80.5 23 94.5" stroke={`url(#${fringeB})`} strokeWidth="1.95" />
@@ -84,33 +88,63 @@ function TasselSvg() {
   );
 }
 
-function TasselHint() {
+function TasselClosedTab() {
   return (
-    <span className="site-header-tassel-hint" aria-hidden="true">
-      <span className="site-header-tassel-hint-text">Trage</span>
-      <svg className="site-header-tassel-hint-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path
-          d="M6 2.5v5.2M6 7.7l-2.2-2.2M6 7.7l2.2-2.2"
-          stroke="currentColor"
-          strokeWidth="1.35"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+    <span className="site-header-tassel-tab" aria-hidden="true">
+      <span className="site-header-tassel-tab-mark" aria-hidden="true">
+        ✦
+      </span>
+      <span className="site-header-tassel-tab-text">Mesajul zilei</span>
+      <svg className="site-header-tassel-tab-chevron" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <path d="M5 2v4.2M5 6.2l-1.6-1.6M5 6.2l1.6-1.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
     </span>
   );
 }
 
-function HeaderTassel({ collapseProgress = 0 }) {
+function HeaderTassel({ collapseProgress = 0, autoCloseOnScroll = false }) {
   const [pullPx, setPullPx] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [unfoldPulse, setUnfoldPulse] = useState(false);
+  const [textHeightPx, setTextHeightPx] = useState(72);
+  const wasOpenRef = useRef(false);
   const pullPxRef = useRef(0);
   const dragRef = useRef({ active: false, startY: 0, startPull: 0 });
   const handleRef = useRef(null);
+  const measureRef = useRef(null);
+  const metricsRef = useRef({ fullOpen: 120, snapOpen: 56 });
 
   const dailyMessage = useMemo(() => getDailyMotivation(), []);
+  const messageDate = useMemo(() => formatMessageDate(), []);
+
+  const fullOpenHeight = Math.max(
+    88,
+    Math.min(MAX_OPEN_CAP_PX, ROLL_HEIGHT_PX + textHeightPx + PAPER_EXTRA_PX),
+  );
+  const snapOpen = Math.max(52, Math.min(96, Math.round(fullOpenHeight * 0.38)));
+
+  metricsRef.current = { fullOpen: fullOpenHeight, snapOpen };
 
   pullPxRef.current = pullPx;
+
+  useEffect(() => {
+    const node = measureRef.current;
+    if (!node) return undefined;
+
+    const measure = () => {
+      setTextHeightPx(node.scrollHeight);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    window.addEventListener('resize', measure);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [dailyMessage.text]);
 
   const retractAmount = collapseRetractAmount(collapseProgress);
   const displayPull = pullPx * (1 - retractAmount);
@@ -124,6 +158,29 @@ function HeaderTassel({ collapseProgress = 0 }) {
     }
   }, [collapseProgress, isDragging]);
 
+  useEffect(() => {
+    if (!autoCloseOnScroll) return undefined;
+
+    const closeIfOpen = () => {
+      if (dragRef.current.active) return;
+      if (pullPxRef.current < 12) return;
+      setPullPx(0);
+    };
+
+    const onWheel = (event) => {
+      if (Math.abs(event.deltaY) < 0.5) return;
+      closeIfOpen();
+    };
+
+    window.addEventListener('scroll', closeIfOpen, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', closeIfOpen);
+      window.removeEventListener('wheel', onWheel);
+    };
+  }, [autoCloseOnScroll]);
+
   const endDrag = useCallback((snap = true) => {
     if (!dragRef.current.active) return;
     dragRef.current.active = false;
@@ -131,14 +188,16 @@ function HeaderTassel({ collapseProgress = 0 }) {
     document.body.classList.remove('header-tassel-drag');
 
     if (snap) {
-      setPullPx((prev) => (prev >= SNAP_OPEN ? MAX_PULL : 0));
+      const { fullOpen, snapOpen: snapAt } = metricsRef.current;
+      setPullPx((prev) => (prev >= snapAt ? fullOpen : 0));
     }
   }, []);
 
   const onPointerMove = useCallback((event) => {
     if (!dragRef.current.active) return;
     const dy = event.clientY - dragRef.current.startY;
-    const next = Math.max(0, Math.min(MAX_PULL, dragRef.current.startPull + dy));
+    const max = metricsRef.current.fullOpen;
+    const next = Math.max(0, Math.min(max, dragRef.current.startPull + dy));
     setPullPx(next);
   }, []);
 
@@ -173,33 +232,84 @@ function HeaderTassel({ collapseProgress = 0 }) {
     handleRef.current?.setPointerCapture?.(event.pointerId);
   };
 
-  const isOpen = displayPull >= SNAP_OPEN;
+  const isOpen = displayPull >= snapOpen;
+  const isClosed = !isOpen && displayPull < 8 && !isDragging;
+  const isAnchored = isClosed;
+  const isExtended = !isAnchored;
   const paperVisible = displayPull > 6;
   const collapsingHeader = collapseProgress > 0.02 && !isDragging;
+  const openProgress =
+    fullOpenHeight > 0 ? Math.min(1, Math.max(0, displayPull / fullOpenHeight)) : 0;
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!isOpen || isDragging) {
+      root.style.removeProperty('--tassel-content-offset');
+      root.classList.remove('tassel-scroll-open');
+      return undefined;
+    }
+    const overhang = Math.max(0, Math.round(fullOpenHeight - ROLL_HEIGHT_PX));
+    root.style.setProperty('--tassel-content-offset', `${overhang}px`);
+    root.classList.add('tassel-scroll-open');
+    return () => {
+      root.style.removeProperty('--tassel-content-offset');
+      root.classList.remove('tassel-scroll-open');
+    };
+  }, [isOpen, isDragging, fullOpenHeight]);
+
+  useEffect(() => {
+    if (isOpen && !isDragging && !wasOpenRef.current) {
+      setUnfoldPulse(true);
+      const timer = window.setTimeout(() => setUnfoldPulse(false), 880);
+      return () => window.clearTimeout(timer);
+    }
+    wasOpenRef.current = isOpen;
+    return undefined;
+  }, [isOpen, isDragging]);
 
   return (
     <div
-      className={`site-header-tassel-widget${isDragging ? ' site-header-tassel-widget--dragging' : ''}${isOpen ? ' site-header-tassel-widget--open' : ''}${collapsingHeader ? ' site-header-tassel-widget--header-collapse' : ''}`}
+      className={[
+        'site-header-tassel-widget',
+        isDragging && 'site-header-tassel-widget--dragging',
+        isOpen && 'site-header-tassel-widget--open',
+        isClosed && 'site-header-tassel-widget--closed',
+        isAnchored && 'site-header-tassel-widget--anchored',
+        isExtended && 'site-header-tassel-widget--extended',
+        unfoldPulse && 'site-header-tassel-widget--unfold',
+        collapsingHeader && 'site-header-tassel-widget--header-collapse'
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         opacity: widgetOpacity,
-        transform: `translateY(100%) scale(${widgetScale})`,
+        transform: isExtended ? `translateY(100%) scale(${widgetScale})` : `scale(${widgetScale})`,
         transformOrigin: 'top left',
         pointerEvents: retractAmount >= 0.98 ? 'none' : undefined
       }}
     >
+      <div className="site-header-scroll-measure" aria-hidden="true">
+        <div ref={measureRef} className="site-header-scroll-inner site-header-scroll-inner--measure">
+          <p className="site-header-scroll-greeting">Mesajul zilei</p>
+          <p className="site-header-scroll-body">{dailyMessage.text}</p>
+          <p className="site-header-scroll-date">{messageDate}</p>
+        </div>
+      </div>
+
       <div
         className="site-header-scroll-paper"
-        style={{ height: `${displayPull}px` }}
+        style={{
+          height: paperVisible ? `${displayPull}px` : '0px',
+          '--paper-progress': openProgress
+        }}
         aria-hidden={!paperVisible}
       >
         <div className="site-header-scroll-roll" aria-hidden="true" />
-        <div
-          className="site-header-scroll-inner"
-          style={{ opacity: paperVisible ? Math.min(1, (displayPull - 12) / 48) : 0 }}
-        >
+        <div className="site-header-scroll-shine" aria-hidden="true" />
+        <div className="site-header-scroll-inner">
           <p className="site-header-scroll-greeting">Mesajul zilei</p>
           <p className="site-header-scroll-body">{dailyMessage.text}</p>
-          <p className="site-header-scroll-quote">{dailyMessage.author}</p>
+          <p className="site-header-scroll-date">{messageDate}</p>
         </div>
       </div>
 
@@ -212,10 +322,12 @@ function HeaderTassel({ collapseProgress = 0 }) {
         onPointerDown={onPointerDown}
         onDragStart={(e) => e.preventDefault()}
       >
-        {!isOpen && displayPull < 24 && retractAmount < 0.15 ? <TasselHint /> : null}
-        <span className="site-header-tassel-visual">
-          <TasselSvg />
-        </span>
+        {isAnchored ? <TasselClosedTab /> : null}
+        {isExtended ? (
+          <span className="site-header-tassel-visual">
+            <TasselSvg compact={isClosed && displayPull < 24} />
+          </span>
+        ) : null}
       </button>
     </div>
   );

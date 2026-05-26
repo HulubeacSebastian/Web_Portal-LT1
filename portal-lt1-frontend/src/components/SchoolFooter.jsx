@@ -1,87 +1,112 @@
 import { Link } from 'react-router-dom';
+import { SCHOOL_FOOTER_LINKS } from '../config/schoolFooterLinks.js';
 
-const QUICK_LINKS = [
-  { to: '/', label: 'Acasă' },
-  { to: '/documente', label: 'Documente' },
-  { to: '/despre-noi', label: 'Despre Noi' },
-  { to: '/contact', label: 'Contact' },
-  { to: '/calendar', label: 'Calendar' }
-];
+function FooterLinkIcon({ type }) {
+  if (type === 'facebook') {
+    return (
+      <svg className="school-footer-social-icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V9.1c0-.9.2-1.5 1.5-1.5H16.7V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.4H8.2v3.1h2.3v8h3z" />
+      </svg>
+    );
+  }
+
+  if (type === 'instagram') {
+    return (
+      <svg className="school-footer-social-icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4A5.8 5.8 0 0 1 16.2 22H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8zm9.2 1.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg className="school-footer-social-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M3 12h18M12 3c2.5 2.8 3.8 5.6 3.8 9s-1.3 6.2-3.8 9M12 3c-2.5 2.8-3.8 5.6-3.8 9s1.3 6.2 3.8 9" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
 
 function SchoolFooter() {
   const year = new Date().getFullYear();
 
   return (
     <footer className="school-footer">
-      <div className="school-footer-ribbon" aria-hidden="true" />
-
-      <div className="school-footer-award">
-        <p className="school-footer-award-line">MINISTERUL EDUCAȚIEI</p>
-        <p className="school-footer-award-line school-footer-award-line--emph">
-          INSPECTORATUL ȘCOLAR JUDEȚEAN SUCEAVA
+      <div className="school-footer-top">
+        <p className="school-footer-ministry">Ministerul Educației</p>
+        <p className="school-footer-ministry school-footer-ministry--sub">
+          Inspectoratul Școlar Județean Suceava
         </p>
       </div>
 
-      <div className="school-footer-body">
-        <div className="school-footer-col school-footer-col--brand">
+      <div className="school-footer-main">
+        <section className="school-footer-block school-footer-block--brand" aria-labelledby="footer-brand">
+          <h2 id="footer-brand" className="visually-hidden">
+            Liceul Tehnologic Nr. 1
+          </h2>
           <div className="school-footer-brand">
-            <img
-              src="/assets/logo-mov-vector.pdf.png"
-              alt="Liceul Tehnologic Nr. 1"
-              className="school-footer-logo"
-            />
+            <div className="school-footer-logo-wrap">
+              <img
+                src="/assets/logo-mov-vector.pdf.png"
+                alt=""
+                className="school-footer-logo"
+                width={72}
+                height={72}
+                decoding="async"
+              />
+            </div>
             <div className="school-footer-brand-text">
-              <strong>LICEUL TEHNOLOGIC NR. 1</strong>
-              <span>Câmpulung Moldovenesc · jud. Suceava</span>
+              <p className="school-footer-school-name">Liceul Tehnologic Nr. 1</p>
+              <p className="school-footer-school-place">Câmpulung Moldovenesc · jud. Suceava</p>
             </div>
           </div>
           <p className="school-footer-tagline">
             Educație tehnică de calitate, comunitate activă, viitor pregătit.
           </p>
-        </div>
+        </section>
 
-        <div className="school-footer-col school-footer-col--links">
-          <h3 className="school-footer-heading">Navigare rapidă</h3>
-          <ul className="school-footer-links">
-            {QUICK_LINKS.map((link) => (
-              <li key={link.to}>
-                <Link to={link.to}>{link.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <div className="school-footer-side">
+          {SCHOOL_FOOTER_LINKS.length > 0 ? (
+            <nav className="school-footer-block" aria-labelledby="footer-social">
+              <h3 id="footer-social" className="school-footer-heading">
+                Liceul online
+              </h3>
+              <ul className="school-footer-social">
+                {SCHOOL_FOOTER_LINKS.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={item.href}
+                      className={`school-footer-social-link school-footer-social-link--${item.icon}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span className={`school-footer-social-icon school-footer-social-icon--${item.icon}`}>
+                        <FooterLinkIcon type={item.icon} />
+                      </span>
+                      <span className="school-footer-social-label">{item.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
 
-        <div className="school-footer-col school-footer-col--contact">
-          <h3 className="school-footer-heading">Contact</h3>
-          <ul className="school-footer-contact">
-            <li>
-              <span className="school-footer-contact-label">Adresă</span>
-              Calea Transilvaniei, Nr. 55, 725100, Câmpulung Moldovenesc
-            </li>
-            <li>
-              <span className="school-footer-contact-label">Telefon</span>
-              <a href="tel:+40230311382">+40 230 311 382</a>
-              <span className="school-footer-contact-sep">·</span>
-              <span className="school-footer-contact-label school-footer-contact-label--inline">Fax</span>
-              <a href="tel:+40230312912">+40 230 312 912</a>
-            </li>
-            <li>
-              <span className="school-footer-contact-label">Email</span>
-              <a href="mailto:liceultehnologic1cm@yahoo.ro">liceultehnologic1cm@yahoo.ro</a>
-            </li>
-            <li>
-              <span className="school-footer-contact-label">Web</span>
-              <a href="https://www.liceultehnologicnr1.ro" target="_blank" rel="noopener noreferrer">
-                www.liceultehnologicnr1.ro
-              </a>
-            </li>
-          </ul>
+          <section className="school-footer-block" aria-labelledby="footer-contact">
+            <h3 id="footer-contact" className="school-footer-heading">
+              Contact
+            </h3>
+            <p className="school-footer-contact-teaser">
+              Adresă, telefon, email, program și formularul de mesaje sunt pe pagina dedicată.
+            </p>
+            <Link to="/contact" className="school-footer-contact-link">
+              Vezi datele de contact
+            </Link>
+          </section>
         </div>
       </div>
 
       <div className="school-footer-bottom">
         <p>© {year} Liceul Tehnologic Nr. 1 Câmpulung Moldovenesc. Toate drepturile rezervate.</p>
-        <p className="school-footer-bottom-note">Portal educațional — documente, calendar și comunicare.</p>
+        <p className="school-footer-bottom-note">Portal educațional — documente, calendar și comunicare</p>
       </div>
     </footer>
   );

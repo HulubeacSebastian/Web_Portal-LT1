@@ -238,7 +238,10 @@ function SiteHeader({ isLoggedIn, displayName, showChat, showActivity, onLogout 
         </div>
       </div>
 
-      <HeaderTassel collapseProgress={isMobile ? collapseProgress : 0} />
+      <HeaderTassel
+        collapseProgress={isMobile ? collapseProgress : 0}
+        autoCloseOnScroll={!isMobile}
+      />
 
       {mobileDrawer}
     </header>

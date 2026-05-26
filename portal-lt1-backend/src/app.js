@@ -48,6 +48,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.get('/', function (req, res) {
+  res.json({
+    service: 'Portal LT1 API',
+    status: 'running',
+    health: '/health',
+    auth: '/api/auth/login',
+    hint: 'Portalul web ruleaza pe frontend (port 5173), nu pe 3000.'
+  });
+});
+
 app.get('/health', function (req, res) {
   res.json({ status: 'ok' });
 });

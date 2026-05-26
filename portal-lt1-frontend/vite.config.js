@@ -48,7 +48,10 @@ function resolveProxyTarget() {
     return process.env.VITE_PROXY_TARGET.trim().replace(/\/$/, '');
   }
   const serverIp = networkEnv.SERVER_IP?.trim() || '127.0.0.1';
-  return `http://${serverIp}:3000`;
+  const backendHttp =
+    networkEnv.BACKEND_HTTP === 'true' || process.env.BACKEND_HTTP === 'true';
+  const protocol = backendHttp ? 'http' : 'https';
+  return `${protocol}://${serverIp}:3000`;
 }
 
 function resolveApiBaseUrl() {
@@ -60,7 +63,10 @@ function resolveApiBaseUrl() {
   }
   const serverIp = networkEnv.SERVER_IP?.trim();
   if (serverIp) {
-    return `${useHttps ? 'https' : 'http'}://${serverIp}:3000`;
+    const backendHttp =
+      networkEnv.BACKEND_HTTP === 'true' || process.env.BACKEND_HTTP === 'true';
+    const protocol = backendHttp ? 'http' : 'https';
+    return `${protocol}://${serverIp}:3000`;
   }
   return '';
 }
@@ -94,8 +100,8 @@ if (apiBaseFromNetwork) {
 
 const devProxy = useDevProxy
   ? {
-      '/api': { target: proxyTarget, changeOrigin: true },
-      '/health': { target: proxyTarget, changeOrigin: true }
+      '/api': { target: proxyTarget, changeOrigin: true, secure: false },
+      '/health': { target: proxyTarget, changeOrigin: true, secure: false }
     }
   : undefined;
 
@@ -127,6 +133,13 @@ function printLanUrls() {
         }
         if (useDevProxy) {
           lines.push(`  API proxy → ${proxyTarget}`);
+        } else if (networkEnv.SERVER_IP?.trim()) {
+          const backendHttp =
+            networkEnv.BACKEND_HTTP === 'true' || process.env.BACKEND_HTTP === 'true';
+          const apiProtocol = backendHttp ? 'http' : 'https';
+          lines.push(
+            `  API (Assignment 4): ${apiProtocol}://${networkEnv.SERVER_IP.trim()}:3000`
+          );
         }
         lines.push('');
         console.log(lines.join('\n'));

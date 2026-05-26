@@ -1,48 +1,9 @@
-# Pornire rapidă (development)
+# Pornire proiect
 
-## Zilnic — fără certificat (recomandat)
+**Pentru predare Assignment 4 (cerinta 100%):** urmeaza exact [docs/PREDARE-Assignment-4.md](docs/PREDARE-Assignment-4.md).
 
-**Terminal 1 — backend:**
-```powershell
-cd portal-lt1-backend
-npm run start:dev
-```
-
-**Terminal 2 — frontend:**
-```powershell
-cd portal-lt1-frontend
-npm run dev
-```
-
-**Browser:** `http://192.168.0.81:5173` (înlocuiește cu IP-ul tău)
-
-Nu deschide `:3000` în browser — acolo e doar API-ul.
-
----
-
-## Predare Assignment 4 — cu HTTPS
-
-```powershell
-cd portal-lt1-backend
-npm start
-```
-
-```powershell
-cd portal-lt1-frontend
-npm run preview:https
-```
-
-Deschide `https://192.168.0.81:5173` → acceptă certificatul o dată.
-
-Sau instalează certificatul permanent (PowerShell **Administrator**):
-```powershell
-npm run trust:dev-cert
-```
-
----
-
-## Dacă portul e ocupat
-
-```powershell
-Get-NetTCPConnection -LocalPort 3000,5173 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
-```
+Rezumat obligatoriu:
+- **2 masini** pe LAN (SERVER + CLIENT)
+- **HTTPS** peste tot (`npm start` + `npm run dev:https`)
+- **Fara** `VITE_USE_DEV_PROXY` la predare (`dev-network.env`)
+- **Nu** deschide `0.0.0.0` in browser

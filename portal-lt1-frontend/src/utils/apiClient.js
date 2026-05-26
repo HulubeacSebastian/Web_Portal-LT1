@@ -115,7 +115,16 @@ export async function apiRequest(path, options = {}) {
     init.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
   }
 
-  let response = await fetch(url, init);
+  let response;
+  try {
+    response = await fetch(url, init);
+  } catch {
+    const error = new Error(
+      'Nu se poate contacta serverul. Deschide https://<IP-server>:3000/health si accepta certificatul, apoi reincarca pagina.'
+    );
+    error.status = 0;
+    throw error;
+  }
   const contentType = response.headers.get('content-type') || '';
 
   if (response.status === 401 && useAuth && !options._retried) {

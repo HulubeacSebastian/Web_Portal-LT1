@@ -80,15 +80,24 @@ function resolveApiBaseUrl() {
 
 const apiBaseFromNetwork = resolveApiBaseUrl();
 const httpsOptions = useHttps ? loadHttpsOptions() : false;
-const hmrHost = lanHost && getLocalIPv4Addresses().includes(lanHost) ? lanHost : getLocalIPv4Addresses()[0];
-const hmrConfig =
-  useHttps && hmrHost
-    ? {
-        host: hmrHost,
-        port: 5173,
-        protocol: 'wss'
-      }
-    : undefined;
+const localIps = getLocalIPv4Addresses();
+const frontendOnClientMachine = Boolean(lanHost && localIps.includes(lanHost));
+const disableHmr =
+  process.env.VITE_DISABLE_HMR === 'true' || networkEnv.VITE_DISABLE_HMR === 'true';
+
+/** HMR cu host fixat gresit (ex. IP Mac cand rulezi pe PC) provoaca refresh infinit. */
+let hmrConfig;
+if (disableHmr) {
+  hmrConfig = false;
+} else if (useHttps) {
+  if (frontendOnClientMachine) {
+    hmrConfig = { host: lanHost, port: 5173, protocol: 'wss' };
+  } else {
+    hmrConfig = { protocol: 'wss', port: 5173 };
+  }
+} else {
+  hmrConfig = undefined;
+}
 
 export default defineConfig({
   plugins: [react(), printLanUrls()],

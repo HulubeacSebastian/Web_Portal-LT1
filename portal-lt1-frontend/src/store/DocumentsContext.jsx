@@ -251,9 +251,17 @@ export function DocumentsProvider({ children }) {
   useEffect(() => {
     if (!remoteEnabled) return;
     if (isOffline) return;
+    if (!getAuthToken()) return;
 
-    const ws = new WebSocket(getWsOrigin());
-    wsRef.current = ws;
+    let cancelled = false;
+    let ws;
+
+    try {
+      ws = new WebSocket(getWsOrigin());
+      wsRef.current = ws;
+    } catch {
+      return undefined;
+    }
 
     ws.onmessage = (event) => {
       try {
@@ -268,11 +276,17 @@ export function DocumentsProvider({ children }) {
 
     ws.onerror = () => {};
     ws.onclose = () => {
-      wsRef.current = null;
+      if (!cancelled) {
+        wsRef.current = null;
+      }
     };
 
     return () => {
-      ws.close();
+      cancelled = true;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+      wsRef.current = null;
     };
   }, [isOffline]);
 

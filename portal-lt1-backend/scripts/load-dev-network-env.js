@@ -1,9 +1,23 @@
 const fs = require('fs');
 const path = require('path');
 
+function resolveDevNetworkEnvPath() {
+  const repoRoot = path.resolve(__dirname, '../..');
+  const candidates = [
+    path.join(repoRoot, 'dev-network.local.env'),
+    path.join(repoRoot, 'dev-network.env')
+  ];
+  for (const envPath of candidates) {
+    if (fs.existsSync(envPath)) {
+      return envPath;
+    }
+  }
+  return null;
+}
+
 function loadDevNetworkEnv() {
-  const envPath = path.resolve(__dirname, '../../dev-network.env');
-  if (!fs.existsSync(envPath)) {
+  const envPath = resolveDevNetworkEnvPath();
+  if (!envPath) {
     return {};
   }
 

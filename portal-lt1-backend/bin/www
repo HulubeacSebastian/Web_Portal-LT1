@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+require('../scripts/load-dotenv').loadAppEnv();
 require('../scripts/load-dev-network-env').loadDevNetworkEnv();
 
 if (process.env.CLIENT_IP) {

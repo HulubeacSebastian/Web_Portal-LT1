@@ -8,6 +8,8 @@ export function resolveDevNetworkEnvPaths() {
   const frontendDir = path.resolve(scriptDir, '..');
   const repoRoot = path.resolve(frontendDir, '..');
   return [
+    path.join(repoRoot, 'dev-network.local.env'),
+    path.join(frontendDir, 'dev-network.local.env'),
     path.join(repoRoot, 'dev-network.env'),
     path.join(frontendDir, 'dev-network.env'),
     path.join(process.cwd(), 'dev-network.env'),

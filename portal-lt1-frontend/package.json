@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "cross-env VITE_USE_DEV_PROXY=true VITE_PROXY_TARGET=http://127.0.0.1:3000 vite",
     "dev:https": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js && node scripts/run-vite-dev.mjs",
     "dev:client": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js && node scripts/run-vite-dev.mjs",
     "build": "vite build",

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { loadDevNetworkEnv } from './scripts/load-dev-network-env.mjs';
+import { isClientMachine, validateClientNetworkEnv } from './scripts/detect-dev-role.mjs';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const certDir = path.resolve(rootDir, '../portal-lt1-backend/certs');
@@ -35,26 +36,33 @@ function shouldUseDevProxy() {
   if (process.env.VITE_USE_DEV_PROXY === 'true' || networkEnv.VITE_USE_DEV_PROXY === 'true') {
     return true;
   }
-
-  const serverIp = networkEnv.SERVER_IP?.trim();
-  const clientIp = networkEnv.CLIENT_IP?.trim();
-
-  if (serverIp && clientIp && serverIp !== clientIp) {
-    const isClientMachine = localIps.includes(clientIp);
-    const isServerMachine = localIps.includes(serverIp);
-    if (isClientMachine && !isServerMachine) {
-      return false;
-    }
-  }
-
-  if (serverIp && serverIp !== '127.0.0.1' && serverIp !== 'localhost' && !localIps.includes(serverIp)) {
+  if (isClientMachine(networkEnv, localIps)) {
     return false;
   }
-
   return true;
 }
 
 const useDevProxy = shouldUseDevProxy();
+const clientValidationError = validateClientNetworkEnv(networkEnv, localIps);
+if (clientValidationError) {
+  throw new Error(clientValidationError);
+}
+if (useDevProxy && !networkEnv.SERVER_IP?.trim()) {
+  const proxyTargetPreview = resolveProxyTargetPreview();
+  if (proxyTargetPreview.includes('127.0.0.1')) {
+    throw new Error(
+      'dev-network.env: seteaza SERVER_IP=IP_PC (ex. 192.168.0.81). Pe Mac nu folosi 127.0.0.1 pentru backend.'
+    );
+  }
+}
+
+function resolveProxyTargetPreview() {
+  const serverIp = networkEnv.SERVER_IP?.trim() || '127.0.0.1';
+  const backendHttp =
+    networkEnv.BACKEND_HTTP === 'true' || process.env.BACKEND_HTTP === 'true';
+  const protocol = backendHttp ? 'http' : 'https';
+  return `${protocol}://${serverIp}:3000`;
+}
 
 function loadHttpsOptions() {
   const keyFile = path.join(certDir, 'dev.key');

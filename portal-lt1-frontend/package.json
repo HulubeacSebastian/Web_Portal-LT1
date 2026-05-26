@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:https": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js && cross-env VITE_DEV_HTTPS=true vite",
-    "dev:client": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js && cross-env VITE_DEV_HTTPS=true VITE_USE_DEV_PROXY=false vite",
+    "dev:https": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js && node scripts/run-vite-dev.mjs",
+    "dev:client": "node ../portal-lt1-backend/scripts/prepare-dev-tls.js && node scripts/run-vite-dev.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "preview:https": "npm run build && cross-env VITE_DEV_HTTPS=true vite preview --host 0.0.0.0",

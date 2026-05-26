@@ -19,7 +19,15 @@ const PUBLIC_AUTH_PATHS = [
   '/api/auth/reset-password'
 ];
 
+function useDevProxy() {
+  return import.meta.env.DEV && import.meta.env.VITE_USE_DEV_PROXY === 'true';
+}
+
 export function getApiOrigin() {
+  if (useDevProxy() && typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+
   const configured = import.meta.env.VITE_API_BASE_URL?.trim();
   if (configured) {
     return configured.replace(/\/$/, '');
@@ -34,6 +42,11 @@ export function getApiOrigin() {
 }
 
 export function getWsOrigin() {
+  if (useDevProxy()) {
+    const serverIp = import.meta.env.VITE_SERVER_IP || '127.0.0.1';
+    return `ws://${serverIp}:3000`;
+  }
+
   const base = new URL(getApiOrigin());
   base.protocol = base.protocol === 'https:' ? 'wss:' : 'ws:';
   return base.origin;
@@ -120,7 +133,9 @@ export async function apiRequest(path, options = {}) {
     response = await fetch(url, init);
   } catch {
     const error = new Error(
-      'Nu se poate contacta serverul. Deschide https://<IP-server>:3000/health si accepta certificatul, apoi reincarca pagina.'
+      useDevProxy()
+        ? 'Nu se poate contacta serverul. Verifica ca backend-ul ruleaza (npm start in portal-lt1-backend).'
+        : `Nu se poate contacta serverul (${getApiOrigin()}/health). Porneste backend-ul sau activeaza proxy-ul Vite (VITE_USE_DEV_PROXY).`
     );
     error.status = 0;
     throw error;

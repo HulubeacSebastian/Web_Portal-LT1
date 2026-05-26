@@ -5,6 +5,12 @@ import { apiRequest } from '../utils/apiClient';
 import { validateRegister } from '../utils/formValidation';
 import { hasErrors } from '../utils/documentValidation';
 
+const highlights = [
+  'Introdu tokenul primit la recuperare',
+  'Alege o parola noua (minim 6 caractere)',
+  'Dupa reset te autentifici din nou (parola + OTP)',
+];
+
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,6 +65,7 @@ function ResetPasswordPage() {
       eyebrow="Parola noua"
       title="Reseteaza parola"
       lead="Introdu tokenul primit si parola noua."
+      highlights={highlights}
       formTitle="Parola noua"
       formLead="Token + parola (minim 6 caractere)."
       footer={

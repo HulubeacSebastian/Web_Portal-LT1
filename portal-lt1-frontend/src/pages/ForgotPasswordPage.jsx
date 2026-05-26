@@ -6,6 +6,12 @@ import { hasErrors } from '../utils/documentValidation';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const highlights = [
+  'Token de resetare cu expirare (1 ora)',
+  'Parola noua salvata criptat (bcrypt)',
+  'Sesiunile vechi sunt invalidate automat',
+];
+
 function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -47,6 +53,7 @@ function ForgotPasswordPage() {
       eyebrow="Recuperare parola"
       title="Ai uitat parola?"
       lead="Trimitem un token de resetare (in dev il vezi pe ecran)."
+      highlights={highlights}
       formTitle="Resetare parola"
       formLead="Introdu emailul contului."
       footer={

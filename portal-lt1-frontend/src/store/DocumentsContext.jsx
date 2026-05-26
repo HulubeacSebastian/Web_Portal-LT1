@@ -252,6 +252,7 @@ export function DocumentsProvider({ children }) {
     if (!remoteEnabled) return;
     if (isOffline) return;
     if (!getAuthToken()) return;
+    if (import.meta.env.VITE_USE_DEV_PROXY === 'true') return;
 
     let cancelled = false;
     let ws;

@@ -29,8 +29,9 @@ app.set('port', port);
 function createAppServer(expressApp) {
   var keyPath = process.env.SSL_KEY_PATH;
   var certPath = process.env.SSL_CERT_PATH;
+  var forceHttp = process.env.PORTAL_DEV_HTTP === 'true';
 
-  if (keyPath && certPath) {
+  if (!forceHttp && keyPath && certPath) {
     var resolvedKey = path.isAbsolute(keyPath) ? keyPath : path.resolve(process.cwd(), keyPath);
     var resolvedCert = path.isAbsolute(certPath) ? certPath : path.resolve(process.cwd(), certPath);
     var sslOptions = {

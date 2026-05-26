@@ -99,6 +99,20 @@ const devProxy = useDevProxy
     }
   : undefined;
 
+function pickPrimaryLanIp() {
+  const configured = [networkEnv.CLIENT_IP, networkEnv.SERVER_IP]
+    .map((value) => value?.trim())
+    .filter(Boolean);
+  for (const ip of configured) {
+    if (localIps.includes(ip)) return ip;
+  }
+  return (
+    localIps.find((ip) => ip.startsWith('192.168.0.')) ||
+    localIps.find((ip) => !ip.startsWith('192.168.56.')) ||
+    localIps[0]
+  );
+}
+
 function printLanUrls() {
   return {
     name: 'portal-lt1-print-urls',
@@ -106,16 +120,13 @@ function printLanUrls() {
       server.httpServer?.once('listening', () => {
         const port = 5173;
         const protocol = useHttps ? 'https' : 'http';
-        const lines = [`\n  Portal LT1 — ${protocol.toUpperCase()} (development):`];
-        lines.push(`    ${protocol}://localhost:${port}/`);
-        for (const ip of localIps) {
-          lines.push(`    ${protocol}://${ip}:${port}/`);
+        const primaryIp = pickPrimaryLanIp();
+        const lines = [`\n  Portal LT1: ${protocol}://localhost:${port}/`];
+        if (primaryIp) {
+          lines.push(`  Retea (acelasi PC / LAN): ${protocol}://${primaryIp}:${port}/`);
         }
         if (useDevProxy) {
           lines.push(`  API proxy → ${proxyTarget}`);
-        }
-        if (!useHttps) {
-          lines.push('  (Fara certificat — recomandat pentru lucru zilnic)');
         }
         lines.push('');
         console.log(lines.join('\n'));

@@ -10,6 +10,7 @@ var debug = require('debug')('portal-lt1-backend:server');
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
+var os = require('os');
 var path = require('path');
 var WebSocket = require('ws');
 var hub = require('../src/realtime/wsHub');
@@ -123,11 +124,38 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
+function getLanIPv4Addresses() {
+  var addresses = [];
+  for (var iface of Object.values(os.networkInterfaces())) {
+    for (var entry of iface || []) {
+      if (entry.family === 'IPv4' && !entry.internal) {
+        addresses.push(entry.address);
+      }
+    }
+  }
+  return addresses;
+}
+
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  var protocol = process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH ? 'https' : 'http';
-  debug('Listening on ' + protocol + '://0.0.0.0:' + bind);
+  var forceHttp = process.env.PORTAL_DEV_HTTP === 'true';
+  var useTls =
+    !forceHttp && process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH;
+  var protocol = useTls ? 'https' : 'http';
+
+  if (typeof addr === 'string') {
+    debug('Listening on ' + protocol + ' pipe ' + addr);
+    return;
+  }
+
+  var port = addr.port;
+  debug('Listening on ' + protocol + '://0.0.0.0:' + port);
+
+  var lines = ['\n  Backend API (' + protocol + ') — deschide in browser:'];
+  lines.push('    ' + protocol + '://127.0.0.1:' + port + '/health');
+  for (var ip of getLanIPv4Addresses()) {
+    lines.push('    ' + protocol + '://' + ip + ':' + port + '/health');
+  }
+  lines.push('  Portal UI: frontend pe port 5173 → http://<IP>:5173\n');
+  console.log(lines.join('\n'));
 }

@@ -88,13 +88,15 @@ Fisier `portal-lt1-frontend/.env`:
 VITE_API_BASE_URL=https://192.168.0.81:3000
 ```
 
-Pornire:
+Pornire (pe Mac **obligatoriu** `dev-network.env` in radacina repo):
 
 ```bash
 cd portal-lt1-frontend
 npm install
-npm run dev:https
+npm run dev:client
 ```
+
+La pornire trebuie sa vezi in terminal: `API direct ... https://192.168.0.81:3000` — **nu** `API proxy → 127.0.0.1:3000`.
 
 Deschide pe **Mac**: `https://<IP-mac>:5173` (nu IP-ul PC-ului)
 
@@ -143,6 +145,16 @@ Trebuie `{"status":"ok"}`. Daca nu merge, problema e retea/firewall, nu React.
 ### 5. F12 pe Mac la login
 
 Trebuie `https://192.168.0.81:3000/api/auth/login` — daca `(failed)`, revino la pasii 1–2.
+
+### 6. Eroare Vite: `ECONNREFUSED 127.0.0.1:3000` sau login `500`
+
+Frontend-ul pe Mac incearca proxy la **localhost**, dar backend-ul e pe **PC**.
+
+**Rezolvare:** copiaza `dev-network.env` in radacina repo pe Mac, opreste Vite (Ctrl+C), ruleaza:
+```bash
+npm run dev:client
+```
+Verifica in terminal: `API direct ... https://<IP-PC>:3000` (nu `127.0.0.1`).
 
 ---
 

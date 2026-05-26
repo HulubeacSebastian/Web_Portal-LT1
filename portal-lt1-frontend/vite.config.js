@@ -8,12 +8,10 @@ import { loadDevNetworkEnv } from './scripts/load-dev-network-env.mjs';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const certDir = path.resolve(rootDir, '../portal-lt1-backend/certs');
+const devNetworkPath = path.resolve(rootDir, '../dev-network.env');
 const networkEnv = loadDevNetworkEnv();
 const useHttps = process.env.VITE_DEV_HTTPS === 'true';
 const lanHost = process.env.VITE_LAN_HOST || networkEnv.VITE_LAN_HOST || networkEnv.CLIENT_IP || '';
-
-const useDevProxy =
-  process.env.VITE_USE_DEV_PROXY !== 'false' && networkEnv.VITE_USE_DEV_PROXY !== 'false';
 
 function getLocalIPv4Addresses() {
   const addresses = new Set();
@@ -26,6 +24,37 @@ function getLocalIPv4Addresses() {
   }
   return Array.from(addresses);
 }
+
+const localIps = getLocalIPv4Addresses();
+
+/** Proxy doar pe acelasi PC cu backend; pe Mac (client) API direct la SERVER_IP. */
+function shouldUseDevProxy() {
+  if (process.env.VITE_USE_DEV_PROXY === 'false' || networkEnv.VITE_USE_DEV_PROXY === 'false') {
+    return false;
+  }
+  if (process.env.VITE_USE_DEV_PROXY === 'true' || networkEnv.VITE_USE_DEV_PROXY === 'true') {
+    return true;
+  }
+
+  const serverIp = networkEnv.SERVER_IP?.trim();
+  const clientIp = networkEnv.CLIENT_IP?.trim();
+
+  if (serverIp && clientIp && serverIp !== clientIp) {
+    const isClientMachine = localIps.includes(clientIp);
+    const isServerMachine = localIps.includes(serverIp);
+    if (isClientMachine && !isServerMachine) {
+      return false;
+    }
+  }
+
+  if (serverIp && serverIp !== '127.0.0.1' && serverIp !== 'localhost' && !localIps.includes(serverIp)) {
+    return false;
+  }
+
+  return true;
+}
+
+const useDevProxy = shouldUseDevProxy();
 
 function loadHttpsOptions() {
   const keyFile = path.join(certDir, 'dev.key');
@@ -74,7 +103,6 @@ function resolveApiBaseUrl() {
 const apiBaseFromNetwork = resolveApiBaseUrl();
 const proxyTarget = resolveProxyTarget();
 const httpsOptions = useHttps ? loadHttpsOptions() : false;
-const localIps = getLocalIPv4Addresses();
 const frontendOnClientMachine = Boolean(lanHost && localIps.includes(lanHost));
 const disableHmr =
   process.env.VITE_DISABLE_HMR === 'true' || networkEnv.VITE_DISABLE_HMR === 'true';
@@ -131,8 +159,20 @@ function printLanUrls() {
         if (primaryIp) {
           lines.push(`  Retea (acelasi PC / LAN): ${protocol}://${primaryIp}:${port}/`);
         }
+        if (!fs.existsSync(devNetworkPath)) {
+          lines.push(
+            '  ATENTIE: lipseste dev-network.env in radacina repo — copiaza-l de pe PC.'
+          );
+        }
         if (useDevProxy) {
           lines.push(`  API proxy → ${proxyTarget}`);
+          if (proxyTarget.includes('127.0.0.1') && !localIps.includes(networkEnv.SERVER_IP?.trim())) {
+            lines.push(
+              '  EROARE probabil: proxy la localhost, dar backend e pe alt PC. Seteaza dev-network.env sau VITE_USE_DEV_PROXY=false'
+            );
+          }
+        } else if (apiBaseFromNetwork) {
+          lines.push(`  API direct (Assignment 4): ${apiBaseFromNetwork}`);
         } else if (networkEnv.SERVER_IP?.trim()) {
           const backendHttp =
             networkEnv.BACKEND_HTTP === 'true' || process.env.BACKEND_HTTP === 'true';

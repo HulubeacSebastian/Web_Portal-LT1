@@ -5,6 +5,21 @@
  */
 
 require('../scripts/load-dev-network-env').loadDevNetworkEnv();
+
+if (process.env.CLIENT_IP) {
+  var clientOrigin = 'https://' + process.env.CLIENT_IP.trim() + ':5173';
+  var origins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(function (value) {
+      return value.trim();
+    })
+    .filter(Boolean);
+  if (!origins.includes(clientOrigin)) {
+    origins.push(clientOrigin);
+    process.env.ALLOWED_ORIGINS = origins.join(',');
+  }
+}
+
 var app = require('../src/app');
 var debug = require('debug')('portal-lt1-backend:server');
 var fs = require('fs');
@@ -156,6 +171,10 @@ function onListening() {
   for (var ip of getLanIPv4Addresses()) {
     lines.push('    ' + protocol + '://' + ip + ':' + port + '/health');
   }
-  lines.push('  Portal UI: frontend pe port 5173 → http://<IP>:5173\n');
+  lines.push('  Portal UI (CLIENT): https://' + (process.env.CLIENT_IP || '<CLIENT_IP>') + ':5173');
+  if (process.env.CLIENT_IP) {
+    lines.push('  CORS permite: https://' + process.env.CLIENT_IP.trim() + ':5173');
+  }
+  lines.push('  Pe Windows: permite port 3000 in Firewall pentru retea privata\n');
   console.log(lines.join('\n'));
 }

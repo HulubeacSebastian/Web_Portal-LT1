@@ -96,9 +96,53 @@ npm install
 npm run dev:https
 ```
 
-Deschide pe **Mac**: `https://192.168.0.94:5173`
+Deschide pe **Mac**: `https://<IP-mac>:5173` (nu IP-ul PC-ului)
 
-**Prima data** pe Mac: deschide si `https://192.168.0.81:3000/health` → accepta certificatul serverului.
+**Prima data pe Mac (obligatoriu):**
+1. `https://192.168.0.81:3000/health` → Advanced → Proceed (certificat server)
+2. Apoi `https://<IP-mac>:5173` → accepta certificat frontend daca e nevoie
+
+---
+
+## Daca merge pe PC dar NU pe Mac
+
+### 1. IP Mac real (adesea nu e .94)
+
+Pe Mac in Terminal:
+```bash
+ipconfig getifaddr en0
+```
+
+Actualizeaza `CLIENT_IP` si `VITE_LAN_HOST` in `dev-network.env` (pe **ambele** masini, acelasi fisier), apoi:
+```powershell
+npm run prepare:dev-tls
+```
+Repornește backend + frontend.
+
+### 2. Firewall Windows (cauza #1)
+
+Pe **PC server**, PowerShell **Administrator**:
+```powershell
+New-NetFirewallRule -DisplayName "Portal LT1 API 3000" -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow -Profile Private
+```
+
+### 3. Fisiere pe Mac (repo complet)
+
+Pe Mac trebuie:
+- `dev-network.env` (radacina)
+- `portal-lt1-backend/certs/` (copiat de pe PC)
+- `portal-lt1-frontend/.env` cu `VITE_API_BASE_URL=https://192.168.0.81:3000`
+
+### 4. Test din Terminal Mac
+
+```bash
+curl -k https://192.168.0.81:3000/health
+```
+Trebuie `{"status":"ok"}`. Daca nu merge, problema e retea/firewall, nu React.
+
+### 5. F12 pe Mac la login
+
+Trebuie `https://192.168.0.81:3000/api/auth/login` — daca `(failed)`, revino la pasii 1–2.
 
 ---
 

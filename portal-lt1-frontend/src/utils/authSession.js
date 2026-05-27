@@ -55,3 +55,23 @@ export function isAdmin() {
   const session = loadAuthSession();
   return session?.role === 'admin';
 }
+
+/** Nickname in header; falls back to full name, then email local-part. */
+export function getDisplayName(session) {
+  if (!session) return '';
+  const nickname = typeof session.nickname === 'string' ? session.nickname.trim() : '';
+  if (nickname) return nickname;
+  const fullName = typeof session.fullName === 'string' ? session.fullName.trim() : '';
+  if (fullName) return fullName;
+  const email = typeof session.email === 'string' ? session.email.trim() : '';
+  if (email.includes('@')) return email.split('@')[0];
+  return email || 'Utilizator';
+}
+
+export function mergeAuthUser(updates) {
+  const current = loadAuthSession();
+  if (!current) return null;
+  const merged = { ...current, ...updates };
+  saveAuthSession({ user: merged });
+  return merged;
+}

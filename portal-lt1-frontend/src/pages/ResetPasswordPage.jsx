@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
 import { apiRequest } from '../utils/apiClient';
 import { validateRegister } from '../utils/formValidation';
@@ -14,11 +14,16 @@ const highlights = [
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const initial = location.state || {};
+  const [searchParams] = useSearchParams();
+  const fromState = location.state || {};
+  const fromQuery = {
+    resetToken: searchParams.get('resetToken') || '',
+    token: searchParams.get('token') || ''
+  };
 
   const [formData, setFormData] = useState({
-    resetToken: initial.resetToken || '',
-    token: initial.token || '',
+    resetToken: fromState.resetToken || fromQuery.resetToken,
+    token: fromState.token || fromQuery.token,
     password: '',
     confirmPassword: ''
   });

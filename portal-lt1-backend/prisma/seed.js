@@ -18,6 +18,7 @@ const USERS = [
     email: 'admin@lt1.ro',
     password: 'admin123',
     fullName: 'Administrator LT1',
+    nickname: 'AdminLT1',
     role: 'admin'
   },
   {
@@ -25,6 +26,7 @@ const USERS = [
     email: 'profesor@lt1.ro',
     password: 'profesor123',
     fullName: 'Profesor LT1',
+    nickname: 'ProfLT1',
     role: 'user'
   }
 ];
@@ -115,6 +117,7 @@ async function seedUsers() {
         email: user.email,
         password: passwordHash,
         fullName: user.fullName,
+        nickname: user.nickname || null,
         roleId: roleByName[user.role]
       },
       create: {
@@ -122,6 +125,7 @@ async function seedUsers() {
         email: user.email,
         password: passwordHash,
         fullName: user.fullName,
+        nickname: user.nickname || null,
         roleId: roleByName[user.role]
       }
     });

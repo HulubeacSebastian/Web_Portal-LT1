@@ -42,7 +42,17 @@ async function buildUserId() {
   return `USR-${String(next).padStart(3, '0')}`;
 }
 
-async function createUser({ email, password, fullName, roleName = 'user' }) {
+async function updateUserProfile(id, { nickname }) {
+  const value = typeof nickname === 'string' ? nickname.trim() : '';
+  const row = await prisma.user.update({
+    where: { id },
+    data: { nickname: value || null },
+    include: userInclude
+  });
+  return mapUser(row);
+}
+
+async function createUser({ email, password, fullName, nickname, roleName = 'user' }) {
   const role = await prisma.role.findUnique({ where: { name: roleName } });
   if (!role) {
     throw new Error(`Rolul "${roleName}" nu exista.`);
@@ -56,6 +66,7 @@ async function createUser({ email, password, fullName, roleName = 'user' }) {
       email: String(email).toLowerCase(),
       password: passwordHash,
       fullName,
+      nickname: nickname?.trim() || null,
       roleId: role.id
     },
     include: userInclude
@@ -169,6 +180,7 @@ module.exports = {
   resetExtraStores,
   getUserByEmail,
   getUserById,
+  updateUserProfile,
   createUser,
   listPosts,
   createPost,

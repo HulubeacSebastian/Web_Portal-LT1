@@ -67,16 +67,31 @@ curl http://127.0.0.1:3000/health
 
 Fișier: `~/Web_Portal-LT1/portal-lt1-backend/.env`
 
+Minim + **reset parolă prin email** (linkul din mail merge la site-ul public, nu la localhost):
+
 ```env
 DATABASE_URL="file:./prisma/dev.db"
 PORT=3000
 ALLOWED_ORIGINS=https://portal-lt1.duckdns.org
 PORTAL_DEV_HTTP=true
+MONGODB_URI=mongodb://127.0.0.1:27017
+MONGODB_DB=portal_lt1_chat
+
+PUBLIC_APP_URL=https://portal-lt1.duckdns.org
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=portal.lt1.suport@gmail.com
+SMTP_PASS=PAROLA_APP_GMAIL
+MAIL_FROM="Portal LT1 <portal.lt1.suport@gmail.com>"
+AUTH_EXPOSE_DEV_CODES=false
 ```
 
 Nu folosi `SSL_KEY_PATH` / `SSL_CERT_PATH` pe server — HTTPS face Nginx + Certbot.
 
 După modificări `.env`: `pm2 restart backend`
+
+Detalii: [ENV.md](./ENV.md) (secțiunea Email / deployment).
 
 ---
 

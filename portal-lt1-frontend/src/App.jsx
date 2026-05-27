@@ -27,6 +27,8 @@ import {
 import { initSessionIdleWatch } from './utils/sessionIdle';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
+import PageSideOrnaments from './components/PageSideOrnaments.jsx';
+import ScrollGearCluster from './components/ScrollGearCluster.jsx';
 import SiteHeader from './components/SiteHeader.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import { deleteCookie, getCookie, setCookie } from './utils/cookies';
@@ -119,6 +121,8 @@ function App() {
 
   return (
     <DocumentsProvider>
+      <PageSideOrnaments />
+      <ScrollGearCluster />
       <div className="layout">
         <SiteHeader
           isLoggedIn={isLoggedIn}

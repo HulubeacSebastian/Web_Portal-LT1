@@ -213,13 +213,16 @@ router.post('/forgot-password', async function (req, res, next) {
       });
     }
 
-    const reset = await sessionService.createPasswordResetChallenge(user.id);
-    return res.json({
-      message: reset.message,
-      resetToken: reset.resetToken,
-      expiresInSeconds: reset.expiresInSeconds,
-      devResetCode: reset.devResetCode
-    });
+    const reset = await sessionService.createPasswordResetChallenge(user.id, user.email);
+    if (reset.error) {
+      return res.status(503).json({ message: reset.error });
+    }
+
+    const body = { message: reset.message };
+    if (reset.resetToken) body.resetToken = reset.resetToken;
+    if (reset.expiresInSeconds) body.expiresInSeconds = reset.expiresInSeconds;
+    if (reset.devResetCode) body.devResetCode = reset.devResetCode;
+    return res.json(body);
   } catch (error) {
     return next(error);
   }

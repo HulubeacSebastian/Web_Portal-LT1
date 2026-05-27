@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
 const MOBILE_HEADER_MQ = '(max-width: 700px)';
-/** Cât scroll „consumă” colapsul față de înălțimea headerului (mai mare = mai lent). */
-const COLLAPSE_RANGE_RATIO = 1.7;
-const WHEEL_DAMPING = 0.52;
-const TOUCH_DAMPING = 0.82;
-const MAX_WHEEL_STEP_PX = 34;
-const MAX_TOUCH_STEP_PX = 50;
+/** Mai mic = mai puțin scroll „consumat” înainte ca pagina să deruleze. */
+const COLLAPSE_RANGE_RATIO = 0.88;
+const WHEEL_DAMPING = 0.68;
+const TOUCH_DAMPING = 1;
+const MAX_WHEEL_STEP_PX = 42;
+const MAX_TOUCH_STEP_PX = 110;
+/** După acest progres, un swipe în jos închide header-ul instant. */
+const SNAP_COLLAPSE_AT = 0.52;
+
 function smoothstep(value) {
   const t = Math.min(1, Math.max(0, value));
   return t * t * (3 - 2 * t);
@@ -27,17 +30,28 @@ function readPxVar(name, fallback) {
   return value;
 }
 
-function applyHeaderProgress(progressRef, progress) {
+function measureLayoutCache() {
+  const expandedPx = readPxVar('--header-mobile-expanded', window.innerHeight * 0.3);
+  const compactPx = readPxVar('--header-mobile-compact', 101);
+  const gapPx = readPxVar('--header-content-gap', 12);
+  const tasselPx = readPxVar('--header-tassel-hang', 26);
+  const travel = Math.max(0, expandedPx - compactPx);
+  return {
+    expandedPx,
+    compactPx,
+    gapPx,
+    tasselPx,
+    collapseRangePx: Math.max(110, travel * COLLAPSE_RANGE_RATIO),
+  };
+}
+
+function applyHeaderProgress(progressRef, progress, layout) {
   const clamped = Math.min(1, Math.max(0, progress));
   progressRef.current = clamped;
 
-  const expandedPx = readPxVar('--header-mobile-expanded', window.innerHeight * 0.3);
-  const compactPx = readPxVar('--header-mobile-compact', 101);
   const eased = smoothstep(clamped);
-  const gapPx = readPxVar('--header-content-gap', 12);
-  const tasselPx = readPxVar('--header-tassel-hang', 26);
-  const visualHeightPx = compactPx + (expandedPx - compactPx) * (1 - eased);
-  const layoutOffsetPx = visualHeightPx + gapPx + tasselPx;
+  const visualHeightPx = layout.compactPx + (layout.expandedPx - layout.compactPx) * (1 - eased);
+  const layoutOffsetPx = visualHeightPx + layout.gapPx + layout.tasselPx;
 
   document.documentElement.style.setProperty('--header-collapse-progress', String(eased));
   document.documentElement.style.setProperty('--header-visual-height', `${visualHeightPx}px`);
@@ -57,16 +71,15 @@ export function useMobileHeaderCollapse(resetKey) {
     return window.matchMedia(MOBILE_HEADER_MQ).matches;
   });
   const progressRef = useRef(0);
-  const collapseRangeRef = useRef(220);
+  const layoutRef = useRef(measureLayoutCache());
+  const rafRef = useRef(0);
+  const pendingProgressRef = useRef(null);
 
   useEffect(() => {
     const media = window.matchMedia(MOBILE_HEADER_MQ);
 
-    const measureRange = () => {
-      const expandedPx = readPxVar('--header-mobile-expanded', window.innerHeight * 0.3);
-      const compactPx = readPxVar('--header-mobile-compact', 101);
-      const travel = Math.max(0, expandedPx - compactPx);
-      collapseRangeRef.current = Math.max(260, travel * COLLAPSE_RANGE_RATIO);
+    const refreshLayout = () => {
+      layoutRef.current = measureLayoutCache();
     };
 
     const dampenDelta = (deltaY, maxStep, damping) => {
@@ -75,16 +88,33 @@ export function useMobileHeaderCollapse(resetKey) {
       return Math.sign(scaled) * maxStep;
     };
 
-    const publish = (value) => {
-      const clamped = applyHeaderProgress(progressRef, value);
+    const flushProgress = (value) => {
+      const clamped = applyHeaderProgress(progressRef, value, layoutRef.current);
       setCollapseProgress(clamped);
+    };
+
+    const publish = (value) => {
+      pendingProgressRef.current = value;
+      if (rafRef.current) return;
+      rafRef.current = window.requestAnimationFrame(() => {
+        rafRef.current = 0;
+        const next = pendingProgressRef.current;
+        pendingProgressRef.current = null;
+        if (next == null) return;
+        flushProgress(next);
+      });
     };
 
     const absorbDelta = (deltaY, maxStep, damping) => {
       if (!media.matches || window.scrollY > 0) return false;
 
-      const range = collapseRangeRef.current;
-      const next = progressRef.current + dampenDelta(deltaY, maxStep, damping) / range;
+      const range = layoutRef.current.collapseRangePx;
+      const damped = dampenDelta(deltaY, maxStep, damping);
+      let next = progressRef.current + damped / range;
+
+      if (deltaY > 0 && next >= SNAP_COLLAPSE_AT) {
+        next = 1;
+      }
 
       if (next >= 1) {
         publish(1);
@@ -112,7 +142,7 @@ export function useMobileHeaderCollapse(resetKey) {
       } else if (progressRef.current >= 1) {
         document.body.classList.remove('header-scroll-lock');
       } else {
-        applyHeaderProgress(progressRef, progressRef.current);
+        applyHeaderProgress(progressRef, progressRef.current, layoutRef.current);
       }
     };
 
@@ -155,13 +185,13 @@ export function useMobileHeaderCollapse(resetKey) {
     };
 
     const onResize = () => {
-      measureRange();
+      refreshLayout();
       publish(window.scrollY > 0 ? 1 : progressRef.current);
     };
 
     const onMediaChange = () => {
       setIsMobile(media.matches);
-      measureRange();
+      refreshLayout();
       if (!media.matches) {
         publish(1);
         return;
@@ -170,9 +200,9 @@ export function useMobileHeaderCollapse(resetKey) {
     };
 
     setIsMobile(media.matches);
-    measureRange();
+    refreshLayout();
     window.scrollTo(0, 0);
-    publish(0);
+    flushProgress(0);
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('wheel', onWheel, { passive: false });
@@ -182,6 +212,10 @@ export function useMobileHeaderCollapse(resetKey) {
     media.addEventListener('change', onMediaChange);
 
     return () => {
+      if (rafRef.current) {
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      }
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchstart', onTouchStart);

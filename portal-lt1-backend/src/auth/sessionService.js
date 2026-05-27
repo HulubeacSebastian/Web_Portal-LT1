@@ -1,5 +1,6 @@
 const { prisma } = require('../db/prisma');
 const { hashPassword, verifyPassword } = require('./password');
+const { isMailConfigured, sendPasswordResetEmail } = require('../services/mailService');
 const {
   generateId,
   generateOtpCode,
@@ -75,10 +76,11 @@ async function verifyLoginChallenge(challengeId, code) {
   return { userId: challenge.userId };
 }
 
-async function createPasswordResetChallenge(userId) {
+async function createPasswordResetChallenge(userId, email) {
   const token = generateResetToken();
   const id = generateId('RST');
   const expiresAt = new Date(Date.now() + RESET_TTL_MS);
+  const expiresMinutes = Math.floor(RESET_TTL_MS / 60000);
 
   await prisma.authChallenge.create({
     data: {
@@ -90,19 +92,31 @@ async function createPasswordResetChallenge(userId) {
     }
   });
 
-  const payload = {
-    message: 'Daca exista contul, vei primi instructiuni de resetare.',
-    resetToken: id,
-    expiresInSeconds: Math.floor(RESET_TTL_MS / 1000)
-  };
+  const message = 'Daca exista contul, vei primi instructiuni de resetare.';
+  const appBase = (process.env.PUBLIC_APP_URL || 'http://localhost:5173').replace(/\/$/, '');
+  const resetUrl = `${appBase}/reset-password?resetToken=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`;
 
-  if (shouldExposeDevCodes()) {
-    payload.devResetCode = token;
-  } else {
-    console.log(`[auth] Reset parola user ${userId}, token: ${token}`);
+  if (isMailConfigured() && email) {
+    try {
+      await sendPasswordResetEmail({ to: email, resetUrl, expiresMinutes });
+      return { message };
+    } catch (error) {
+      console.error('[auth] Eroare trimitere email reset:', error.message);
+      return { error: 'Nu am putut trimite emailul. Incearca mai tarziu.' };
+    }
   }
 
-  return payload;
+  if (shouldExposeDevCodes()) {
+    return {
+      message,
+      resetToken: id,
+      expiresInSeconds: Math.floor(RESET_TTL_MS / 1000),
+      devResetCode: token
+    };
+  }
+
+  console.log(`[auth] Reset parola user ${userId}, link: ${resetUrl}`);
+  return { message };
 }
 
 async function verifyPasswordReset(resetTokenId, token, newPassword) {

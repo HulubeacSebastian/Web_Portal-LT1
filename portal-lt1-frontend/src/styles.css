@@ -30,6 +30,9 @@ html {
   --header-logo-compact: 5.35rem;
   --header-content-gap: 0.75rem;
   --header-tassel-hang: 1.65rem;
+  --content-frame-width: min(calc(100vw - 2rem), var(--frame-max));
+  --content-half-width: calc(var(--content-frame-width) / 2);
+  --side-gutter-width: max(0px, calc((100vw - var(--content-frame-width)) / 2));
   --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-springy: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 120ms;
@@ -88,6 +91,8 @@ a {
 }
 
 .layout {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -95,12 +100,574 @@ a {
   padding-bottom: 0.85rem;
 }
 
+/* Angrenaj colț — rotație la scroll */
+.scroll-gear-cluster {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .scroll-gear-cluster {
+    display: block;
+    position: fixed;
+    right: max(0.75rem, calc((100vw - var(--content-frame-width)) / 2 - 10rem));
+    bottom: 1.5rem;
+    z-index: 0;
+    width: clamp(7rem, 10vw, 10rem);
+    height: clamp(7rem, 10vw, 10rem);
+    pointer-events: none;
+    opacity: 0.46;
+    transition: opacity 0.35s ease;
+  }
+
+  .scroll-gear-cluster__halo {
+    position: absolute;
+    inset: -12%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 55% 45%,
+      rgba(106, 87, 184, 0.1) 0%,
+      rgba(232, 192, 74, 0.06) 42%,
+      transparent 72%
+    );
+    pointer-events: none;
+  }
+
+  .scroll-gear-cluster__svg {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 6px 16px rgba(58, 31, 92, 0.1));
+  }
+
+  .scroll-gear-cluster__shape {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .scroll-gear-cluster__wheel--gold {
+    color: var(--brand-gold-deep);
+  }
+
+  .scroll-gear-cluster__wheel--purple {
+    color: var(--brand-purple-soft);
+  }
+}
+
+@media (min-width: 1440px) {
+  .scroll-gear-cluster {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-gear-cluster {
+    opacity: 0.38;
+  }
+}
+
+/* Ornamente SVG în marginile laterale (desktop lat) */
+.page-side-ornaments {
+  display: none;
+}
+
+/* Afișează ornamente doar când există gutter real lângă cadru (≈ peste 1440px) */
+@media (min-width: 1440px) {
+  .page-side-ornaments {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    --ornament-gutter: min(var(--side-gutter-width), 300px);
+    --ornament-scale: clamp(0.88, calc(var(--ornament-gutter) / 150px), 1.12);
+  }
+
+  .page-side-ornaments__glow {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    opacity: 0.38;
+  }
+
+  .page-side-ornaments__glow--left {
+    left: 0;
+    right: calc(50% + var(--content-half-width));
+    background: radial-gradient(ellipse 90% 55% at 100% 40%, rgba(106, 87, 184, 0.14), transparent 72%);
+  }
+
+  .page-side-ornaments__glow--right {
+    left: calc(50% + var(--content-half-width));
+    right: 0;
+    background: radial-gradient(ellipse 90% 55% at 0% 60%, rgba(232, 192, 74, 0.12), transparent 72%);
+  }
+
+  .page-side-ornaments__layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .page-side-ornaments__layer--back {
+    z-index: 0;
+  }
+
+  .page-side-ornaments__layer--mid {
+    z-index: 1;
+  }
+
+  .page-side-ornaments__layer--front {
+    z-index: 2;
+  }
+
+  .page-side-ornaments__column {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--ornament-gutter);
+    min-width: 0;
+    max-width: 300px;
+  }
+
+  .page-side-ornaments__column::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, rgba(106, 87, 184, 0.04) 100%);
+  }
+
+  .page-side-ornaments__column--right::after {
+    background: linear-gradient(270deg, transparent 0%, rgba(232, 192, 74, 0.05) 100%);
+  }
+
+  .page-side-ornaments__column--left {
+    left: auto;
+    right: calc(50% + var(--content-half-width));
+  }
+
+  .page-side-ornaments__column--right {
+    left: calc(50% + var(--content-half-width));
+    right: auto;
+  }
+
+  /* Spirale lungi */
+  .page-side-spiral {
+    position: absolute;
+    z-index: 1;
+    width: clamp(22px, 18%, 32px);
+    height: min(42vh, 400px);
+    opacity: 0.34;
+    pointer-events: none;
+    transform-origin: center top;
+    filter: blur(1px) drop-shadow(0 4px 14px rgba(75, 41, 120, 0.08));
+    animation: side-spiral-sway 22s ease-in-out infinite;
+  }
+
+  .page-side-spiral svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .page-side-spiral--a {
+    top: 1%;
+    right: 18%;
+    animation-duration: 18s;
+    animation-delay: -4s;
+  }
+
+  .page-side-spiral--b {
+    display: none;
+    top: 56%;
+    right: 8%;
+    height: min(38vh, 360px);
+    opacity: 0.36;
+    animation-duration: 24s;
+    animation-delay: -9s;
+  }
+
+  @media (min-width: 1680px) {
+    .page-side-spiral--b {
+      display: block;
+    }
+  }
+
+  .page-side-ornaments__column--right .page-side-spiral--a {
+    top: 32%;
+    right: auto;
+    left: 22%;
+    animation-delay: -11s;
+  }
+
+  .page-side-ornaments__column--right .page-side-spiral--b {
+    top: 74%;
+    right: auto;
+    left: 6%;
+    animation-delay: -6s;
+  }
+
+  .page-side-spiral--mirror {
+    transform: scaleX(-1);
+    animation-name: side-spiral-sway-mirror;
+  }
+
+  @keyframes side-spiral-sway {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-5deg);
+    }
+    50% {
+      transform: translate3d(6px, -28px, 0) rotate(7deg);
+    }
+  }
+
+  @keyframes side-spiral-sway-mirror {
+    0%,
+    100% {
+      transform: scaleX(-1) translate3d(0, 0, 0) rotate(-5deg);
+    }
+    50% {
+      transform: scaleX(-1) translate3d(-6px, -28px, 0) rotate(7deg);
+    }
+  }
+
+  /* Confetti — puțin, împrăștiat */
+  .page-side-confetti {
+    position: absolute;
+    z-index: 0;
+    width: var(--confetti-size, 8px);
+    height: var(--confetti-size, 8px);
+    background: var(--confetti-color, #6a57b8);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+    filter: saturate(1.05);
+    animation-duration: var(--confetti-dur, 10s);
+    animation-delay: var(--confetti-delay, 0s);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  .page-side-confetti--distant {
+    filter: blur(2px) saturate(1.02);
+    opacity: 0.85;
+  }
+
+  .page-side-confetti--circle {
+    border-radius: 50%;
+  }
+
+  .page-side-confetti--rect {
+    border-radius: 2px;
+    height: calc(var(--confetti-size, 8px) * 1.55);
+    width: calc(var(--confetti-size, 8px) * 0.72);
+  }
+
+  .page-side-confetti--strip {
+    width: calc(var(--confetti-size, 8px) * 2.1);
+    height: calc(var(--confetti-size, 8px) * 0.42);
+    border-radius: 999px;
+  }
+
+  .page-side-confetti--confetti-drift-a {
+    animation-name: confetti-drift-a;
+  }
+
+  .page-side-confetti--confetti-drift-b {
+    animation-name: confetti-drift-b;
+  }
+
+  .page-side-confetti--confetti-drift-c {
+    animation-name: confetti-drift-c;
+  }
+
+  @keyframes confetti-drift-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate3d(8px, -12px, 0) rotate(75deg);
+    }
+  }
+
+  @keyframes confetti-drift-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(8deg);
+    }
+    50% {
+      transform: translate3d(-10px, 10px, 0) rotate(120deg);
+    }
+  }
+
+  @keyframes confetti-drift-c {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-6deg);
+    }
+    50% {
+      transform: translate3d(6px, 14px, 0) rotate(95deg);
+    }
+  }
+
+  .page-side-ornament {
+    position: absolute;
+    width: calc(var(--ornament-size, 64px) * var(--ornament-scale, 1));
+    height: calc(var(--ornament-size, 64px) * var(--ornament-scale, 1));
+    color: var(--brand-purple-soft);
+    transform-origin: center;
+  }
+
+  /* Adâncime — planuri */
+  .page-side-ornament--depth-back-far {
+    z-index: 0;
+    opacity: 0.2;
+    filter: blur(5px) saturate(0.92);
+  }
+
+  .page-side-ornament--depth-back-mid {
+    z-index: 0;
+    opacity: 0.26;
+    filter: blur(3px) saturate(0.95);
+  }
+
+  .page-side-ornament--depth-soft {
+    z-index: 2;
+    opacity: 0.44;
+    filter: blur(2px) drop-shadow(0 4px 12px rgba(58, 31, 92, 0.1));
+  }
+
+  .page-side-ornament--depth-near {
+    z-index: 3;
+    opacity: 0.5;
+    filter: drop-shadow(0 5px 14px rgba(58, 31, 92, 0.12));
+  }
+
+  .page-side-ornament--depth-focus {
+    z-index: 4;
+    opacity: 0.56;
+    filter: drop-shadow(0 6px 18px rgba(58, 31, 92, 0.14));
+  }
+
+  .page-side-ornament svg,
+  .page-side-ornament-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .page-side-ornament--gold {
+    color: var(--brand-gold-deep);
+  }
+
+  .page-side-ornament--purple {
+    color: var(--brand-purple-deep);
+  }
+
+  .page-side-ornament--mirror:not(
+      .page-side-ornament--float-a,
+      .page-side-ornament--float-b,
+      .page-side-ornament--drift-a,
+      .page-side-ornament--drift-b
+    ) {
+    transform: scaleX(-1);
+  }
+
+  .page-side-ornament--float-a {
+    --ornament-anim: side-ornament-float-a;
+    animation: side-ornament-float-a 9s ease-in-out infinite;
+  }
+
+  .page-side-ornament--float-b {
+    --ornament-anim: side-ornament-float-b;
+    animation: side-ornament-float-b 11s ease-in-out infinite;
+    animation-delay: -3s;
+  }
+
+  .page-side-ornament--drift-a {
+    --ornament-anim: side-ornament-drift-a;
+    animation: side-ornament-drift-a 14s ease-in-out infinite;
+    animation-delay: -2s;
+  }
+
+  .page-side-ornament--drift-b {
+    --ornament-anim: side-ornament-drift-b;
+    animation: side-ornament-drift-b 16s ease-in-out infinite;
+    animation-delay: -5s;
+  }
+
+  @keyframes side-ornament-float-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-4deg);
+    }
+    50% {
+      transform: translate3d(0, -14px, 0) rotate(3deg);
+    }
+  }
+
+  @keyframes side-ornament-float-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(5deg);
+    }
+    50% {
+      transform: translate3d(6px, -18px, 0) rotate(-2deg);
+    }
+  }
+
+  @keyframes side-ornament-drift-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    33% {
+      transform: translate3d(10px, -10px, 0) rotate(6deg);
+    }
+    66% {
+      transform: translate3d(-6px, 8px, 0) rotate(-4deg);
+    }
+  }
+
+  @keyframes side-ornament-drift-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-2deg);
+    }
+    40% {
+      transform: translate3d(-8px, 12px, 0) rotate(4deg);
+    }
+    70% {
+      transform: translate3d(12px, -6px, 0) rotate(-5deg);
+    }
+  }
+
+  .page-side-ornament--mirror.page-side-ornament--float-a {
+    animation-name: side-ornament-float-a-mirror;
+  }
+
+  .page-side-ornament--mirror.page-side-ornament--float-b {
+    animation-name: side-ornament-float-b-mirror;
+  }
+
+  .page-side-ornament--mirror.page-side-ornament--drift-a {
+    animation-name: side-ornament-drift-a-mirror;
+  }
+
+  .page-side-ornament--mirror.page-side-ornament--drift-b {
+    animation-name: side-ornament-drift-b-mirror;
+  }
+
+  @keyframes side-ornament-float-a-mirror {
+    0%,
+    100% {
+      transform: scaleX(-1) translate3d(0, 0, 0) rotate(-4deg);
+    }
+    50% {
+      transform: scaleX(-1) translate3d(0, -14px, 0) rotate(3deg);
+    }
+  }
+
+  @keyframes side-ornament-float-b-mirror {
+    0%,
+    100% {
+      transform: scaleX(-1) translate3d(0, 0, 0) rotate(5deg);
+    }
+    50% {
+      transform: scaleX(-1) translate3d(-6px, -18px, 0) rotate(-2deg);
+    }
+  }
+
+  @keyframes side-ornament-drift-a-mirror {
+    0%,
+    100% {
+      transform: scaleX(-1) translate3d(0, 0, 0) rotate(0deg);
+    }
+    33% {
+      transform: scaleX(-1) translate3d(-10px, -10px, 0) rotate(6deg);
+    }
+    66% {
+      transform: scaleX(-1) translate3d(6px, 8px, 0) rotate(-4deg);
+    }
+  }
+
+  @keyframes side-ornament-drift-b-mirror {
+    0%,
+    100% {
+      transform: scaleX(-1) translate3d(0, 0, 0) rotate(-2deg);
+    }
+    40% {
+      transform: scaleX(-1) translate3d(8px, 12px, 0) rotate(4deg);
+    }
+    70% {
+      transform: scaleX(-1) translate3d(-12px, -6px, 0) rotate(-5deg);
+    }
+  }
+}
+
+@media (min-width: 1440px) and (prefers-reduced-motion: reduce) {
+  .page-side-ornament--float-a,
+  .page-side-ornament--float-b,
+  .page-side-ornament--drift-a,
+  .page-side-ornament--drift-b,
+  .page-side-spiral,
+  .page-side-confetti {
+    animation: none !important;
+  }
+
+  .page-side-ornament--depth-back-far,
+  .page-side-ornament--depth-back-mid,
+  .page-side-ornament--depth-soft {
+    filter: none;
+  }
+
+  .page-side-ornament--mirror {
+    transform: scaleX(-1);
+  }
+
+  .page-side-spiral--mirror {
+    transform: scaleX(-1);
+  }
+}
+
+/* Ultrawide: fundal discret în zona exterioară, fără iconițe izolate */
+@media (min-width: 1680px) {
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: max(0px, calc(var(--side-gutter-width) - 300px));
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
+  body::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(106, 87, 184, 0.05), transparent 85%);
+  }
+
+  body::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(232, 192, 74, 0.05), transparent 85%);
+  }
+}
+
 /* —— Site header —— */
 .site-header {
   position: sticky;
   top: 0.65rem;
   z-index: 100;
-  width: min(calc(100vw - 2rem), var(--frame-max));
+  width: var(--content-frame-width);
+  max-width: 100%;
   margin: 0 auto 1.25rem;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.75);
@@ -828,14 +1395,69 @@ a {
     margin: 0 auto 1.25rem;
   }
 
-  .site-header--expanded .site-header-inner,
-  .site-header--compact .site-header-inner {
-    min-height: var(--header-height);
-    padding: 0.5rem 1.15rem 0.7rem;
+  .site-header-inner {
+    min-height: 6.35rem;
+    padding: 0.55rem 1.25rem 1.05rem;
+    gap: 1rem 1.5rem;
   }
 
+  .site-header-brand {
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .site-header-logo-wrap {
+    margin-bottom: 0;
+    padding: 0.5rem 0.72rem 0.55rem;
+    border-radius: 20px;
+    border: 1.5px solid rgba(75, 41, 120, 0.22);
+    background: linear-gradient(
+      165deg,
+      #ffffff 0%,
+      #f6f2ff 48%,
+      #fff9eb 100%
+    );
+    box-shadow:
+      0 12px 32px rgba(58, 31, 92, 0.16),
+      0 0 0 1px rgba(255, 255, 255, 0.9) inset,
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+
+  .site-header-logo {
+    height: 5.35rem;
+    max-width: 5.75rem;
+    min-width: 4.75rem;
+    filter:
+      drop-shadow(0 3px 10px rgba(58, 31, 92, 0.28))
+      contrast(1.06)
+      saturate(1.08);
+  }
+
+  .site-header-brand-title {
+    font-size: 1.08rem;
+  }
+
+  .site-header-brand-sub {
+    font-size: 0.72rem;
+    color: #5b6478;
+  }
+
+  .site-header--expanded .site-header-inner,
+  .site-header--compact .site-header-inner {
+    min-height: 6.35rem;
+    padding: 0.55rem 1.25rem 0.75rem;
+  }
+
+  /* Ciucurel la baza headerului, sub emblemă */
   .site-header-tassel-widget {
-    left: 0.75rem;
+    left: 0.85rem;
+    bottom: 0.2rem;
+    z-index: 1;
+  }
+
+  .site-header-tassel-widget--anchored {
+    bottom: 0.28rem;
   }
 
   .site-header-scroll-paper {
@@ -1231,8 +1853,8 @@ a {
 }
 
 .content {
-  width: min(calc(100vw - 2rem), var(--frame-max));
-  max-width: none;
+  width: var(--content-frame-width);
+  max-width: 100%;
   margin: 0 auto;
   padding: 0.15rem 0 1.25rem;
   flex: 1;
@@ -2843,9 +3465,11 @@ a.contact-channel-value:hover {
   margin-top: 0.95rem;
   border: 1px solid #dde1e8;
   border-radius: 6px;
-  overflow: auto;
+  overflow-x: auto;
   display: grid;
-  grid-template-columns: repeat(12, minmax(84px, 1fr));
+  grid-template-columns: repeat(12, minmax(84px, 7.5rem));
+  width: 100%;
+  max-width: 100%;
 }
 
 .calendar-month {
@@ -3052,11 +3676,16 @@ a.contact-channel-value:hover {
 
 .calendar-timeline {
   border-left: 1px solid #e5e9f1;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .calendar-days {
   display: grid;
-  grid-template-columns: repeat(15, minmax(52px, 1fr));
+  grid-template-columns: repeat(15, minmax(52px, 4.25rem));
+  width: max-content;
+  min-width: 100%;
   border-bottom: 1px solid #e8ebf2;
 }
 
@@ -3093,7 +3722,9 @@ a.contact-channel-value:hover {
 .calendar-row-grid {
   min-height: 58px;
   display: grid;
-  grid-template-columns: repeat(15, minmax(52px, 1fr));
+  grid-template-columns: repeat(15, minmax(52px, 4.25rem));
+  width: max-content;
+  min-width: 100%;
   position: relative;
   border-bottom: 1px solid #edf0f6;
 }
@@ -3163,7 +3794,8 @@ a.contact-channel-value:hover {
 }
 
 .school-footer {
-  width: min(calc(100vw - 2rem), var(--frame-max));
+  width: var(--content-frame-width);
+  max-width: 100%;
   margin: 2rem auto 1.25rem;
   border-radius: 18px;
   overflow: hidden;
@@ -4510,7 +5142,7 @@ th {
     );
     padding-left: 0;
     padding-right: 0;
-    transition: padding-top 0.1s linear;
+    transition: none;
   }
 
   body.header-scroll-lock {
@@ -4525,6 +5157,7 @@ th {
     left: 0;
     right: 0;
     z-index: 100;
+    contain: layout style;
     width: 100%;
     max-width: none;
     margin: 0;
@@ -4556,20 +5189,13 @@ th {
       padding 0.4s var(--ease-springy);
   }
 
-  .site-header--collapsing .site-header-inner {
-    transition: min-height 0.1s linear;
-  }
-
-  .site-header--collapsing .site-header-logo {
-    transition: height 0.1s linear, max-width 0.1s linear;
-  }
-
-  .site-header--collapsing .site-header-logo-wrap {
-    transition: padding 0.1s linear, border-radius 0.1s linear;
-  }
-
-  .site-header--collapsing .site-header-brand-text {
-    transition: opacity 0.1s linear, max-height 0.1s linear;
+  .site-header--collapsing .site-header-inner,
+  .site-header--collapsing .site-header-logo,
+  .site-header--collapsing .site-header-logo-wrap,
+  .site-header--collapsing .site-header-brand,
+  .site-header--collapsing .site-header-brand-text,
+  .site-header--collapsing .site-header-toolbar {
+    transition: none;
   }
 
   .site-header--compact .site-header-inner {

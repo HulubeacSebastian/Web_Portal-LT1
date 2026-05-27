@@ -54,7 +54,9 @@ pm2 restart backend
 
 ## Server backend — `.env` (doar SSH)
 
-`~/Web_Portal-LT1/portal-lt1-backend/.env`:
+Fișier pe VM-ul **backend** (`api-lt1`): `~/Web_Portal-LT1/portal-lt1-backend/.env`
+
+**Nu copia `.env` de pe PC.** Pe server pui variabilele de mai jos (inclusiv email).
 
 ```env
 DATABASE_URL="file:./prisma/dev.db"
@@ -63,10 +65,42 @@ ALLOWED_ORIGINS=https://portal-lt1.duckdns.org
 PORTAL_DEV_HTTP=true
 MONGODB_URI=mongodb://127.0.0.1:27017
 MONGODB_DB=portal_lt1_chat
-AUTH_EXPOSE_DEV_CODES=true
+
+# Linkul din mail trebuie să ducă la SITE (frontend), nu la localhost
+PUBLIC_APP_URL=https://portal-lt1.duckdns.org
+
+# Gmail (cont dedicat + App Password din Google)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=portal.lt1.suport@gmail.com
+SMTP_PASS=PAROLA_APP_16_CARACTERE_FARA_SPATII
+MAIL_FROM="Portal LT1 <portal.lt1.suport@gmail.com>"
+
+# Producție: nu mai afișa token în UI
+AUTH_EXPOSE_DEV_CODES=false
 ```
 
-Fără `SSL_KEY_PATH` / `SSL_CERT_PATH`.
+Fără `SSL_KEY_PATH` / `SSL_CERT_PATH`. După salvare: `pm2 restart backend`.
+
+## Email — resetare parolă (deployment)
+
+| Unde | Ce face |
+|------|---------|
+| **PC local** | `.env` cu `PUBLIC_APP_URL=http://localhost:5173` → linkurile din mail merg doar dacă rulezi `npm run dev` |
+| **Server (deploy)** | `.env` cu `PUBLIC_APP_URL=https://portal-lt1.duckdns.org` → linkurile din mail deschid site-ul live |
+
+Flux:
+
+1. Utilizatorul pe **https://portal-lt1.duckdns.org** → „Ai uitat parola?”
+2. Backend pe **https://api-lt1.duckdns.org** trimite mailul (SMTP)
+3. Linkul din mail: `https://portal-lt1.duckdns.org/reset-password?resetToken=...&token=...`
+
+**Mailurile vechi** (trimise când lipsea `PUBLIC_APP_URL`) au încă `localhost` în link — cere din nou resetarea după ce ai configurat serverul.
+
+Butonul **Trimite link de resetare** apelează `POST /api/auth/forgot-password`. Fără SMTP, tokenul poate apărea în UI doar dacă `AUTH_EXPOSE_DEV_CODES=true`.
+
+Alternativ la Gmail: Brevo, SendGrid, Mailgun — aceleași variabile `SMTP_*` și `MAIL_FROM`.
 
 ## Rezumat
 

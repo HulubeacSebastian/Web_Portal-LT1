@@ -14,9 +14,11 @@ function AuthPageLayout({
       <header className="auth-hero" aria-labelledby="auth-hero-title">
         <div className="auth-hero-scrim" aria-hidden="true" />
         <div className="auth-hero-content">
-          <span className="auth-eyebrow">{eyebrow}</span>
-          <h1 id="auth-hero-title">{title}</h1>
-          <p className="auth-hero-lead">{lead}</p>
+          <div className={`auth-hero-copy${eyebrow ? '' : ' auth-hero-copy--no-eyebrow'}`}>
+            {eyebrow ? <span className="auth-eyebrow">{eyebrow}</span> : null}
+            <h1 id="auth-hero-title">{title}</h1>
+            {lead ? <p className="auth-hero-lead">{lead}</p> : null}
+          </div>
         </div>
       </header>
 
@@ -25,13 +27,23 @@ function AuthPageLayout({
           <h2>{highlights.length > 0 ? 'De ce un cont in portal?' : 'Portal LT1'}</h2>
           {highlights.length > 0 ? (
             <ul className="auth-highlight-list">
-              {highlights.map((item) => (
-                <li key={item}>{item}</li>
+              {highlights.map((item, index) => (
+                <li
+                  key={item}
+                  className={`auth-highlight-item auth-highlight-item--${index + 1}`}
+                  style={{ animationDelay: `${index * 0.08}s` }}
+                >
+                  <span className="auth-highlight-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="auth-highlight-text">{item}</span>
+                </li>
               ))}
             </ul>
           ) : null}
           <p className="auth-aside-note">
-            Recuperarea parolei foloseste token securizat pe server (Assignment 4).
+            <span className="auth-aside-note-icon" aria-hidden="true" />
+            Datele tale sunt protejate prin autentificare securizata si resetare controlata.
           </p>
         </aside>
 

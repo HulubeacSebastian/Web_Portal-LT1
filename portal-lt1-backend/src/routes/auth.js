@@ -77,10 +77,14 @@ router.post('/login', async function (req, res, next) {
 
     const user = await store.getUserByEmail(emailCheck.value);
     if (!user || !(await verifyPassword(passwordCheck.value, user.password))) {
-      return res.status(401).json({ message: 'Credentiale invalide.' });
+      return res.status(401).json({ message: 'Parola sau email invalid.' });
     }
 
-    const challenge = await sessionService.createLoginChallenge(user.id);
+    const challenge = await sessionService.createLoginChallenge(user.id, user.email);
+    if (challenge.error) {
+      return res.status(503).json({ message: challenge.error });
+    }
+
     return res.json({
       step: 2,
       challengeId: challenge.challengeId,
@@ -208,8 +212,8 @@ router.post('/forgot-password', async function (req, res, next) {
 
     const user = await store.getUserByEmail(emailCheck.value);
     if (!user) {
-      return res.json({
-        message: 'Daca exista contul, vei primi instructiuni de resetare.'
+      return res.status(404).json({
+        message: 'Nu exista un cont cu acest email.'
       });
     }
 

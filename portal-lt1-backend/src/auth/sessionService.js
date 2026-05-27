@@ -1,6 +1,6 @@
 const { prisma } = require('../db/prisma');
 const { hashPassword, verifyPassword } = require('./password');
-const { isMailConfigured, sendPasswordResetEmail } = require('../services/mailService');
+const { isMailConfigured, sendLoginOtpEmail, sendPasswordResetEmail } = require('../services/mailService');
 const {
   generateId,
   generateOtpCode,
@@ -21,10 +21,11 @@ async function updateUserPassword(userId, plainPassword) {
   });
 }
 
-async function createLoginChallenge(userId) {
+async function createLoginChallenge(userId, email) {
   const code = generateOtpCode();
   const id = generateId('CHL');
   const expiresAt = new Date(Date.now() + OTP_TTL_MS);
+  const expiresMinutes = Math.floor(OTP_TTL_MS / 60000);
 
   await prisma.authChallenge.create({
     data: {
@@ -38,17 +39,31 @@ async function createLoginChallenge(userId) {
 
   const payload = {
     challengeId: id,
-    message: 'Cod de verificare trimis. Introdu codul din 6 cifre.',
+    message: 'Cod de verificare trimis pe email. Introdu codul din 6 cifre.',
     expiresInSeconds: Math.floor(OTP_TTL_MS / 1000)
   };
 
-  if (shouldExposeDevCodes()) {
-    payload.devCode = code;
-  } else {
-    console.log(`[auth] OTP login pentru user ${userId}: ${code}`);
+  if (isMailConfigured() && email) {
+    try {
+      await sendLoginOtpEmail({ to: email, code, expiresMinutes });
+      if (shouldExposeDevCodes()) {
+        payload.devCode = code;
+      }
+      return payload;
+    } catch (error) {
+      console.error('[auth] Eroare trimitere email OTP:', error.message);
+      return { error: 'Nu am putut trimite codul pe email. Incearca mai tarziu.' };
+    }
   }
 
-  return payload;
+  if (shouldExposeDevCodes()) {
+    payload.devCode = code;
+    payload.message = 'Cod de verificare (dev). Introdu codul din 6 cifre.';
+    return payload;
+  }
+
+  console.error('[auth] SMTP neconfigurat — OTP nu poate fi trimis pe email.');
+  return { error: 'Trimiterea codului pe email nu este configurata pe server.' };
 }
 
 async function verifyLoginChallenge(challengeId, code) {
@@ -92,7 +107,7 @@ async function createPasswordResetChallenge(userId, email) {
     }
   });
 
-  const message = 'Daca exista contul, vei primi instructiuni de resetare.';
+  const message = 'Email de resetare a fost trimis (verifica si folderul Spam).';
   const appBase = (process.env.PUBLIC_APP_URL || 'http://localhost:5173').replace(/\/$/, '');
   const resetUrl = `${appBase}/reset-password?resetToken=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`;
 

@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
+import AuthStepper from '../components/AuthStepper.jsx';
+import AuthStatusMessage from '../components/AuthStatusMessage.jsx';
+import AuthSubmitButton from '../components/AuthSubmitButton.jsx';
+import PasswordField from '../components/PasswordField.jsx';
 import { apiRequest, AUTH_CHANGED_EVENT } from '../utils/apiClient';
 import { saveAuthSession } from '../utils/authSession';
 import { setCookie } from '../utils/cookies';
@@ -9,7 +13,7 @@ import { validateLogin } from '../utils/formValidation';
 import { recordActivityEvent, savePreference } from '../utils/activityCookies';
 
 const highlights = [
-  'Autentificare in 3 pasi: parola, cod OTP, sesiune securizata',
+  'Autentificare in 3 pasi: parola, cod OTP pe email, sesiune securizata',
   'Acces la documente si informatii scolare',
   'Token-uri cu permisiuni pe rol (admin / user)',
 ];
@@ -21,7 +25,10 @@ function LoginPage() {
   const [challengeId, setChallengeId] = useState('');
   const [devCode, setDevCode] = useState('');
   const [message, setMessage] = useState('');
+  const [messageStatus, setMessageStatus] = useState(null);
   const [errors, setErrors] = useState({});
+  const [loadingCredentials, setLoadingCredentials] = useState(false);
+  const [loadingOtp, setLoadingOtp] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -30,6 +37,7 @@ function LoginPage() {
     }
     if (message) {
       setMessage('');
+      setMessageStatus(null);
     }
   };
 
@@ -44,6 +52,7 @@ function LoginPage() {
     savePreference('lastLoginEmail', formData.email.trim());
     recordActivityEvent('login_success');
     setMessage('Autentificare reusita.');
+    setMessageStatus('success');
     navigate('/');
   };
 
@@ -56,6 +65,7 @@ function LoginPage() {
       return;
     }
 
+    setLoadingCredentials(true);
     try {
       const response = await apiRequest('/api/auth/login', {
         method: 'POST',
@@ -71,9 +81,13 @@ function LoginPage() {
       }
       setStep(2);
       setMessage(response.message || 'Introdu codul de verificare.');
+      setMessageStatus('success');
     } catch (error) {
       recordActivityEvent('login_failed_validation');
-      setMessage(error?.message || 'Autentificare esuata. Verifica emailul si parola.');
+      setMessage(error?.message || 'Parola sau email invalid.');
+      setMessageStatus('error');
+    } finally {
+      setLoadingCredentials(false);
     }
   };
 
@@ -84,6 +98,7 @@ function LoginPage() {
       return;
     }
 
+    setLoadingOtp(true);
     try {
       const response = await apiRequest('/api/auth/verify-otp', {
         method: 'POST',
@@ -95,21 +110,26 @@ function LoginPage() {
       finishLogin(response);
     } catch (error) {
       setMessage(error?.message || 'Cod invalid.');
+      setMessageStatus('error');
+    } finally {
+      setLoadingOtp(false);
     }
   };
+
+  const stepperStep = loadingOtp ? 3 : step;
 
   return (
     <AuthPageLayout
       variant="login"
-      eyebrow="Acces securizat — Assignment 4"
+      eyebrow="Autentificare"
       title="Autentificare in portal"
-      lead="Conecteaza-te in 3 pasi: parola, verificare OTP, sesiune cu token."
+      lead="Parola, verificare OTP si sesiune securizata."
       highlights={highlights}
       formTitle={step === 1 ? 'Pasul 1 — Parola' : 'Pasul 2 — Cod OTP'}
       formLead={
         step === 1
           ? 'Introdu emailul si parola.'
-          : 'Introdu codul de 6 cifre (in dev apare si mai jos).'
+          : 'Introdu codul de 6 cifre primit pe email (verifica si Spam).'
       }
       footer={
         <p className="auth-note">
@@ -119,6 +139,8 @@ function LoginPage() {
         </p>
       }
     >
+      <AuthStepper currentStep={stepperStep} />
+
       {step === 1 ? (
         <form onSubmit={handleCredentialsSubmit} className="auth-form" noValidate>
           <div className={`auth-field${errors.email ? ' has-error' : ''}`}>
@@ -131,28 +153,25 @@ function LoginPage() {
               placeholder="ex: profesor@lt1.ro"
               maxLength={120}
               autoComplete="username"
+              disabled={loadingCredentials}
             />
             {errors.email ? <p className="error">{errors.email}</p> : null}
           </div>
 
-          <div className={`auth-field${errors.password ? ' has-error' : ''}`}>
-            <label htmlFor="login-password">Parola</label>
-            <input
-              id="login-password"
-              type="password"
-              value={formData.password}
-              onChange={(event) => handleChange('password', event.target.value)}
-              placeholder="Introdu parola"
-              maxLength={80}
-              autoComplete="current-password"
-            />
-            {errors.password ? <p className="error">{errors.password}</p> : null}
-          </div>
+          <PasswordField
+            id="login-password"
+            label="Parola"
+            value={formData.password}
+            onChange={(event) => handleChange('password', event.target.value)}
+            error={errors.password}
+            placeholder="Introdu parola"
+            autoComplete="current-password"
+            disabled={loadingCredentials}
+          />
 
-          <button type="submit" className="auth-submit">
-            <span>Continua</span>
-            <small>Pasul 1 din 3</small>
-          </button>
+          <AuthSubmitButton loading={loadingCredentials} subtitle="Pasul 1 din 3">
+            Continua
+          </AuthSubmitButton>
         </form>
       ) : (
         <form onSubmit={handleOtpSubmit} className="auth-form" noValidate>
@@ -173,21 +192,27 @@ function LoginPage() {
               placeholder="6 cifre"
               maxLength={6}
               autoComplete="one-time-code"
+              disabled={loadingOtp}
             />
             {errors.otp ? <p className="error">{errors.otp}</p> : null}
           </div>
 
-          <button type="submit" className="auth-submit">
-            <span>Finalizeaza autentificarea</span>
-            <small>Pasul 2–3 — sesiune JWT + refresh</small>
-          </button>
+          <AuthSubmitButton
+            loading={loadingOtp}
+            loadingLabel="Se autentifica..."
+            subtitle="Pasul 2 din 3"
+          >
+            Finalizeaza autentificarea
+          </AuthSubmitButton>
 
           <button
             type="button"
             className="auth-link-button"
+            disabled={loadingOtp}
             onClick={() => {
               setStep(1);
               setMessage('');
+              setMessageStatus(null);
             }}
           >
             Inapoi la parola
@@ -195,11 +220,7 @@ function LoginPage() {
         </form>
       )}
 
-      {message ? (
-        <p className={`auth-status${message.includes('reusita') ? ' is-success' : ''}`} role="status">
-          {message}
-        </p>
-      ) : null}
+      <AuthStatusMessage message={message} status={messageStatus} />
     </AuthPageLayout>
   );
 }

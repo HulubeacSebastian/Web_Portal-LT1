@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
+import AuthStatusMessage from '../components/AuthStatusMessage.jsx';
+import AuthSubmitButton from '../components/AuthSubmitButton.jsx';
 import { apiRequest } from '../utils/apiClient';
 import { hasErrors } from '../utils/documentValidation';
 
@@ -16,8 +18,10 @@ function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [status, setStatus] = useState(null);
   const [errors, setErrors] = useState({});
   const [resetPayload, setResetPayload] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,12 +34,16 @@ function ForgotPasswordPage() {
     setErrors(emailErrors);
     if (hasErrors(emailErrors)) return;
 
+    setLoading(true);
+    setStatus(null);
+    setMessage('');
     try {
       const response = await apiRequest('/api/auth/forgot-password', {
         method: 'POST',
         body: { email: email.trim() }
       });
-      setMessage(response.message);
+      setStatus('success');
+      setMessage('Email de resetare a fost trimis. Verifica si folderul Spam.');
       if (response.resetToken && response.devResetCode) {
         setResetPayload({
           resetToken: response.resetToken,
@@ -43,16 +51,19 @@ function ForgotPasswordPage() {
         });
       }
     } catch (error) {
+      setStatus('error');
       setMessage(error?.message || 'Cererea a esuat.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <AuthPageLayout
-      variant="login"
+      variant="forgot"
       eyebrow="Recuperare parola"
       title="Ai uitat parola?"
-      lead="Trimitem un token de resetare (in dev il vezi pe ecran)."
+      lead="Primesti un link securizat pe email."
       highlights={highlights}
       formTitle="Resetare parola"
       formLead="Introdu emailul contului."
@@ -71,30 +82,29 @@ function ForgotPasswordPage() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="ex: profesor@lt1.ro"
+            disabled={loading}
           />
           {errors.email ? <p className="error">{errors.email}</p> : null}
         </div>
 
-        <button type="submit" className="auth-submit">
-          <span>Trimite link de resetare</span>
-        </button>
+        <AuthSubmitButton loading={loading} loadingLabel="Se trimite...">
+          Trimite link de resetare
+        </AuthSubmitButton>
       </form>
 
-      {message ? <p className="auth-status" role="status">{message}</p> : null}
+      <AuthStatusMessage message={message} status={status} />
 
       {resetPayload ? (
-        <button
+        <AuthSubmitButton
           type="button"
-          className="auth-submit"
           onClick={() =>
             navigate('/reset-password', {
               state: resetPayload
             })
           }
         >
-          <span>Continua resetarea</span>
-          <small>Token dev disponibil</small>
-        </button>
+          Continua resetarea
+        </AuthSubmitButton>
       ) : null}
     </AuthPageLayout>
   );

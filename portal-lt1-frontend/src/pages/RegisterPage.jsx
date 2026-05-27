@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageLayout from '../components/AuthPageLayout.jsx';
+import AuthStatusMessage from '../components/AuthStatusMessage.jsx';
+import AuthSubmitButton from '../components/AuthSubmitButton.jsx';
+import PasswordField from '../components/PasswordField.jsx';
 import { apiRequest, AUTH_CHANGED_EVENT } from '../utils/apiClient';
 import { saveAuthSession } from '../utils/authSession';
 import { setCookie } from '../utils/cookies';
@@ -19,6 +22,8 @@ function RegisterPage() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
+  const [messageStatus, setMessageStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -27,6 +32,7 @@ function RegisterPage() {
     }
     if (message) {
       setMessage('');
+      setMessageStatus(null);
     }
   };
 
@@ -40,6 +46,7 @@ function RegisterPage() {
       return;
     }
 
+    setLoading(true);
     try {
       const response = await apiRequest('/api/auth/register', {
         method: 'POST',
@@ -60,6 +67,7 @@ function RegisterPage() {
       savePreference('lastRegisteredName', formData.name.trim());
       recordActivityEvent('register_success');
       setMessage('Cont creat cu succes.');
+      setMessageStatus('success');
       navigate('/');
     } catch (error) {
       recordActivityEvent('register_failed_validation');
@@ -68,6 +76,9 @@ function RegisterPage() {
         setErrors((prev) => ({ ...prev, ...serverErrors }));
       }
       setMessage(error?.message || 'Inregistrarea a esuat. Incearca din nou.');
+      setMessageStatus('error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +87,7 @@ function RegisterPage() {
       variant="register"
       eyebrow="Cont nou"
       title="Creare cont portal"
-      lead="Inregistreaza-te pentru a folosi functionalitatile personalizate ale platformei educationale."
+      lead="Acces personalizat la platforma educationala LT1."
       highlights={highlights}
       formTitle="Informatii cont"
       formLead="Completeaza datele de mai jos pentru a-ti crea contul."
@@ -97,6 +108,7 @@ function RegisterPage() {
             maxLength={80}
             aria-invalid={Boolean(errors.name)}
             autoComplete="name"
+            disabled={loading}
           />
           {errors.name ? <p className="error">{errors.name}</p> : null}
         </div>
@@ -112,47 +124,44 @@ function RegisterPage() {
             maxLength={120}
             aria-invalid={Boolean(errors.email)}
             autoComplete="email"
+            disabled={loading}
           />
           {errors.email ? <p className="error">{errors.email}</p> : null}
         </div>
 
-        <div className={`auth-field${errors.password ? ' has-error' : ''}`}>
-          <label htmlFor="register-password">Parola</label>
-          <input
-            id="register-password"
-            type="password"
-            value={formData.password}
-            onChange={(event) => handleChange('password', event.target.value)}
-            placeholder="Minimum 6 caractere"
-            maxLength={80}
-            aria-invalid={Boolean(errors.password)}
-            autoComplete="new-password"
-          />
-          {errors.password ? <p className="error">{errors.password}</p> : null}
-        </div>
+        <PasswordField
+          id="register-password"
+          label="Parola"
+          value={formData.password}
+          onChange={(event) => handleChange('password', event.target.value)}
+          error={errors.password}
+          placeholder="Minimum 6 caractere"
+          autoComplete="new-password"
+          disabled={loading}
+        />
 
-        <div className={`auth-field${errors.confirmPassword ? ' has-error' : ''}`}>
-          <label htmlFor="register-confirm-password">Confirmare Parola</label>
-          <input
-            id="register-confirm-password"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={(event) => handleChange('confirmPassword', event.target.value)}
-            placeholder="Repeta parola"
-            maxLength={80}
-            aria-invalid={Boolean(errors.confirmPassword)}
-            autoComplete="new-password"
-          />
-          {errors.confirmPassword ? <p className="error">{errors.confirmPassword}</p> : null}
-        </div>
+        <PasswordField
+          id="register-confirm-password"
+          label="Confirmare Parola"
+          value={formData.confirmPassword}
+          onChange={(event) => handleChange('confirmPassword', event.target.value)}
+          error={errors.confirmPassword}
+          placeholder="Repeta parola"
+          autoComplete="new-password"
+          disabled={loading}
+        />
 
-        {message ? <p className="auth-message">{message}</p> : null}
-
-        <button type="submit" className="auth-submit auth-submit--register">
-          <span>Creare cont</span>
-          <small>Cont salvat pe server cu rol utilizator</small>
-        </button>
+        <AuthSubmitButton
+          loading={loading}
+          loadingLabel="Se creeaza contul..."
+          variant="register"
+          subtitle="Cont salvat pe server cu rol utilizator"
+        >
+          Creare cont
+        </AuthSubmitButton>
       </form>
+
+      <AuthStatusMessage message={message} status={messageStatus} />
     </AuthPageLayout>
   );
 }

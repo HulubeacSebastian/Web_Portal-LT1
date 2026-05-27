@@ -29,6 +29,37 @@ function getTransporter() {
   return transporter;
 }
 
+async function sendLoginOtpEmail({ to, code, expiresMinutes = 10 }) {
+  const transport = getTransporter();
+  if (!transport) {
+    throw new Error('SMTP nu este configurat.');
+  }
+
+  const subject = 'Cod de autentificare — Portal LT1';
+  const text = [
+    'Ai initiat autentificarea in Portal LT1.',
+    '',
+    `Codul tau de verificare (expira in ${expiresMinutes} minute): ${code}`,
+    '',
+    'Daca nu ai incercat sa te autentifici, ignora acest mesaj.'
+  ].join('\n');
+
+  const html = `
+    <p>Ai initiat autentificarea in <strong>Portal LT1</strong>.</p>
+    <p>Codul tau de verificare (valabil ${expiresMinutes} minute):</p>
+    <p style="font-size:28px;font-weight:700;letter-spacing:0.2em;color:#1a3270;">${code}</p>
+    <p style="color:#666;font-size:14px;">Daca nu ai incercat sa te autentifici, ignora acest mesaj.</p>
+  `;
+
+  await transport.sendMail({
+    from: process.env.MAIL_FROM,
+    to,
+    subject,
+    text,
+    html
+  });
+}
+
 async function sendPasswordResetEmail({ to, resetUrl, expiresMinutes = 60 }) {
   const transport = getTransporter();
   if (!transport) {
@@ -62,5 +93,6 @@ async function sendPasswordResetEmail({ to, resetUrl, expiresMinutes = 60 }) {
 
 module.exports = {
   isMailConfigured,
+  sendLoginOtpEmail,
   sendPasswordResetEmail
 };

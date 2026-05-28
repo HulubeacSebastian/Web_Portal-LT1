@@ -174,7 +174,7 @@ router.post('/register', async function (req, res, next) {
         email: emailCheck.value,
         password: passwordCheck.value,
         fullName: nameCheck.value,
-        roleName: 'user'
+        roleName: 'elev'
       });
     }
 

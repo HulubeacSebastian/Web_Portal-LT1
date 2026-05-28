@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { hasErrors } from '../utils/documentValidation';
 import { validateContact } from '../utils/formValidation';
 import { recordActivityEvent, savePreference } from '../utils/activityCookies';
+import { apiRequest } from '../utils/apiClient';
 
 const contactChannels = [
   {
@@ -54,7 +55,7 @@ function ContactPage() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validateContact(formData);
     setErrors(nextErrors);
@@ -64,10 +65,24 @@ function ContactPage() {
       return;
     }
 
-    savePreference('lastContactEmail', formData.email.trim());
-    recordActivityEvent('contact_success');
-    setStatusMessage('Mesajul a fost trimis cu succes.');
-    setFormData({ name: '', email: '', message: '' });
+    try {
+      savePreference('lastContactEmail', formData.email.trim());
+      await apiRequest('/api/contact', {
+        method: 'POST',
+        auth: false,
+        body: {
+          sender_name: formData.name,
+          sender_email: formData.email,
+          message: formData.message
+        }
+      });
+      recordActivityEvent('contact_success');
+      setStatusMessage('Mesajul a fost trimis cu succes.');
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      recordActivityEvent('contact_failed_network');
+      setStatusMessage(error?.message || 'Nu se poate trimite mesajul momentan.');
+    }
   };
 
   const statusClassName = statusMessage.includes('succes') ? ' is-success' : ' is-error';
@@ -75,14 +90,27 @@ function ContactPage() {
   return (
     <section className="page-shell contact-page">
       <header className="contact-hero" aria-labelledby="contact-hero-title">
+        <img
+          src="/assets/Poze_liceu/WhatsApp%20Image%202026-05-26%20at%2021.09.21.jpeg"
+          alt=""
+          className="contact-hero-media"
+          aria-hidden="true"
+        />
         <div className="contact-hero-scrim" aria-hidden="true" />
         <div className="contact-hero-content">
-          <span className="contact-eyebrow">Suport si informatii</span>
-          <h1 id="contact-hero-title">Contacteaza liceul</h1>
+          <span className="contact-hero-badge">Suport si informatii</span>
+          <h1 id="contact-hero-title">
+            <span className="contact-hero-title-gradient">Contacteaza liceul</span>
+          </h1>
           <p className="contact-hero-lead">
             Trimite-ne un mesaj pentru admitere, documente sau intrebari generale. Echipa noastra te
             ghideaza catre informatia potrivita.
           </p>
+          <div className="contact-hero-chips" aria-hidden="true">
+            <span>Secretariat</span>
+            <span>Program</span>
+            <span>Intrebari</span>
+          </div>
         </div>
       </header>
 
@@ -119,7 +147,7 @@ function ContactPage() {
 
           <div className="contact-hours">
             <h3>Program secretariat</h3>
-            <p>Luni – Vineri: 08:00 – 14:00</p>
+            <p>Luni – Vineri: 08:00 – 16:00</p>
             <p>Sambata – Duminica: inchis</p>
           </div>
 
@@ -193,7 +221,7 @@ function ContactPage() {
 
             <button type="submit" className="contact-submit">
               <span>TRIMITE</span>
-              <small>Mesajul este procesat local in portal</small>
+              <small>Mesajul este trimis prin email catre secretariat</small>
             </button>
 
             {statusMessage ? (

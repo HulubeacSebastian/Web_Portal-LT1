@@ -69,8 +69,11 @@ async function updatePendingRegistration(id, { password, fullName }) {
   return mapUser(row);
 }
 
-async function createUser({ email, password, fullName, nickname, roleName = 'user' }) {
-  const role = await prisma.role.findUnique({ where: { name: roleName } });
+async function createUser({ email, password, fullName, nickname, roleName = 'elev' }) {
+  let role = await prisma.role.findUnique({ where: { name: roleName } });
+  if (!role && roleName === 'elev') {
+    role = await prisma.role.findUnique({ where: { name: 'user' } });
+  }
   if (!role) {
     throw new Error(`Rolul "${roleName}" nu exista.`);
   }
@@ -193,6 +196,66 @@ async function createContactMessage(payload) {
   return mapContactMessage(row);
 }
 
+async function listUsers() {
+  const rows = await prisma.user.findMany({
+    orderBy: { email: 'asc' },
+    include: userInclude
+  });
+  return rows
+    .map(mapUser)
+    .filter(Boolean)
+    .map((user) => {
+      const { password, ...rest } = user;
+      return rest;
+    });
+}
+
+async function getUserLastLoginAt(userId) {
+  const session = await prisma.userSession.findFirst({
+    where: { userId },
+    orderBy: [{ lastUsedAt: 'desc' }, { createdAt: 'desc' }]
+  });
+  return session?.lastUsedAt || session?.createdAt || null;
+}
+
+async function getUserAdminDetails(userId) {
+  const user = await getUserById(userId);
+  if (!user) return null;
+  const lastLoginAt = await getUserLastLoginAt(userId);
+  return { ...user, last_login_at: lastLoginAt ? lastLoginAt.toISOString() : null };
+}
+
+async function listUsersWithLastLogin() {
+  const users = await listUsers();
+  const entries = await Promise.all(
+    users.map(async (user) => {
+      const lastLoginAt = await getUserLastLoginAt(user.id);
+      return { ...user, last_login_at: lastLoginAt ? lastLoginAt.toISOString() : null };
+    })
+  );
+  return entries;
+}
+
+async function setUserRole(userId, roleName) {
+  const dbRoleName =
+    roleName === 'elev' ? 'elev' : roleName === 'profesor' ? 'profesor' : roleName;
+  let role = await prisma.role.findUnique({ where: { name: dbRoleName } });
+  if (!role && roleName === 'elev') {
+    role = await prisma.role.findUnique({ where: { name: 'user' } });
+  }
+  if (!role && roleName === 'profesor') {
+    role = await prisma.role.findUnique({ where: { name: 'teacher' } });
+  }
+  if (!role) {
+    throw new Error(`Rolul "${roleName}" nu exista.`);
+  }
+  await prisma.user.update({
+    where: { id: userId },
+    data: { roleId: role.id }
+  });
+  return getUserAdminDetails(userId);
+}
+
 module.exports = {
   resetExtraStores,
   getUserByEmail,
@@ -204,5 +267,9 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
-  createContactMessage
+  createContactMessage,
+  listUsers,
+  listUsersWithLastLogin,
+  getUserAdminDetails,
+  setUserRole
 };

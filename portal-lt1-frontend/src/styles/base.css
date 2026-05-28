@@ -7,6 +7,15 @@ html {
   scrollbar-gutter: stable;
 }
 
+html.modal-open,
+body.modal-open {
+  overflow: hidden;
+}
+
+body.modal-open {
+  overscroll-behavior: none;
+}
+
 :root {
   --frame-max: 1280px;
   --bg: #e8edf5;

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
+const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
+
 const stats = [
   { label: 'Raport elevi-profesor', value: '10:1', hint: 'Atentie personalizata' },
   { label: 'Rata de angajare', value: '81%', hint: 'Absolventi in piata muncii' },
@@ -62,16 +64,86 @@ const highlights = [
 
 const galleryFilters = ['Toate', 'Ateliere', 'Evenimente', 'Sport', 'Scoala'];
 
-const galleryItems = [
-  { src: '/assets/poza_liceu.jpeg', alt: 'Elevi in curtea liceului', category: 'Scoala' },
-  { src: '/assets/antet2@4x.png', alt: 'Activitate la atelier', category: 'Ateliere' },
-  { src: '/assets/poza_liceu.jpeg', alt: 'Laborator tehnologic', category: 'Ateliere' },
-  { src: '/assets/antet2@4x.png', alt: 'Eveniment scolar', category: 'Evenimente' },
-  { src: '/assets/poza_liceu.jpeg', alt: 'Competitie sportiva', category: 'Sport' },
-  { src: '/assets/antet2@4x.png', alt: 'Ziua portilor deschise', category: 'Evenimente' },
-  { src: '/assets/poza_liceu.jpeg', alt: 'Cladirea liceului', category: 'Scoala' },
-  { src: '/assets/antet2@4x.png', alt: 'Proiect elevicesc', category: 'Ateliere' },
+const GALLERY_PHOTOS = [
+  "WhatsApp Image 2026-05-26 at 21.08.55.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.08.56 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.08.56 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.08.56 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.08.56 (4).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.08.56 (5).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.08.56.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.21.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.46 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.46 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.46 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.46 (4).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.46.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (4).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (5).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (6).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (7).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47 (8).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.47.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.48 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.48 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.48 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.48 (4).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.09.48.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.11.17 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.11.17 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.11.17 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.11.17 (4).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.11.17.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.11.18.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.12.34.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.06.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.07 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.07 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.07 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.07.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.53 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.53 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.53 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.53.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.54 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.54 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.54 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.13.54.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.15.17.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.21 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.21 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.21 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.21 (4).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.21 (5).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.21.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.22 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.22.jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.23 (1).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.23 (2).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.23 (3).jpeg",
+  "WhatsApp Image 2026-05-26 at 21.17.23.jpeg",
+  "WhatsApp Image 2026-05-26 at 2ss1.12.34.jpeg",
+  "WhatsApp Image 2026-05-26 ats 21.17.23.jpeg",
+  "WhatsApp Image 2026-05-26ss at 21.12.34.jpeg",
+  "WhatsApp Image 2026-05-2s6 at 21.17.22.jpeg",
+  "WhatsApp Image 2026-05s-26 at 21.17.22.jpeg",
+  "WhatsApp Image 2026-s05-26 at 21.17.22.jpeg",
+  "WhatsApp Image 2026-ss05-26 at 21.17.22.jpeg",
+  "WhatsApp Image 202ss-05-26 at 21.12.34.jpeg",
+  "WhatsApps Image 2026-05-26 at 21.17.22.jpeg",
+  "WhatsssApp Image 2026-05-26 at 21.17.22.jpeg"
 ];
+
+const galleryCategories = ['Scoala', 'Ateliere', 'Evenimente', 'Sport'];
+
+const galleryItems = GALLERY_PHOTOS.map((filename, index) => ({
+  src: photoUrl(filename),
+  alt: filename.replace(/\.(jpe?g|png|webp)$/i, ''),
+  category: galleryCategories[index % galleryCategories.length]
+}));
 
 function AboutSectionHead({ eyebrow, title, lead }) {
   return (
@@ -117,11 +189,13 @@ function AboutPage() {
       }
     };
 
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [lightboxImage]);
@@ -130,7 +204,7 @@ function AboutPage() {
     <section className="page-shell about-page">
       <header className="about-hero" aria-labelledby="about-hero-title">
         <img
-          src="/assets/poza_liceu.jpeg"
+          src={photoUrl('WhatsApp Image 2026-05-26 at 21.09.47.jpeg')}
           alt=""
           className="about-hero-media"
           aria-hidden="true"
@@ -157,7 +231,11 @@ function AboutPage() {
       <div className="about-body">
         <section className="about-story about-reveal" id="cine-suntem">
           <div className="about-story-visual">
-            <img src="/assets/antet2@4x.png" alt="Spatii de lucru la liceu" loading="lazy" />
+            <img
+              src={photoUrl('WhatsApp Image 2026-05-26 at 21.13.06.jpeg')}
+              alt="Spatii de lucru la liceu"
+              loading="lazy"
+            />
             <div className="about-story-visual-badge">
               <strong>1873</strong>
               <span>Traditie tehnica</span>

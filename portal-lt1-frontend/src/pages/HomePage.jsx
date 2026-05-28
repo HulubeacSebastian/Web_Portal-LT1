@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 
+const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
+
 const stats = [
   { label: 'Raport Elevi-Profesor', value: '10:1' },
   { label: 'Rata de Angajare', value: '81%' },
@@ -34,7 +36,11 @@ function HomePage() {
   return (
     <section className="page-shell home-page">
       <article className="home-hero">
-        <img src="/assets/poza_liceu.jpeg" alt="Liceul Tehnologic Nr. 1" className="home-hero-image" />
+        <img
+          src={photoUrl('WhatsApp Image 2026-05-26 at 21.09.21.jpeg')}
+          alt="Liceul Tehnologic Nr. 1"
+          className="home-hero-image"
+        />
 
         <div className="home-hero-overlay">
           <h1>

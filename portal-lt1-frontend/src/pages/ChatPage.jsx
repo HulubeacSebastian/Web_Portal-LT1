@@ -24,6 +24,8 @@ function ChatPage() {
   const [chatReady, setChatReady] = useState(false);
   const [error, setError] = useState('');
   const wsRef = useRef(null);
+  const messagesRef = useRef(null);
+  const shouldAutoScrollRef = useRef(true);
 
   const userId = session?.id ?? '';
   const permissionsKey = (session?.permissions ?? []).join(',');
@@ -98,6 +100,20 @@ function ChatPage() {
     };
   }, [isLoggedIn, canChat, token, userId, permissionsKey, wsUrl, session?.fullName, session?.email]);
 
+  useEffect(() => {
+    if (!chatReady) return;
+    if (!shouldAutoScrollRef.current) return;
+    const node = messagesRef.current;
+    if (!node) return;
+
+    const doScroll = () => {
+      node.scrollTop = node.scrollHeight;
+    };
+
+    // wait for DOM paint (new messages) then snap to bottom
+    requestAnimationFrame(doScroll);
+  }, [chatReady, messages.length]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const text = draft.trim();
@@ -160,20 +176,51 @@ function ChatPage() {
 
   return (
     <section className="page-shell chat-page">
-      <header className="page-head">
-        <h1>Chat in timp real</h1>
-        <p>
-          Conectat ca <strong>{session.fullName}</strong> ({session.role}) — <strong>{status}</strong>
-        </p>
-        <p className="muted" style={{ fontSize: '0.85rem' }}>
-          WebSocket: {wsUrl}
-        </p>
+      <header className="chat-hero" aria-labelledby="chat-hero-title">
+        <img
+          src="/assets/poza_liceu.jpeg"
+          alt=""
+          className="chat-hero-media"
+          aria-hidden="true"
+        />
+        <div className="chat-hero-scrim" aria-hidden="true" />
+        <div className="chat-hero-content">
+          <span className="chat-hero-badge">Comunicare scolara</span>
+          <h1 id="chat-hero-title">
+            Chat <span className="chat-hero-title-gradient">in timp real</span>
+          </h1>
+          <p className="chat-hero-lead">
+            Conectat ca <strong>{session.fullName}</strong> ({session.role}){' '}
+            <span
+              className={`chat-status chat-status--${
+                status === 'Conectat' ? 'ok' : status === 'Eroare' ? 'error' : 'warn'
+              }`}
+            >
+              {status}
+            </span>
+          </p>
+          <p className="muted chat-ws">WebSocket: {wsUrl}</p>
+        </div>
       </header>
 
       <div className="chat-panel">
-        <ul className="chat-messages" aria-live="polite">
+        <ul
+          className="chat-messages"
+          aria-live="polite"
+          ref={messagesRef}
+          onScroll={(event) => {
+            const node = event.currentTarget;
+            const distanceFromBottom = node.scrollHeight - node.scrollTop - node.clientHeight;
+            shouldAutoScrollRef.current = distanceFromBottom < 80;
+          }}
+        >
           {messages.map((item) => (
-            <li key={item.id} className={`chat-message chat-message--${item.role}`}>
+            <li
+              key={item.id}
+              className={`chat-message chat-message--${item.role}${
+                item.userId && session?.id && item.userId === session.id ? ' chat-message--me' : ''
+              }`}
+            >
               <span className="chat-message-meta">
                 {item.displayName} · {new Date(item.sentAt).toLocaleTimeString('ro-RO')}
               </span>
@@ -192,7 +239,7 @@ function ChatPage() {
             onChange={(event) => setDraft(event.target.value)}
             placeholder="Scrie un mesaj pentru ceilalti utilizatori conectati..."
           />
-          <button type="submit" className="btn" disabled={status !== 'Conectat' || !chatReady}>
+          <button type="submit" className="chat-send" disabled={status !== 'Conectat' || !chatReady}>
             Trimite
           </button>
         </form>

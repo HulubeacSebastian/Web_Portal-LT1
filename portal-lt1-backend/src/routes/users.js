@@ -16,6 +16,23 @@ function toProfile(user) {
   };
 }
 
+function requireAdmin(req, res, next) {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ message: 'Nu ai permisiunea necesara pentru aceasta actiune.' });
+  }
+  return next();
+}
+
+const ALLOWED_ROLES = new Set(['elev', 'profesor', 'admin']);
+
+function validateRoleName(input) {
+  const value = typeof input === 'string' ? input.trim().toLowerCase() : '';
+  if (!ALLOWED_ROLES.has(value)) {
+    return { error: 'Rol invalid. Rolurile permise: elev, profesor, admin.' };
+  }
+  return { value };
+}
+
 function validateNickname(nickname) {
   const value = typeof nickname === 'string' ? nickname.trim() : '';
   const errors = {};
@@ -43,6 +60,48 @@ router.get('/profile', requireAuth, async function (req, res, next) {
     }
 
     return res.json(toProfile(user));
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/', requireAuth, requireAdmin, async function (req, res, next) {
+  try {
+    const users = await store.listUsersWithLastLogin();
+    return res.json(
+      users.map((user) => ({
+        ...toProfile(user),
+        last_login_at: user.last_login_at || null
+      }))
+    );
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/:id', requireAuth, requireAdmin, async function (req, res, next) {
+  try {
+    const user = await store.getUserAdminDetails(String(req.params.id));
+    if (!user) {
+      return res.status(404).json({ message: 'Utilizatorul nu a fost gasit.' });
+    }
+    return res.json(toProfile(user));
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch('/:id/role', requireAuth, requireAdmin, async function (req, res, next) {
+  try {
+    const check = validateRoleName(req.body?.role);
+    if (check.error) {
+      return res.status(400).json({ message: check.error });
+    }
+    const updated = await store.setUserRole(String(req.params.id), check.value);
+    if (!updated) {
+      return res.status(404).json({ message: 'Utilizatorul nu a fost gasit.' });
+    }
+    return res.json(toProfile(updated));
   } catch (error) {
     return next(error);
   }

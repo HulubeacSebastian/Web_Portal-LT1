@@ -32,6 +32,10 @@ function mapUser(row) {
   const permissions =
     row.role?.permissions?.map((entry) => entry.permission.code).filter(Boolean) || [];
 
+  const rawRole = row.role?.name || '';
+  const canonicalRole =
+    rawRole === 'user' ? 'elev' : rawRole === 'teacher' ? 'profesor' : rawRole;
+
   return {
     id: row.id,
     email: row.email,
@@ -39,7 +43,7 @@ function mapUser(row) {
     fullName: row.fullName,
     nickname: row.nickname || null,
     emailVerifiedAt: row.emailVerifiedAt || null,
-    role: row.role.name,
+    role: canonicalRole,
     roleDescription: row.role?.description || '',
     permissions
   };

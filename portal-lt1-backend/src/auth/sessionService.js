@@ -248,7 +248,8 @@ async function createUserSession(userId) {
       id,
       userId,
       refreshTokenHash: hashSecret(refreshToken),
-      expiresAt
+      expiresAt,
+      lastUsedAt: new Date()
     }
   });
 

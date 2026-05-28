@@ -12,13 +12,22 @@ const statusPalette = {
   Arhivat: '#e2e8f0'
 };
 
+function isMobileViewport() {
+  if (typeof window === 'undefined') return false;
+  return Boolean(window.matchMedia?.('(max-width: 640px)')?.matches);
+}
+
 function DocumentListPage() {
   const { documents, deleteDocument, generator, isOffline, startGenerator, stopGenerator } = useDocuments();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Toate');
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState(() => getCookie('portal_last_document') || documents[0]?.id || '');
-  const [viewMode, setViewMode] = useState(() => getCookie('portal_view_mode') || 'table');
+  const [viewMode, setViewMode] = useState(() => {
+    const cookie = getCookie('portal_view_mode');
+    if (cookie === 'table' || cookie === 'cards') return cookie;
+    return isMobileViewport() ? 'cards' : 'table';
+  });
   const isLoggedIn = Boolean(getCookie('portal_user'));
   const canCreate = hasPermission('documents:create');
   const canUpdate = hasPermission('documents:update');
@@ -138,39 +147,82 @@ function DocumentListPage() {
   };
 
   return (
-    <section className="documents-page">
-      <article className="documents-title-card">
-        <h2>DOCUMENTE SCOLARE</h2>
-        <p className="documents-subtitle">SCHIMBA VIZUALIZARE</p>
-        <Link to="/documente2" className="view-toggle" aria-label="Schimba vizualizare" />
-      </article>
+    <section className="page-shell documents-page">
+      <header className="documents-hero" aria-labelledby="documents-hero-title">
+        <img
+          src="/assets/Poze_liceu/contact-hero.jpg"
+          alt=""
+          className="documents-hero-media"
+          aria-hidden="true"
+        />
+        <div className="documents-hero-scrim" aria-hidden="true" />
 
-      <div className="documents-stage">
+        <div className="documents-hero-content">
+          <span className="documents-hero-badge">Documente si formulare</span>
+          <h1 id="documents-hero-title">
+            Documente <span className="documents-hero-title-gradient">scolare</span>
+          </h1>
+          <p className="documents-hero-lead">
+            Cauta rapid dupa titlu, categorie sau emitent, apoi deschide, editeaza sau adauga documente
+            in functie de permisiuni.
+          </p>
+          <div className="documents-hero-tags" aria-label="Etichete documente">
+            <span className="documents-tag">Cautare rapida</span>
+            <span className="documents-tag">Status documente</span>
+            <span className="documents-tag">Formulare &amp; regulamente</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="documents-body">
+        <div className="documents-actions-bar" aria-label="Actiuni documente">
+          <div className="documents-toggle-group" role="group" aria-label="Comenzi vizualizare">
+            <Link to="/documente2" className="documents-toggle">
+              <span className="documents-toggle-icon documents-toggle-icon--stats" aria-hidden="true" />
+              <span>Statistici</span>
+            </Link>
+            <button type="button" className="documents-toggle" onClick={toggleViewMode}>
+              <span className="documents-toggle-icon documents-toggle-icon--view" aria-hidden="true" />
+              <span>{viewMode === 'table' ? 'Vezi: Carduri' : 'Vezi: Tabel'}</span>
+            </button>
+          </div>
+          {isLoggedIn && canCreate ? (
+            <Link to="/documente/adauga" className="btn documents-action-accent">
+              Adaugare
+            </Link>
+          ) : null}
+        </div>
         <div className="documents-grid">
-          <article className="card documents-card documents-master-card">
+          <article className="documents-panel documents-master-card" aria-label="Lista documente">
             <div className="row space-between documents-toolbar-head">
               <div className="toolbar-grid toolbar-grid-docs">
                 <div>
                   <label htmlFor="search">Cautare</label>
-                  <input
-                    id="search"
-                    value={query}
-                    onChange={(event) => handleFilterChange(event.target.value, setQuery)}
-                    placeholder="Titlu, categorie sau emitent"
-                  />
+                  <div className="docs-field docs-field--search">
+                    <span className="docs-field-icon docs-field-icon--search" aria-hidden="true" />
+                    <input
+                      id="search"
+                      value={query}
+                      onChange={(event) => handleFilterChange(event.target.value, setQuery)}
+                      placeholder="Titlu, categorie sau emitent"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="status">Status</label>
-                  <select
-                    id="status"
-                    value={status}
-                    onChange={(event) => handleFilterChange(event.target.value, setStatus)}
-                  >
-                    <option value="Toate">Toate</option>
-                    <option value="Activ">Activ</option>
-                    <option value="Revizie">Revizie</option>
-                    <option value="Arhivat">Arhivat</option>
-                  </select>
+                  <div className="docs-field docs-field--select">
+                    <select
+                      id="status"
+                      value={status}
+                      onChange={(event) => handleFilterChange(event.target.value, setStatus)}
+                    >
+                      <option value="Toate">Toate</option>
+                      <option value="Activ">Activ</option>
+                      <option value="Revizie">Revizie</option>
+                      <option value="Arhivat">Arhivat</option>
+                    </select>
+                    <span className="docs-field-caret" aria-hidden="true" />
+                  </div>
                 </div>
               </div>
               {canControlGenerator ? (
@@ -183,14 +235,6 @@ function DocumentListPage() {
                 >
                   {generator?.running ? 'STOP GENERATOR' : 'START GENERATOR'}
                 </button>
-              ) : null}
-              <button type="button" className="btn documents-add-btn view-toggle-btn" onClick={toggleViewMode}>
-                {viewMode === 'table' ? 'CARDURI' : 'TABEL'}
-              </button>
-              {isLoggedIn && canCreate ? (
-                <Link to="/documente/adauga" className="btn documents-add-btn">
-                  ADAUGARE
-                </Link>
               ) : null}
             </div>
 
@@ -214,12 +258,20 @@ function DocumentListPage() {
                       </tr>
                     ) : (
                       pageDocs.map((doc) => (
-                        <tr key={doc.id} className={selectedId === doc.id ? 'is-selected' : ''}>
+                        <tr
+                          key={doc.id}
+                          className={`documents-row${selectedId === doc.id ? ' is-selected' : ''}`}
+                          onClick={() => {
+                            setSelectedId(doc.id);
+                            recordActivityEvent('documents_select_row', { id: doc.id });
+                          }}
+                        >
                           <td>
                               <button
                                 type="button"
                                 className="table-link"
                                 onClick={() => {
+                                  // keep explicit click target, but row is clickable too
                                   setSelectedId(doc.id);
                                   recordActivityEvent('documents_select_row', { id: doc.id });
                                 }}
@@ -229,11 +281,16 @@ function DocumentListPage() {
                           </td>
                           <td>{doc.issuer}</td>
                           <td>
-                            <span className={`status-pill status-${doc.status.toLowerCase()}`}>{doc.status}</span>
+                            <span className={`status-pill status-${doc.status.toLowerCase()}`}>
+                              <span className="status-pill-dot" aria-hidden="true" />
+                              <span className="status-pill-icon" aria-hidden="true" />
+                              <span className="status-pill-text">{doc.status}</span>
+                            </span>
                           </td>
                           <td>
                             <div className="actions">
-                              <Link to={`/documente/${doc.id}`} className="btn ghost">
+                              <Link to={`/documente/${doc.id}`} className="btn ghost btn-icon-left">
+                                <span className="btn-icon btn-icon--view" aria-hidden="true" />
                                 Vezi
                               </Link>
                               {isLoggedIn && canUpdate ? (
@@ -274,8 +331,21 @@ function DocumentListPage() {
                       }}
                     >
                       <strong>{doc.title}</strong>
-                      <span>{doc.issuer}</span>
-                      <span className={`status-pill status-${doc.status.toLowerCase()}`}>{doc.status}</span>
+                      <div className="document-card-meta">
+                        <span className="document-card-issuer">{doc.issuer}</span>
+                        <span className="document-card-dot" aria-hidden="true">
+                          •
+                        </span>
+                        <span className="document-card-category">{doc.category}</span>
+                      </div>
+                      <div className="document-card-foot">
+                        <span className={`status-pill status-${doc.status.toLowerCase()}`}>
+                          <span className="status-pill-dot" aria-hidden="true" />
+                          <span className="status-pill-icon" aria-hidden="true" />
+                          <span className="status-pill-text">{doc.status}</span>
+                        </span>
+                        <span className="document-card-date">{doc.issuedAt}</span>
+                      </div>
                     </button>
                   ))
                 )}
@@ -285,7 +355,7 @@ function DocumentListPage() {
             <div className="pagination space-between">
               <button
                 type="button"
-                className="secondary"
+                className="btn secondary"
                 onClick={() => {
                   setPage((prev) => Math.max(1, prev - 1));
                   recordActivityEvent('documents_page_previous', { page: safePage });
@@ -299,7 +369,7 @@ function DocumentListPage() {
               </span>
               <button
                 type="button"
-                className="secondary"
+                className="btn secondary"
                 onClick={() => {
                   setPage((prev) => Math.min(maxPage, prev + 1));
                   recordActivityEvent('documents_page_next', { page: safePage });
@@ -311,31 +381,47 @@ function DocumentListPage() {
             </div>
           </article>
 
-          <aside className="card documents-detail-card">
-            <p className="eyebrow">Master detail</p>
-            <h3>{selectedDoc ? selectedDoc.title : 'Nu exista document selectat'}</h3>
+          <aside className="documents-panel documents-detail-card" aria-label="Detalii document selectat">
+            <div className="documents-detail-head">
+              <div>
+                <p className="eyebrow">Detalii</p>
+                <h3 className="documents-detail-title">{selectedDoc ? selectedDoc.title : 'Nu exista document selectat'}</h3>
+              </div>
+              {selectedDoc ? (
+                <span className={`status-pill status-${selectedDoc.status.toLowerCase()}`}>
+                  <span className="status-pill-dot" aria-hidden="true" />
+                  <span className="status-pill-icon" aria-hidden="true" />
+                  <span className="status-pill-text">{selectedDoc.status}</span>
+                </span>
+              ) : null}
+            </div>
             {selectedDoc ? (
               <>
-                <p className="muted">{selectedDoc.category}</p>
-                <p>
-                  <strong>Creat de:</strong> {selectedDoc.issuer}
-                </p>
-                <p>
-                  <strong>Status:</strong>{' '}
-                  <span className={`status-pill status-${selectedDoc.status.toLowerCase()}`}>{selectedDoc.status}</span>
-                </p>
-                <p>
-                  <strong>Data:</strong> {selectedDoc.issuedAt}
-                </p>
+                <p className="muted documents-detail-category">{selectedDoc.category}</p>
+                <div className="documents-detail-meta">
+                  <div className="documents-detail-meta-item">
+                    <span className="documents-detail-meta-label">Creat de</span>
+                    <strong className="documents-detail-meta-value">{selectedDoc.issuer}</strong>
+                  </div>
+                  <div className="documents-detail-meta-item">
+                    <span className="documents-detail-meta-label">Data</span>
+                    <strong className="documents-detail-meta-value">{selectedDoc.issuedAt}</strong>
+                  </div>
+                </div>
                 <p className="documents-detail-description">{selectedDoc.description}</p>
-                <div className="actions">
-                  <Link to={`/documente/${selectedDoc.id}`} className="btn ghost">
+                <div className="actions documents-detail-actions">
+                  <Link to={`/documente/${selectedDoc.id}`} className="btn documents-detail-cta">
                     Deschide
                   </Link>
                   {isLoggedIn && canUpdate ? (
                     <Link to={`/documente/${selectedDoc.id}/edit`} className="btn secondary">
                       Editeaza
                     </Link>
+                  ) : null}
+                  {isLoggedIn && canDelete ? (
+                    <button type="button" className="btn danger" onClick={() => handleDeleteFromList(selectedDoc.id)}>
+                      Sterge
+                    </button>
                   ) : null}
                 </div>
               </>
@@ -355,28 +441,6 @@ function DocumentListPage() {
                 </div>
               ))}
             </div>
-
-            <article className="analytics-pie-card">
-              <div className="analytics-legend">
-                <span>
-                  <i className="activ" /> Activ
-                </span>
-                <span>
-                  <i className="revizie" /> Revizie
-                </span>
-                <span>
-                  <i className="arhivat" /> Arhivat
-                </span>
-              </div>
-
-              <div
-                className="analytics-pie"
-                style={{ background: `conic-gradient(${analyticsStats.gradient})` }}
-                role="img"
-                aria-label="Distribuirea documentelor dupa status"
-              />
-            </article>
-
           </aside>
         </div>
       </div>

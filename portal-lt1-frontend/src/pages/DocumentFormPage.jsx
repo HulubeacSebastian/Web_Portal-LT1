@@ -35,7 +35,7 @@ function DocumentFormPage({ mode }) {
       <section className="card">
         <h2>Document inexistent</h2>
         <p className="muted">Nu se poate edita un document care nu exista.</p>
-        <Link to="/documente" className="btn secondary">
+        <Link to="/documente" className="btn secondary documents-back-btn">
           Inapoi la lista
         </Link>
       </section>
@@ -105,7 +105,7 @@ function DocumentFormPage({ mode }) {
   };
 
   return (
-    <section className="page-stack">
+    <section className="page-stack documents-page">
       <article className="card page-title-row">
         <div>
           <p className="eyebrow">Formular</p>
@@ -257,7 +257,9 @@ function DocumentFormPage({ mode }) {
           </div>
 
           <div className="row mt-12">
-            <button type="submit">{mode === 'edit' ? 'Salveaza modificarile' : 'Creeaza document'}</button>
+            <button type="submit" className="btn documents-action-accent">
+              {mode === 'edit' ? 'Salveaza modificarile' : 'Creeaza document'}
+            </button>
             <Link to={mode === 'edit' ? `/documente/${id}` : '/documente'} className="btn ghost">
               Renunta
             </Link>

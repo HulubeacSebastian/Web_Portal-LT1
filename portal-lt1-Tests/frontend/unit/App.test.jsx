@@ -10,7 +10,7 @@ describe('App routes', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Acasa')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /ac(a|ă)s(a|ă)/i })).toBeInTheDocument();
     expect(screen.getByText('START ADMITERE 2026: INVATA O MESERIE DE VIITOR!')).toBeInTheDocument();
   });
 
@@ -18,7 +18,7 @@ describe('App routes', () => {
     ['/despre-noi', 'Cine suntem'],
     ['/contact', 'Nume și Prenume'],
     ['/calendar', 'Generare Orar'],
-    ['/documente2', 'Evolutia documentelor incarcate (2026)'],
+    ['/documente2', 'Analiza documentelor'],
   ])('renders the %s route', (path, expectedText) => {
     render(
       <MemoryRouter initialEntries={[path]}>
@@ -42,7 +42,7 @@ describe('App routes', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Monitorizare activitate si preferinte')).toBeInTheDocument();
+    expect(screen.getByText('Conturi utilizatori')).toBeInTheDocument();
 
     localStorage.clear();
   });

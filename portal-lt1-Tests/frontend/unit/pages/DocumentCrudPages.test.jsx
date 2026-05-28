@@ -44,7 +44,7 @@ describe('CRUD pages', () => {
     const user = userEvent.setup();
     renderCrudApp('/documente');
 
-    expect(screen.getByRole('heading', { name: 'DOCUMENTE SCOLARE' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /documente scolare/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Regulament intern elevi 2026' })).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('Cautare'), 'document inexistent');
@@ -97,7 +97,7 @@ describe('CRUD pages', () => {
 
     await user.click(screen.getByRole('button', { name: 'Sterge' }));
 
-    expect(screen.getByRole('heading', { name: 'DOCUMENTE SCOLARE' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /documente scolare/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Regulament intern elevi 2026' })).not.toBeInTheDocument();
   });
 
@@ -128,10 +128,10 @@ describe('CRUD pages', () => {
 
     expect(screen.getByRole('button', { name: /Regulament intern elevi 2026/i })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'TABEL' }));
+    await user.click(screen.getByRole('button', { name: /tabel/i }));
     expect(screen.getByRole('columnheader', { name: 'Titlu document' })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'CARDURI' }));
+    await user.click(screen.getByRole('button', { name: /carduri/i }));
 
     await user.type(screen.getByLabelText('Cautare'), 'zzzz-inexistent');
     expect(screen.getByText('Nu exista rezultate pentru filtrele curente.')).toBeInTheDocument();

@@ -141,13 +141,18 @@ function App() {
           </div>
         ) : null}
 
-        {cookieConsent && userIsAdmin ? (
-          <div className="cookie-banner">
-            <span>
-              Monitorizare activa: {activity.totalVisits} navigari, ultima pagina {activity.lastPath}, preferinte salvate{' '}
-              {preferenceCount}.
-            </span>
-          </div>
+        {cookieConsent && userIsAdmin && import.meta.env.DEV && location.pathname === '/calendar' ? (
+          <>
+            <div className="wip-screen" aria-hidden="true">
+              <div className="wip-screen-label">IN LUCRU</div>
+            </div>
+            <div className="cookie-banner cookie-banner--wip" aria-label="In lucru">
+              <span>
+                Monitorizare activa: {activity.totalVisits} navigari, ultima pagina {activity.lastPath}, preferinte salvate{' '}
+                {preferenceCount}.
+              </span>
+            </div>
+          </>
         ) : null}
 
         <main className="content">

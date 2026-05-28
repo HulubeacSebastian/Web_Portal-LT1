@@ -17,7 +17,7 @@ function DocumentDetailPage() {
       <section className="card">
         <h2>Document inexistent</h2>
         <p className="muted">Documentul cautat nu exista sau a fost deja sters.</p>
-        <Link to="/documente" className="btn secondary">
+        <Link to="/documente" className="btn secondary documents-back-btn">
           Inapoi la lista
         </Link>
       </section>
@@ -39,7 +39,7 @@ function DocumentDetailPage() {
   const isPdf = (document.file?.type || '').toLowerCase() === 'application/pdf' || fileHref.toLowerCase().includes('.pdf');
 
   return (
-    <section className="page-stack">
+    <section className="page-stack documents-page">
       <article className="card page-title-row">
         <div>
           <p className="eyebrow">Document</p>
@@ -106,7 +106,7 @@ function DocumentDetailPage() {
         </article>
       ) : null}
 
-      <Link to="/documente" className="btn ghost">
+      <Link to="/documente" className="btn ghost documents-back-btn">
         Inapoi la lista
       </Link>
     </section>

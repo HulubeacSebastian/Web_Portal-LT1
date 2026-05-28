@@ -316,6 +316,26 @@ th {
   gap: 0.45rem 0.9rem;
 }
 
+.detail-grid.activity-stack {
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.activity-save-actions {
+  justify-content: flex-end;
+}
+
+.btn.activity-save-btn {
+  background: linear-gradient(180deg, #6a57b8 0%, #4a2ca4 100%);
+  border: 1px solid rgba(112, 89, 209, 0.35);
+  box-shadow: 0 12px 26px rgba(74, 44, 164, 0.18);
+  font-weight: 900;
+}
+
+.btn.activity-save-btn:hover {
+  background: linear-gradient(180deg, #5f4eab 0%, #3f248d 100%);
+}
+
 .detail-grid p {
   margin: 0;
   padding: 0.62rem 0.72rem;

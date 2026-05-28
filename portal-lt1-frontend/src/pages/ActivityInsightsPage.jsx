@@ -110,7 +110,7 @@ function ActivityInsightsPage() {
           <p className="muted">Nu exista conturi in baza de date.</p>
         ) : null}
         {!loading && !error && sortedUsers.length > 0 ? (
-          <div className="detail-grid">
+          <div className="detail-grid activity-stack">
             <div className="table-wrap">
               <table>
                 <thead>
@@ -188,8 +188,13 @@ function ActivityInsightsPage() {
                       <option value="profesor">Profesor</option>
                       <option value="admin">Administrator</option>
                     </select>
-                    <div className="actions mt-8">
-                      <button type="button" className="btn" onClick={saveRole} disabled={savingRole || !draftRole}>
+                    <div className="actions mt-8 activity-save-actions">
+                      <button
+                        type="button"
+                        className="btn activity-save-btn"
+                        onClick={saveRole}
+                        disabled={savingRole || !draftRole}
+                      >
                         {savingRole ? 'Salvez...' : 'Salveaza'}
                       </button>
                     </div>

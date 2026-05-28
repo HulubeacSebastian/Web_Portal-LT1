@@ -13,7 +13,11 @@ const facebookUrl = pickUrl(
   import.meta.env.VITE_SCHOOL_FACEBOOK_URL,
   'https://www.facebook.com/liceultehnologicnr1campulungmoldovenesc',
 );
-const instagramUrl = pickUrl(import.meta.env.VITE_SCHOOL_INSTAGRAM_URL, '');
+const instagramUrl = pickUrl(
+  import.meta.env.VITE_SCHOOL_INSTAGRAM_URL,
+  'https://www.instagram.com/ltnclungmold?igsh=MXMyaDk3ODhob3B1aQ==',
+);
+const tiktokUrl = pickUrl(import.meta.env.VITE_SCHOOL_TIKTOK_URL, 'https://www.tiktok.com/@ltn1_clungmold?_r=1&_t=ZN-96iEivM5SR4');
 
 export const SCHOOL_FOOTER_LINKS = [
   {
@@ -27,6 +31,12 @@ export const SCHOOL_FOOTER_LINKS = [
     label: 'Instagram',
     href: instagramUrl,
     icon: 'instagram'
+  },
+  {
+    id: 'tiktok',
+    label: 'TikTok',
+    href: tiktokUrl,
+    icon: 'tiktok'
   },
   {
     id: 'website',

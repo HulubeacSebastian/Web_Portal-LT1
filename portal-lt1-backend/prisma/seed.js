@@ -118,6 +118,7 @@ async function seedUsers() {
         password: passwordHash,
         fullName: user.fullName,
         nickname: user.nickname || null,
+        emailVerifiedAt: new Date(),
         roleId: roleByName[user.role]
       },
       create: {
@@ -126,6 +127,7 @@ async function seedUsers() {
         password: passwordHash,
         fullName: user.fullName,
         nickname: user.nickname || null,
+        emailVerifiedAt: new Date(),
         roleId: roleByName[user.role]
       }
     });

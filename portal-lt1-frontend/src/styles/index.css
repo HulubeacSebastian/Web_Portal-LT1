@@ -1,0 +1,12 @@
+@import './base.css';
+@import './header_tel.css';
+@import './header_pc.css';
+@import './pages/auth.css';
+@import './pages/static.css';
+@import './pages/calendar.css';
+@import './footer.css';
+@import './pages/home.css';
+@import './pages/documents.css';
+@import './components/ui.css';
+@import './pages/chat.css';
+@import './pages/account.css';

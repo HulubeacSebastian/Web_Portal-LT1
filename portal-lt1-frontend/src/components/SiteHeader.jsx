@@ -26,9 +26,11 @@ const NAV_ITEMS = [
 
 function NavIcon({ src }) {
   return (
-    <span className="site-header-nav-icon" aria-hidden="true">
-      <img src={src} alt="" className="site-header-nav-icon-img" width={20} height={20} decoding="async" />
-    </span>
+    <span
+      className="site-header-nav-icon"
+      aria-hidden="true"
+      style={{ '--nav-icon-src': `url("${src}")` }}
+    />
   );
 }
 
@@ -163,7 +165,6 @@ function SiteHeader({ isLoggedIn, displayName, showChat, showActivity, onLogout 
   return (
     <header className={headerClassName}>
       <div className="site-header-shell">
-        <div className="site-header-accent" aria-hidden="true" />
         <div className="site-header-inner">
         <Link to="/" className="site-header-brand" aria-label="Portal LT1 — pagina principală">
           <span className="site-header-logo-wrap">

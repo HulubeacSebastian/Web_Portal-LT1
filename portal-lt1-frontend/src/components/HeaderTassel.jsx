@@ -284,7 +284,7 @@ function HeaderTassel({ collapseProgress = 0, autoCloseOnScroll = false }) {
       style={{
         opacity: widgetOpacity,
         transform: isExtended ? `translateY(100%) scale(${widgetScale})` : `scale(${widgetScale})`,
-        transformOrigin: 'top left',
+        transformOrigin: 'top right',
         pointerEvents: retractAmount >= 0.98 ? 'none' : undefined
       }}
     >

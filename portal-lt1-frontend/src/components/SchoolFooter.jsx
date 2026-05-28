@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { SCHOOL_FOOTER_LINKS } from '../config/schoolFooterLinks.js';
 
 function FooterLinkIcon({ type }) {
@@ -18,6 +17,14 @@ function FooterLinkIcon({ type }) {
     );
   }
 
+  if (type === 'tiktok') {
+    return (
+      <svg className="school-footer-social-icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.5 7.1c-1.3-.8-2.2-2.2-2.4-3.7V3h-3.5v12c0 1.6-1.3 2.9-2.9 2.9S5.8 16.6 5.8 15s1.3-2.9 2.9-2.9c.3 0 .6 0 .9.1V8.7c-.3 0-.6-.1-.9-.1-3.6 0-6.4 2.9-6.4 6.4s2.9 6.4 6.4 6.4 6.4-2.9 6.4-6.4V9.8c1.3.9 2.9 1.4 4.6 1.4V7.8c-.8 0-1.7-.2-2.4-.7z" />
+      </svg>
+    );
+  }
+
   return (
     <svg className="school-footer-social-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
@@ -28,40 +35,44 @@ function FooterLinkIcon({ type }) {
 
 function SchoolFooter() {
   const year = new Date().getFullYear();
+  const mapsHref =
+    'https://www.google.com/maps/search/?api=1&query=Liceul%20Tehnologic%20Nr.%201%20C%C3%A2mpulung%20Moldovenesc';
 
   return (
     <footer className="school-footer">
       <div className="school-footer-top">
-        <p className="school-footer-ministry">Ministerul Educației</p>
-        <p className="school-footer-ministry school-footer-ministry--sub">
-          Inspectoratul Școlar Județean Suceava
+        <p className="school-footer-ministry-line">
+          <span className="school-footer-ministry">Ministerul Educației</span>
+          <span className="school-footer-ministry-sep" aria-hidden="true">
+            ·
+          </span>
+          <span className="school-footer-ministry school-footer-ministry--sub">
+            Inspectoratul Școlar Județean Suceava
+          </span>
         </p>
       </div>
 
       <div className="school-footer-main">
+        <section className="school-footer-block school-footer-block--location" aria-labelledby="footer-location">
+          <h3 id="footer-location" className="school-footer-heading">
+            Locație
+          </h3>
+          <p className="school-footer-location-line">Câmpulung Moldovenesc, jud. Suceava</p>
+          <a className="school-footer-map-link" href={mapsHref} target="_blank" rel="noopener noreferrer">
+            Vezi pe hartă
+          </a>
+        </section>
+
         <section className="school-footer-block school-footer-block--brand" aria-labelledby="footer-brand">
           <h2 id="footer-brand" className="visually-hidden">
             Liceul Tehnologic Nr. 1
           </h2>
           <div className="school-footer-brand">
-            <div className="school-footer-logo-wrap">
-              <img
-                src="/assets/logo-mov-vector.pdf.png"
-                alt=""
-                className="school-footer-logo"
-                width={72}
-                height={72}
-                decoding="async"
-              />
-            </div>
             <div className="school-footer-brand-text">
               <p className="school-footer-school-name">Liceul Tehnologic Nr. 1</p>
-              <p className="school-footer-school-place">Câmpulung Moldovenesc · jud. Suceava</p>
+              <p className="school-footer-director">Director: Hulubeac Angela-Elena</p>
             </div>
           </div>
-          <p className="school-footer-tagline">
-            Educație tehnică de calitate, comunitate activă, viitor pregătit.
-          </p>
         </section>
 
         <div className="school-footer-side">
@@ -89,23 +100,11 @@ function SchoolFooter() {
               </ul>
             </nav>
           ) : null}
-
-          <section className="school-footer-block" aria-labelledby="footer-contact">
-            <h3 id="footer-contact" className="school-footer-heading">
-              Contact
-            </h3>
-            <p className="school-footer-contact-teaser">
-              Adresă, telefon, email, program și formularul de mesaje sunt pe pagina dedicată.
-            </p>
-            <Link to="/contact" className="school-footer-contact-link">
-              Vezi datele de contact
-            </Link>
-          </section>
         </div>
       </div>
 
       <div className="school-footer-bottom">
-        <p>© {year} Liceul Tehnologic Nr. 1 Câmpulung Moldovenesc. Toate drepturile rezervate.</p>
+        <p>© {year} Liceul Tehnologic Nr. 1 Câmpulung Moldovenesc.</p>
         <p className="school-footer-bottom-note">Portal educațional — documente, calendar și comunicare</p>
       </div>
     </footer>

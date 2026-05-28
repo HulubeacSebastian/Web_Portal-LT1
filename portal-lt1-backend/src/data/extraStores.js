@@ -52,6 +52,23 @@ async function updateUserProfile(id, { nickname }) {
   return mapUser(row);
 }
 
+async function updatePendingRegistration(id, { password, fullName }) {
+  const data = {};
+  if (typeof fullName === 'string' && fullName.trim()) {
+    data.fullName = fullName.trim();
+  }
+  if (password) {
+    data.password = await hashPassword(password);
+  }
+
+  const row = await prisma.user.update({
+    where: { id },
+    data,
+    include: userInclude
+  });
+  return mapUser(row);
+}
+
 async function createUser({ email, password, fullName, nickname, roleName = 'user' }) {
   const role = await prisma.role.findUnique({ where: { name: roleName } });
   if (!role) {
@@ -181,6 +198,7 @@ module.exports = {
   getUserByEmail,
   getUserById,
   updateUserProfile,
+  updatePendingRegistration,
   createUser,
   listPosts,
   createPost,

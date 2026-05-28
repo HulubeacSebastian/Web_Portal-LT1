@@ -1,4 +1,4 @@
-const STEPS = [
+const DEFAULT_STEPS = [
   { id: 1, label: 'Parola' },
   { id: 2, label: 'Cod OTP' },
   { id: 3, label: 'Sesiune' }
@@ -14,11 +14,11 @@ function stepState(stepId, currentStep) {
   return 'is-upcoming';
 }
 
-function AuthStepper({ currentStep = 1 }) {
+function AuthStepper({ currentStep = 1, steps = DEFAULT_STEPS }) {
   return (
     <nav className="auth-stepper" aria-label="Progres autentificare">
       <ol className="auth-stepper-list">
-        {STEPS.map((step, index) => (
+        {steps.map((step, index) => (
           <li
             key={step.id}
             className={`auth-stepper-item ${stepState(step.id, currentStep)}`}
@@ -27,7 +27,7 @@ function AuthStepper({ currentStep = 1 }) {
               {step.id < currentStep ? '✓' : step.id}
             </span>
             <span className="auth-stepper-label">{step.label}</span>
-            {index < STEPS.length - 1 ? (
+            {index < steps.length - 1 ? (
               <span className="auth-stepper-line" aria-hidden="true" />
             ) : null}
           </li>

@@ -24,6 +24,7 @@ function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '', otp: '' });
   const [challengeId, setChallengeId] = useState('');
   const [devCode, setDevCode] = useState('');
+  const [verifyMode, setVerifyMode] = useState('login');
   const [message, setMessage] = useState('');
   const [messageStatus, setMessageStatus] = useState(null);
   const [errors, setErrors] = useState({});
@@ -79,11 +80,23 @@ function LoginPage() {
       if (response.devCode) {
         setDevCode(response.devCode);
       }
+      setVerifyMode('login');
       setStep(2);
       setMessage(response.message || 'Introdu codul de verificare.');
       setMessageStatus('success');
     } catch (error) {
       recordActivityEvent('login_failed_validation');
+      if (error?.data?.needsEmailVerification) {
+        setChallengeId(error.data.challengeId);
+        if (error.data.devCode) {
+          setDevCode(error.data.devCode);
+        }
+        setVerifyMode('email');
+        setStep(2);
+        setMessage(error.message || 'Contul nu este activat. Introdu codul trimis pe email.');
+        setMessageStatus('success');
+        return;
+      }
       setMessage(error?.message || 'Parola sau email invalid.');
       setMessageStatus('error');
     } finally {
@@ -100,7 +113,9 @@ function LoginPage() {
 
     setLoadingOtp(true);
     try {
-      const response = await apiRequest('/api/auth/verify-otp', {
+      const verifyPath =
+        verifyMode === 'email' ? '/api/auth/register/verify-email' : '/api/auth/verify-otp';
+      const response = await apiRequest(verifyPath, {
         method: 'POST',
         body: {
           challengeId,
@@ -125,11 +140,13 @@ function LoginPage() {
       title="Autentificare in portal"
       lead="Parola, verificare OTP si sesiune securizata."
       highlights={highlights}
-      formTitle={step === 1 ? 'Pasul 1 — Parola' : 'Pasul 2 — Cod OTP'}
+      formTitle={step === 1 ? 'Pasul 1 — Parola' : verifyMode === 'email' ? 'Pasul 2 — Activare cont' : 'Pasul 2 — Cod OTP'}
       formLead={
         step === 1
           ? 'Introdu emailul si parola.'
-          : 'Introdu codul de 6 cifre primit pe email (verifica si Spam).'
+          : verifyMode === 'email'
+            ? 'Contul nu este activat. Introdu codul primit pe email (verifica si Spam).'
+            : 'Introdu codul de 6 cifre primit pe email (verifica si Spam).'
       }
       footer={
         <p className="auth-note">
@@ -211,6 +228,7 @@ function LoginPage() {
             disabled={loadingOtp}
             onClick={() => {
               setStep(1);
+              setVerifyMode('login');
               setMessage('');
               setMessageStatus(null);
             }}

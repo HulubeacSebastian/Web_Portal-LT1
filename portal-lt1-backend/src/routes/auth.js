@@ -80,6 +80,22 @@ router.post('/login', async function (req, res, next) {
       return res.status(401).json({ message: 'Parola sau email invalid.' });
     }
 
+    if (!user.emailVerifiedAt) {
+      const verification = await sessionService.createEmailVerificationChallenge(user.id, user.email);
+      if (verification.error) {
+        return res.status(503).json({ message: verification.error });
+      }
+
+      return res.status(403).json({
+        message: 'Contul nu este activat. Introdu codul trimis pe email.',
+        needsEmailVerification: true,
+        step: 2,
+        challengeId: verification.challengeId,
+        expiresInSeconds: verification.expiresInSeconds,
+        devCode: verification.devCode
+      });
+    }
+
     const challenge = await sessionService.createLoginChallenge(user.id, user.email);
     if (challenge.error) {
       return res.status(503).json({ message: challenge.error });
@@ -143,23 +159,69 @@ router.post('/register', async function (req, res, next) {
     }
 
     const existing = await store.getUserByEmail(emailCheck.value);
-    if (existing) {
+    if (existing?.emailVerifiedAt) {
       return res.status(409).json({ message: 'Exista deja un cont cu acest email.' });
     }
 
-    const user = await store.createUser({
-      email: emailCheck.value,
-      password: passwordCheck.value,
-      fullName: nameCheck.value,
-      roleName: 'user'
-    });
+    let user;
+    if (existing && !existing.emailVerifiedAt) {
+      user = await store.updatePendingRegistration(existing.id, {
+        password: passwordCheck.value,
+        fullName: nameCheck.value
+      });
+    } else {
+      user = await store.createUser({
+        email: emailCheck.value,
+        password: passwordCheck.value,
+        fullName: nameCheck.value,
+        roleName: 'user'
+      });
+    }
 
-    const tokens = await issueSessionTokens(user);
-    return res.status(201).json(tokens);
+    const verification = await sessionService.createEmailVerificationChallenge(user.id, user.email);
+    if (verification.error) {
+      return res.status(503).json({ message: verification.error });
+    }
+
+    return res.status(201).json({
+      step: 2,
+      challengeId: verification.challengeId,
+      message: verification.message,
+      expiresInSeconds: verification.expiresInSeconds,
+      devCode: verification.devCode
+    });
   } catch (error) {
     if (error.code === 'P2002') {
       return res.status(409).json({ message: 'Exista deja un cont cu acest email.' });
     }
+    return next(error);
+  }
+});
+
+router.post('/register/verify-email', async function (req, res, next) {
+  try {
+    const { challengeId, code } = req.body || {};
+    if (!challengeId || !code) {
+      return res.status(400).json({ message: 'Codul si identificatorul provocarii sunt obligatorii.' });
+    }
+
+    const result = await sessionService.verifyEmailChallenge(challengeId, String(code).trim());
+    if (result.error) {
+      return res.status(401).json({ message: result.error });
+    }
+
+    const user = await store.getUserById(result.userId);
+    if (!user) {
+      return res.status(401).json({ message: 'Utilizator inexistent.' });
+    }
+
+    const tokens = await issueSessionTokens(user);
+    return res.json({
+      step: 3,
+      ...tokens,
+      message: 'Cont activat. Autentificare reusita.'
+    });
+  } catch (error) {
     return next(error);
   }
 });

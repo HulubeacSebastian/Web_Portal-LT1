@@ -38,6 +38,7 @@ function mapUser(row) {
     password: row.password,
     fullName: row.fullName,
     nickname: row.nickname || null,
+    emailVerifiedAt: row.emailVerifiedAt || null,
     role: row.role.name,
     roleDescription: row.role?.description || '',
     permissions

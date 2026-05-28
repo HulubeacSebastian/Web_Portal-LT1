@@ -1,6 +1,6 @@
 const { prisma } = require('../db/prisma');
 const { hashPassword, verifyPassword } = require('./password');
-const { isMailConfigured, sendLoginOtpEmail, sendPasswordResetEmail } = require('../services/mailService');
+const { isMailConfigured, sendLoginOtpEmail, sendEmailVerificationEmail, sendPasswordResetEmail } = require('../services/mailService');
 const {
   generateId,
   generateOtpCode,
@@ -64,6 +64,82 @@ async function createLoginChallenge(userId, email) {
 
   console.error('[auth] SMTP neconfigurat — OTP nu poate fi trimis pe email.');
   return { error: 'Trimiterea codului pe email nu este configurata pe server.' };
+}
+
+async function createEmailVerificationChallenge(userId, email) {
+  const code = generateOtpCode();
+  const id = generateId('CHL');
+  const expiresAt = new Date(Date.now() + OTP_TTL_MS);
+  const expiresMinutes = Math.floor(OTP_TTL_MS / 60000);
+
+  await prisma.authChallenge.create({
+    data: {
+      id,
+      userId,
+      purpose: 'email_verify',
+      codeHash: hashSecret(code),
+      expiresAt
+    }
+  });
+
+  const payload = {
+    challengeId: id,
+    message: 'Cod de activare trimis pe email. Introdu codul din 6 cifre (verifica si Spam).',
+    expiresInSeconds: Math.floor(OTP_TTL_MS / 1000)
+  };
+
+  if (isMailConfigured() && email) {
+    try {
+      await sendEmailVerificationEmail({ to: email, code, expiresMinutes });
+      if (shouldExposeDevCodes()) {
+        payload.devCode = code;
+      }
+      return payload;
+    } catch (error) {
+      console.error('[auth] Eroare trimitere email activare:', error.message);
+      return { error: 'Nu am putut trimite codul de activare. Incearca mai tarziu.' };
+    }
+  }
+
+  if (shouldExposeDevCodes()) {
+    payload.devCode = code;
+    payload.message = 'Cod de activare (dev). Introdu codul din 6 cifre.';
+    return payload;
+  }
+
+  console.error('[auth] SMTP neconfigurat — cod activare netrimis.');
+  return { error: 'Trimiterea codului pe email nu este configurata pe server.' };
+}
+
+async function verifyEmailChallenge(challengeId, code) {
+  const challenge = await prisma.authChallenge.findUnique({
+    where: { id: challengeId }
+  });
+
+  if (!challenge || challenge.purpose !== 'email_verify' || challenge.usedAt) {
+    return { error: 'Cod invalid sau expirat.' };
+  }
+
+  if (challenge.expiresAt < new Date()) {
+    return { error: 'Codul a expirat. Reincearca inregistrarea.' };
+  }
+
+  if (hashSecret(code) !== challenge.codeHash) {
+    return { error: 'Cod de activare incorect.' };
+  }
+
+  await prisma.$transaction([
+    prisma.authChallenge.update({
+      where: { id: challengeId },
+      data: { usedAt: new Date() }
+    }),
+    prisma.user.update({
+      where: { id: challenge.userId },
+      data: { emailVerifiedAt: new Date() }
+    })
+  ]);
+
+  return { userId: challenge.userId };
 }
 
 async function verifyLoginChallenge(challengeId, code) {
@@ -221,7 +297,9 @@ module.exports = {
   hashPassword,
   updateUserPassword,
   createLoginChallenge,
+  createEmailVerificationChallenge,
   verifyLoginChallenge,
+  verifyEmailChallenge,
   createPasswordResetChallenge,
   verifyPasswordReset,
   createUserSession,

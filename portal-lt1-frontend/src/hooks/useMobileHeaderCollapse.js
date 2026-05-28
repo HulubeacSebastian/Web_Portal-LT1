@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const MOBILE_HEADER_MQ = '(max-width: 700px)';
+const MOBILE_HEADER_MQ = '(max-width: 1245px)';
 /** Mai mic = mai puțin scroll „consumat” înainte ca pagina să deruleze. */
 const COLLAPSE_RANGE_RATIO = 0.88;
 const WHEEL_DAMPING = 0.68;
@@ -57,9 +57,8 @@ function applyHeaderProgress(progressRef, progress, layout) {
   document.documentElement.style.setProperty('--header-visual-height', `${visualHeightPx}px`);
   document.documentElement.style.setProperty('--layout-header-offset', `${layoutOffsetPx}px`);
 
-  const media = window.matchMedia(MOBILE_HEADER_MQ);
-  const lockScroll = media.matches && window.scrollY <= 0 && clamped < 1;
-  document.body.classList.toggle('header-scroll-lock', lockScroll);
+  // Nu mai blocăm scroll-ul: pe unele device-uri bloca complet scroll-ul „până sus”.
+  document.body.classList.remove('header-scroll-lock');
 
   return clamped;
 }

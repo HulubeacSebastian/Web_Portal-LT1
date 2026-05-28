@@ -10,10 +10,84 @@
   border: 1px solid rgba(106, 87, 184, 0.15);
 }
 
+.account-hero-right {
+  display: grid;
+  justify-items: end;
+  gap: 0.65rem;
+}
+
+.account-hero-actions {
+  display: grid;
+  justify-items: end;
+  gap: 0.45rem;
+}
+
+.account-hero-actions .danger,
+.account-hero-actions .account-link-btn {
+  box-sizing: border-box;
+  width: 170px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.account-hero-actions .account-link-btn {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(106, 87, 184, 0.22);
+  color: var(--brand-purple-deep);
+}
+
+.account-hero-actions .account-link-btn:hover {
+  background: #fff;
+  border-color: rgba(106, 87, 184, 0.34);
+}
+
+.account-hero-actions .account-link-btn {
+  padding: 0 0.9rem;
+  border-radius: 10px;
+}
+
+.account-hero-actions .danger {
+  padding: 0 0.9rem;
+  border-radius: 10px;
+}
+
 .account-hero-main {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.account-hero-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.account-hero-title-row h2 {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.account-hero-title-row .account-role-badge {
+  align-self: center;
+  transform: translateY(1px);
+}
+
+@media (max-width: 960px) {
+  .account-hero-right {
+    width: 100%;
+    justify-items: center;
+  }
+
+  .account-hero-actions {
+    justify-items: center;
+  }
 }
 
 .account-avatar {
@@ -87,7 +161,7 @@
 }
 
 .account-nickname-form {
-  margin-top: 0.75rem;
+  margin-top: 0.4rem;
   display: grid;
   gap: 0.45rem;
 }
@@ -111,6 +185,20 @@
   border: 1px solid var(--line);
   border-radius: 10px;
   font: inherit;
+}
+
+.account-nickname-save {
+  background: linear-gradient(115deg, var(--brand-purple-deep) 0%, var(--brand-purple) 48%, var(--brand-purple-soft) 100%);
+  box-shadow: 0 12px 26px rgba(74, 44, 164, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.account-nickname-save:hover:enabled {
+  background: linear-gradient(115deg, var(--brand-purple) 0%, var(--brand-purple-soft) 55%, var(--brand-purple-deep) 100%);
+  box-shadow:
+    0 16px 34px rgba(74, 44, 164, 0.28),
+    0 0 0 3px rgba(212, 160, 61, 0.12);
 }
 
 .account-save-ok {

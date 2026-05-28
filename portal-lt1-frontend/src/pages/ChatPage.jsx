@@ -190,7 +190,9 @@ function ChatPage() {
             Chat <span className="chat-hero-title-gradient">in timp real</span>
           </h1>
           <p className="chat-hero-lead">
-            Conectat ca <strong>{session.fullName}</strong> ({session.role}){' '}
+            <span className="chat-hero-identity">
+              Conectat ca <strong>{session.fullName}</strong> ({session.role})
+            </span>
             <span
               className={`chat-status chat-status--${
                 status === 'Conectat' ? 'ok' : status === 'Eroare' ? 'error' : 'warn'
@@ -199,7 +201,6 @@ function ChatPage() {
               {status}
             </span>
           </p>
-          <p className="muted chat-ws">WebSocket: {wsUrl}</p>
         </div>
       </header>
 

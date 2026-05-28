@@ -4,62 +4,108 @@ import { Link, useLocation } from 'react-router-dom';
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
 
 const stats = [
-  { label: 'Raport elevi-profesor', value: '10:1', hint: 'Atentie personalizata' },
-  { label: 'Rata de angajare', value: '81%', hint: 'Absolventi in piata muncii' },
-  { label: 'Traditie', value: '150+', hint: 'Ani de excelenta' },
-  { label: 'Profiluri tehnice', value: '5+', hint: 'Calificari profesionale' },
+  { label: 'Elevi 👩‍🎓', value: '800', hint: 'Comunitate scolara activa' },
+  { label: 'Liceeni 🎓', value: '581', hint: 'Invatamant liceal' },
+  { label: 'Prescolari 🧒', value: '219', hint: 'Invatamant prescolar' },
+  { label: 'Sali 🏫', value: '33', hint: '23 sali de clasa' },
+  { label: 'Lab & ateliere 🔧', value: '10', hint: 'Spatii pentru invatare aplicata' },
+  { label: 'Angajati 👥', value: '76', hint: '45 cadre didactice + 31 personal suport' },
 ];
 
 const timeline = [
   {
     year: '1873',
-    title: 'Infiintare',
-    text: 'Liceul isi incepe activitatea in Campulung Moldovenesc, cu orientare tehnica inca de la origini.',
+    title: 'Inceputurile invatamantului profesional',
+    text: 'Institutie cu traditie tehnica, cu radacini in invatamantul profesional din Bucovina.',
   },
   {
-    year: '1960–1980',
-    title: 'Dezvoltare tehnica',
-    text: 'Extinderea atelierelor si consolidarea pregatirii practice pentru meserii industriale locale.',
+    year: '1921–1948',
+    title: 'Consolidare si reorganizare',
+    text: 'In 1921, institutia devine „Scoala de Constructii de Lucrari Publice”. Intre 1925–1931 functioneaza ca „Scoala de Conductori Arhitecti”, iar intre 1931–1936 ca „Scoala de Constructii si Desenatori de Arhitectura” (durata 5 ani). In perioada 1936–1948 poarta denumirea „Liceul Industrial de Constructii Civile si Edilitare”.',
   },
   {
-    year: '2000–2010',
-    title: 'Parteneriate economice',
-    text: 'Colaborari cu agenti economici din regiune pentru stagii, practica si orientare profesionala.',
+    year: '1944–1945',
+    title: 'Relocare in contextul razboiului',
+    text: 'Din cauza razboiului, scoala se muta de la Cernauti la Strehaia (jud. Mehedinti) in 1944, iar in 1945 isi stabileste activitatea la Campulung Moldovenesc.',
   },
   {
-    year: '2015–2020',
-    title: 'Modernizare',
-    text: 'Investitii in echipamente si laboratoare pentru profiluri tehnologice actuale.',
+    year: '1950–1974',
+    title: 'Invatamant tehnic si profesional',
+    text: 'Dupa reforma invatamantului din 1948, incepand cu 1950 scoala functioneaza ca „Scoala Medie Tehnica de Constructii Civile si Industriale”. In 1955, in baza H.C.M. 247 (24 februarie 1955) si a Ordinului 366 (martie 1955), este repartizata in subordinea Trustului de Constructii Iasi si devine „Scoala Profesionala de Ucenici – Constructii”, cu durata de 3 ani, avand ca for tutelar Ministerul Constructiilor. Sub aceasta denumire functioneaza neintrerupt pana in 1974.',
   },
   {
-    year: '2026',
-    title: 'Portal educational',
-    text: 'Acces digital la documente, calendar si informatii pentru elevi, parinti si profesori.',
+    year: '1974',
+    title: 'Transformare in grup scolar',
+    text: 'Prin Ordin al Ministrului Constructiilor Industriale nr. 592/D din 24 mai 1974, „Scoala Profesionala de Ucenici – Constructii” din Campulung Moldovenesc se transforma in „Grupul Scolar de Constructii Campulung Moldovenesc”, devenind baza actualului Grup Scolar nr. 1.',
   },
+  {
+    year: '2012–prezent',
+    title: 'Liceul Tehnologic Nr. 1',
+    text: 'Modernizare, diversificarea programelor si orientare spre formare profesionala de calitate.',
+  },
+];
+
+const visualTimeline = [
+  { year: '1873', label: 'Scoala profesionala de stat', image: encodeURI('/assets/poza_liceu_1873.png') },
+  { year: '1895', label: 'Scoala de lemnarit', image: photoUrl('WhatsApp Image 2026-05-26 at 21.13.06.jpeg') },
+  { year: '1927', label: 'Scoala de arte si meserii', image: photoUrl('WhatsApp Image 2026-05-26 at 21.09.21.jpeg') },
+  { year: '1936', label: 'Gimnaziul industrial', image: photoUrl('WhatsApp Image 2026-05-26 at 21.11.17.jpeg') },
+  { year: '1945', label: 'Stabilire la Campulung Moldovenesc', image: photoUrl('WhatsApp Image 2026-05-26 at 21.15.17.jpeg') },
+  { year: '1955', label: 'Ucenici – Constructii', image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.21.jpeg') },
+  { year: '1974', label: 'Grup scolar de constructii', image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.22.jpeg') },
+  { year: '2012', label: 'Liceul Tehnologic Nr. 1', image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.23.jpeg') },
 ];
 
 const pillars = [
   {
     icon: '01',
     title: 'Misiune',
-    text: 'Competente teoretice si practice, recunoscute pe piata muncii si utile pentru studii superioare tehnice.',
+    text: 'Formam tineri competenti, responsabili si adaptati societatii moderne, imbinand teoria cu deprinderile practice si valorile morale.',
   },
   {
     icon: '02',
     title: 'Viziune',
-    text: 'Un liceu tehnologic modern, conectat la economia locala si deschis spre inovare si performanta.',
+    text: 'O scoala deschisa, moderna si incluziva, un centru de formare profesionala care pregateste elevii pentru viata si o cariera solida in societatea digitala si europeana.',
   },
   {
     icon: '03',
-    title: 'Valori',
-    text: 'Respect, munca in echipa, profesionalism, incluziune si orientare spre rezultate pentru fiecare elev.',
+    title: 'Valori fundamentale',
+    text: 'Respect, educatie, profesionalism, echilibru, comunitate si toleranta — reperele care ne ghideaza deciziile si relatiile din scoala.',
   },
 ];
 
 const highlights = [
-  'Ateliere si laboratoare pentru invatare aplicata',
-  'Parteneriate cu firme locale pentru practica',
-  'Trasee clare catre angajare sau studii tehnice',
+  'Invatare aplicata si calificari relevante pentru piata muncii',
+  'Activitati educationale si extracurriculare care dezvolta aptitudini reale',
+  'Proiecte, concursuri si initiative care intaresc comunitatea scolara',
+];
+
+const schoolNoua = [
+  {
+    icon: '🧰',
+    title: 'Meserii cautate',
+    text: 'Calificari relevante si competente aplicate, conectate la nevoile pietei muncii.',
+  },
+  {
+    icon: '🚀',
+    title: 'Angajare',
+    text: 'Pregatire practica orientata spre integrare profesionala, inca din timpul liceului.',
+  },
+  {
+    icon: '👩‍🏫',
+    title: 'Cadre didactice',
+    text: 'Profesori experimentati, implicati si preocupati de progresul fiecarui elev.',
+  },
+  {
+    icon: '🏫',
+    title: 'Sali de clasa',
+    text: 'Spatii de invatare la standarde europene, pentru un cadru modern si sigur.',
+  },
+  {
+    icon: '🔬',
+    title: 'Laboratoare',
+    text: 'Dotari si tehnologii actuale pentru invatare aplicata in ateliere si laboratoare.',
+  },
 ];
 
 const galleryFilters = ['Toate', 'Ateliere', 'Evenimente', 'Sport', 'Scoala'];
@@ -229,10 +275,56 @@ function AboutPage() {
       </header>
 
       <div className="about-body">
+        <section className="about-heritage about-reveal" aria-label="Traditie si identitate">
+          <div className="about-heritage-inner">
+            <div className="about-heritage-copy">
+              <AboutSectionHead
+                eyebrow="Traditie"
+                title="Cea mai veche institutie de invatamant din Campulung Moldovenesc"
+                lead="Din 1873, construim educatie tehnica prin munca, disciplina si respect pentru comunitate."
+              />
+
+              <div className="about-heritage-badges" aria-label="Repere de traditie">
+                <span className="about-heritage-badge">
+                  <strong>151</strong>
+                  <em>ani</em>
+                </span>
+                <span className="about-heritage-badge is-gold">
+                  <strong>1873–2024</strong>
+                  <em>repere</em>
+                </span>
+              </div>
+
+              <div className="about-heritage-origin" aria-label="Origini 1873">
+                <p className="about-heritage-quote">
+                  In 1873, la Cernauti — capitala Bucovinei — a luat fiinta „Inalt cezaro-craiasca scoala
+                  profesionala de stat”, prima scoala de acest gen din Bucovina.
+                </p>
+                <ul className="about-heritage-points">
+                  <li>
+                    <strong>Constructii</strong> — pregatire pentru lucrari publice: cladiri, sosele, poduri si
+                    infrastructura.
+                  </li>
+                  <li>
+                    <strong>Chimie</strong> — formare tehnica pentru nevoile economice ale vremii.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <aside className="about-heritage-aside" aria-label="Mesaj cheie">
+              <p>
+                O scoala care a crescut odata cu orasul — de la primele forme de invatamant profesional,
+                pana la programe moderne, laboratoare si formare relevanta pentru societatea de azi.
+              </p>
+            </aside>
+          </div>
+        </section>
+
         <section className="about-story about-reveal" id="cine-suntem">
           <div className="about-story-visual">
             <img
-              src={photoUrl('WhatsApp Image 2026-05-26 at 21.13.06.jpeg')}
+              src={encodeURI('/assets/poza_liceu_1873.png')}
               alt="Spatii de lucru la liceu"
               loading="lazy"
             />
@@ -246,23 +338,56 @@ function AboutPage() {
             <AboutSectionHead
               eyebrow="Identitate"
               title="Cine suntem"
-              lead="O comunitate scolara orientata spre competente reale si oportunitati concrete pentru elevi."
+              lead="Cea mai veche institutie de invatamant profesional si tehnic din Campulung Moldovenesc, cu traditie din 1873."
             />
             <p>
-              La Liceul Tehnologic Nr. 1, credem ca educatia practica este cheia succesului. Misiunea
-              noastra este sa oferim elevilor competentele necesare pentru a reusi pe o piata a muncii in
-              continua schimbare.
+              Liceul Tehnologic Nr. 1 are o istorie bogata si ramane un punct de referinta pentru educatia
+              tehnica din zona noastra. De-a lungul timpului, institutia a evoluat si s-a adaptat
+              schimbarilor din societate si din domeniul tehnic, pastrand focusul pe formarea de competente
+              utile si durabile.
             </p>
             <p>
-              Prin ateliere moderne, parteneriate cu agenti economici si un corp profesoral dedicat,
-              asiguram tranzitia usoara de la scoala la cariera sau catre studii superioare in domeniul
-              tehnic.
+              Astazi, ne asumam rolul de a pregati elevii pentru integrare directa pe piata muncii si
+              pentru continuarea studiilor. Programele noastre urmaresc dezvoltarea aptitudinilor
+              academice, profesionale, socio-emotionale si de colaborare, pentru ca fiecare elev sa isi
+              construiasca un parcurs solid.
             </p>
             <ul className="about-story-list">
               {highlights.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        <section className="about-school-new about-reveal" aria-label="Scoala noua">
+          <AboutSectionHead
+            eyebrow="Directii"
+            title="Școală nouă"
+            lead="O scoala moderna, orientata spre practica, performanta si oportunitati reale pentru elevi."
+          />
+          <div className="about-school-bulb" role="img" aria-label="Scoala noua: beneficii si directii">
+            <div className="about-school-bulb-center" aria-hidden="true">
+              <span className="about-school-bulb-title">ȘCOALĂ NOUĂ</span>
+              <span className="about-school-bulb-glow" />
+              <span className="about-school-bulb-base" />
+            </div>
+
+            <ol className="about-school-bulb-slices" aria-label="Directii Scoala noua">
+              {schoolNoua.map((item, index) => (
+                <li
+                  key={item.title}
+                  className="about-school-bulb-slice"
+                  style={{ '--slice-index': index }}
+                >
+                  <span className="about-school-bulb-slice-icon" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                  <strong className="about-school-bulb-slice-title">{item.title}</strong>
+                  <span className="about-school-bulb-slice-text">{item.text}</span>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
@@ -284,6 +409,22 @@ function AboutPage() {
             title="Istoricul nostru"
             lead="Repere care arata cum am crescut impreuna cu comunitatea locala."
           />
+          <div className="about-visual-timeline" aria-label="Istoric vizual">
+            <ol className="about-visual-track">
+              {visualTimeline.map((item) => (
+                <li key={item.year} className="about-visual-node">
+                  <div className="about-visual-ring" aria-hidden="true" />
+                  <figure className="about-visual-photo">
+                    <img src={item.image} alt="" loading="lazy" />
+                  </figure>
+                  <div className="about-visual-meta">
+                    <strong>{item.year}</strong>
+                    <span>{item.label}</span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
           <ol className="about-timeline-track">
             {timeline.map((item, index) => (
               <li key={item.year} className="about-timeline-entry">

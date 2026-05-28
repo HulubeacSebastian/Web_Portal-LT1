@@ -78,11 +78,22 @@ function AccountPage({ onLogout }) {
           </span>
           <div>
             <p className="eyebrow">Contul meu</p>
-            <h2>{displayName}</h2>
-            <p className="muted account-hero-email">{profile?.email || session?.email}</p>
+            <div className="account-hero-title-row">
+              <h2>{displayName}</h2>
+              <span className="account-role-badge">{roleLabel}</span>
+            </div>
           </div>
         </div>
-        <span className="account-role-badge">{roleLabel}</span>
+        <div className="account-hero-right">
+          <div className="account-hero-actions" aria-label="Actiuni cont">
+            <button type="button" className="danger" onClick={() => onLogout()}>
+              Deconectare
+            </button>
+            <Link to="/" className="secondary account-link-btn">
+              Înapoi acasă
+            </Link>
+          </div>
+        </div>
       </article>
 
       {loading ? (
@@ -128,10 +139,11 @@ function AccountPage({ onLogout }) {
           </article>
 
           <article className="card account-nickname">
-            <h3>Nickname (afișat în header)</h3>
-            <p className="muted">Acest nume apare în bara de navigare, nu adresa de email.</p>
+            <h3>Nickname</h3>
             <form className="account-nickname-form" onSubmit={handleSaveNickname}>
-              <label htmlFor="account-nickname">Nickname</label>
+              <label htmlFor="account-nickname" className="visually-hidden">
+                Nickname
+              </label>
               <div className="account-nickname-row">
                 <input
                   id="account-nickname"
@@ -142,7 +154,7 @@ function AccountPage({ onLogout }) {
                   maxLength={32}
                   autoComplete="nickname"
                 />
-                <button type="submit" className="btn" disabled={saving}>
+                <button type="submit" className="btn account-nickname-save" disabled={saving}>
                   {saving ? 'Se salvează…' : 'Salvează'}
                 </button>
               </div>
@@ -163,18 +175,6 @@ function AccountPage({ onLogout }) {
             )}
           </article>
 
-          <article className="card account-actions">
-            <h3>Sesiune</h3>
-            <p className="muted">Deloghează-te de pe acest dispozitiv.</p>
-            <div className="account-actions-row">
-              <button type="button" className="danger" onClick={() => onLogout()}>
-                Deconectare
-              </button>
-              <Link to="/" className="secondary account-link-btn">
-                Înapoi acasă
-              </Link>
-            </div>
-          </article>
         </>
       ) : null}
     </section>

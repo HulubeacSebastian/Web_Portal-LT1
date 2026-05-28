@@ -3,32 +3,32 @@ import { Link } from 'react-router-dom';
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
 
 const stats = [
-  { label: 'Raport Elevi-Profesor', value: '10:1' },
-  { label: 'Rata de Angajare', value: '81%' },
-  { label: 'Ani de Traditie si Excelenta', value: '>150' },
-  { label: 'Specializari si Calificari Profesionale', value: '+5' },
+  { label: 'Elevi 👩‍🎓', value: '800' },
+  { label: 'Sali 🏫', value: '33' },
+  { label: 'Lab & ateliere 🔧', value: '10' },
+  { label: 'Angajati 👥', value: '76' },
 ];
 
 const events = [
   {
-    date: 'Sam, 24 Feb',
-    text: 'Ziua Portilor Deschise / Tur ghidat al atelierelor si laboratoarelor pentru viitorii elevi.',
-    cta: 'DETALII EVENIMENT',
+    date: '2025–2026',
+    text: 'Extinderea mobilitatilor Erasmus+ si schimburi educationale pentru elevi si profesori.',
+    cta: 'DESPRE ERASMUS+',
   },
   {
-    date: 'Joi, 14 Mar',
-    text: 'Targul Ofertelor Educationale / Prezentarea profilurilor tehnologice pentru absolventii de clasa a VIII-a.',
-    cta: 'VEZI PROGRAMUL',
+    date: '2025–2026',
+    text: 'Infiintarea unui Centru de Practica Modern si programe de dezvoltare tehnica actualizate.',
+    cta: 'DIRECTII STRATEGICE',
   },
   {
-    date: 'Lun, 15 Apr',
-    text: 'Concursul Regional de Robotica si Mecanica Fina / Editia a X-a, gazduit in sala de festivitati.',
-    cta: 'INSCRIE ECHIPA',
+    date: '2025–2026',
+    text: 'Digitalizarea procesului educativ: resurse online, comunicare eficienta si acces rapid la informatii.',
+    cta: 'ACCES PLATFORME',
   },
   {
-    date: 'Vin, 26 Apr',
-    text: 'Saptamana "Scoala Altfel" / Activitati extracurriculare si vizite la parteneri economici.',
-    cta: 'VEZI ACTIVITATILE',
+    date: '2025–2026',
+    text: 'Proiecte inovative pentru invatare aplicata: spatii moderne, activitati practice si cultura a performantei.',
+    cta: 'PROIECTE INOVATIVE',
   },
 ];
 
@@ -57,10 +57,11 @@ function HomePage() {
         <article className="home-intro-story">
           <h2>DE CE SA ALEGI LICEUL TEHNOLOGIC NR. 1?</h2>
           <p>
-            Cu o traditie ce incepe in 1873, Liceul Tehnologic Nr. 1 din Campulung Moldovenesc imbina
-            educatia teoretica de calitate cu o pregatire practica esentiala pentru piata muncii.
-            Oferim elevilor nostri laboratoare moderne, parteneriate solide cu agenti economici locali
-            si oportunitatea de a dobandi calificari profesionale recunoscute.
+            Cu traditie din 1873, Liceul Tehnologic Nr. 1 din Campulung Moldovenesc este o institutie
+            de invatamant profesional si tehnic care imbina educatia teoretica cu deprinderile practice
+            si valorile care formeaza caracterul. Ne asumam misiunea de a pregati tineri competenti,
+            responsabili si adaptati cerintelor societatii moderne, pentru o cariera solida sau pentru
+            continuarea studiilor.
           </p>
         </article>
 
@@ -90,7 +91,7 @@ function HomePage() {
       </section>
 
       <section className="home-events">
-        <h2>EVENIMENTE VIITOARE IN SCOALA NOASTRA</h2>
+        <h2>PRIORITATI SI DIRECTII 2025–2026</h2>
 
         <div className="home-events-grid">
           <div className="home-events-list">

@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { to: '/documente', label: 'Documente', icon: NAV_ICONS.documents },
   { to: '/despre-noi', label: 'Despre Noi', icon: NAV_ICONS.about },
   { to: '/contact', label: 'Contact', icon: NAV_ICONS.contact },
-  { to: '/calendar', label: 'Calendar', icon: NAV_ICONS.calendar },
+  { to: '/calendar', label: 'Calendar', icon: NAV_ICONS.calendar, authOnly: true },
   { to: '/activitate', label: 'Activitate', icon: NAV_ICONS.activity, adminOnly: true }
 ];
 
@@ -41,12 +41,14 @@ function SiteHeader({ isLoggedIn, displayName, showChat, showActivity, onLogout 
   const { collapseProgress, isCompact, isMobile } = useMobileHeaderCollapse(location.pathname);
 
   const navLinks = useMemo(() => {
-    const items = NAV_ITEMS.filter((item) => !item.adminOnly || showActivity);
+    const items = NAV_ITEMS.filter(
+      (item) => (!item.adminOnly || showActivity) && (!item.authOnly || isLoggedIn)
+    );
     if (showChat) {
       items.push({ to: '/chat', label: 'Chat', icon: NAV_ICONS.chat });
     }
     return items;
-  }, [showActivity, showChat]);
+  }, [isLoggedIn, showActivity, showChat]);
 
   useEffect(() => {
     setMenuOpen(false);

@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BreakdownIcon, CseLogo, ErasmusLogo, OfferIcon } from '../components/home/HomeIcons.jsx';
+import { BreakdownIcon, ErasmusLogo } from '../components/home/HomeIcons.jsx';
+import { hasAuthSession } from '../utils/authSession';
+
+const CSE_LOGO = '/assets/cselt1.png';
+const RESTAURANT_IMAGE = '/assets/restaurant.jpeg';
+const MANSARDA_IMAGE = '/assets/pod.jpeg';
 
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
 
@@ -48,77 +53,110 @@ const valueTags = [
   { label: 'Toleranță', tone: 'amber' }
 ];
 
-const assetItems = [
-  'Fotografii de campus pe timp de zi, de înaltă rezoluție.',
-  'Fotografii ale laboratoarelor moderne.',
-  'Descrieri detaliate ale noului curriculum.',
-  'Puncte de date specifice pentru secțiunea "Liceul în Cifre".',
-  'Pictograme personalizate și detaliate pentru fiecare specializare.',
-  'Fotografii ale proiectelor specifice (ex: bucătărie didactică, VR) de înaltă calitate.',
-  'Logouri pentru Erasmus+ și CSE.'
+const portalDiscover = [
+  {
+    title: 'Oferta educațională',
+    desc: 'Specializări, ateliere moderne și trasee de formare pentru piața muncii — anul 2024-2025.',
+    to: '#oferta-educationala',
+    hash: true,
+    cta: 'Vezi programele'
+  },
+  {
+    title: 'Documente școlare',
+    desc: 'Regulamente, planuri de învățământ și informări pentru elevi, părinți și cadre didactice.',
+    to: '/documente',
+    cta: 'Accesează documentele'
+  },
+  {
+    title: 'Calendar școlar',
+    desc: 'Examene, activități, întâlniri și evenimente importante pe parcursul anului.',
+    to: '/calendar',
+    cta: 'Vezi calendarul'
+  },
+  {
+    title: 'Despre liceu',
+    desc: 'Istorie, identitate, proiecte inovatoare și comunitatea LT1 din Câmpulung Moldovenesc.',
+    to: '/despre-noi',
+    cta: 'Cunoaște liceul'
+  }
 ];
 
 const offers = [
   {
     title: 'Tehnician în turism',
     desc: 'Comunicare, ospitalitate, ghidaj și organizare.',
-    icon: 'tourism'
+    tone: 'tourism',
+    tag: 'Turism'
   },
   {
     title: 'Tehnician mecanic',
     desc: 'Tehnologii moderne, practică aplicată și competențe tehnice.',
-    icon: 'mechanic'
+    tone: 'mechanic',
+    tag: 'Mecanică'
   },
   {
     title: 'Ospătar / Vânzător',
     desc: 'Meserii căutate, lucru cu publicul și abilități reale.',
-    icon: 'hospitality'
+    tone: 'hospitality',
+    tag: 'HoReCa'
   },
   {
     title: 'Învățământ Profesional Dual',
     desc: 'Carieră sigură și susținere prin practică și parteneriate.',
-    icon: 'dual',
-    highlight: true
+    tone: 'dual',
+    tag: 'Dual',
+    featured: true
   },
   {
     title: 'Maistru în construcții civile (postliceal)',
     desc: 'Specializare avansată și competențe de coordonare.',
-    icon: 'construction'
+    tone: 'construction',
+    tag: 'Construcții'
   }
 ];
 
 const projects = [
   {
     title: 'Mansarda Inteligentă – Smart Learning Loft',
-    desc: 'Hub educațional, bibliotecă modernă și tehnologie pentru învățare.',
+    desc: 'Hub educațional, bibliotecă modernă și tehnologie pentru învățare — spațiu dedicat explorării și cercetării.',
     badge: 'Proiect 01',
-    image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.22.jpeg'),
-    imageAlt: 'Student utilizând echipament VR în laborator'
+    tone: 'loft',
+    image: MANSARDA_IMAGE,
+    imageAlt: 'Mansarda Inteligentă – Smart Learning Loft'
   },
   {
     title: 'Restaurant Didactic Academia Gustului',
-    desc: 'Spațiu modern de instruire culinară, practică și cultură a ospitalității.',
+    desc: 'Spațiu modern de instruire culinară, practică și cultură a ospitalității — pregătire reală pentru industrie.',
     badge: 'Proiect 02',
-    image: photoUrl('WhatsApp Image 2026-05-26 at 21.13.53.jpeg'),
-    imageAlt: 'Prezentare culinară profesională în bucătăria didactică'
+    tone: 'culinary',
+    image: RESTAURANT_IMAGE,
+    imageAlt: 'Restaurant Didactic Academia Gustului — spațiu de instruire culinară'
   }
 ];
 
 const community = [
   {
     title: 'Proiecte ERASMUS+',
-    desc: 'Deschidere europeană',
-    logo: 'erasmus'
+    desc: 'Mobilități, parteneriate europene și experiențe care deschid orizonturi elevilor noștri.',
+    tone: 'erasmus',
+    logo: 'erasmus',
+    image: photoUrl('WhatsApp Image 2026-05-26 at 21.12.34.jpeg'),
+    imageAlt: 'Elevi în activitate Erasmus+'
   },
   {
     title: 'Proiectul ECLESSIA',
-    desc: 'Tradiție și voluntariat'
+    desc: 'Tradiție, solidaritate și voluntariat — implicare activă în viața spirituală și socială a comunității.',
+    tone: 'eclessia',
+    image: photoUrl('WhatsApp Image 2026-05-26 at 21.09.48.jpeg'),
+    imageAlt: 'Activități de voluntariat ECLESSIA'
   },
   {
     title: 'Consiliul Școlar al Elevilor (CȘE)',
-    desc: 'Când elevii prind curaj, școala prinde viață!',
-    highlight: true,
-    logo: 'cse',
+    desc: 'Când elevii prind curaj, școala prinde viață! Vocea elevilor în deciziile care îi privesc.',
+    tone: 'cse',
+    featured: true,
+    logoSrc: CSE_LOGO,
+    logoAlt: 'Logo Consiliul Școlar al Elevilor',
     image: photoUrl('chat-hero-people.jpg'),
     imageAlt: 'Ședință a Consiliului Școlar al Elevilor'
   }
@@ -209,6 +247,10 @@ function StatGroupCard({ group }) {
 }
 
 function HomePage() {
+  const discoverItems = portalDiscover.filter(
+    (item) => item.to !== '/calendar' || hasAuthSession()
+  );
+
   return (
     <section className="page-shell home2-page">
       <div className="home2-bg-pattern" aria-hidden="true">
@@ -258,132 +300,184 @@ function HomePage() {
         </div>
       </header>
 
-      <section className="home2-section" id="traditie-valori" aria-label="Tradiție și valori">
-        <div className="home2-section-head">
-          <h2>Tradiție și valori</h2>
-          <p className="muted">
-            Cea mai veche instituție de învățământ din Câmpulung Moldovenesc – <strong>151 ANI (1873 - 2024)</strong>.
-          </p>
+      <div className="home2-about-cluster" id="despre-liceu">
+        <section className="home2-section home2-section--heritage" id="traditie-valori" aria-label="Tradiție și valori">
+          <div className="home2-block-head">
+            <span className="home2-section-eyebrow">Rădăcini</span>
+            <h2>Tradiție și valori</h2>
+            <p className="muted">
+              Cea mai veche instituție de învățământ din Câmpulung Moldovenesc — peste un secol și jumătate de
+              formare tehnică, cu rădăcini din <strong>1873</strong>.
+            </p>
+          </div>
+
+          <div className="home2-info-grid home2-info-grid--two">
+            <article className="home2-info-card home2-info-card--history">
+              <p className="home2-info-kicker">1873 – 2024</p>
+              <p className="home2-info-title">151 ani de istorie</p>
+              <p className="home2-info-desc">
+                De la primele școli profesionale din Bucovina la programe moderne pentru piața muncii — continuitate,
+                seriozitate și performanță pentru fiecare generație de elevi.
+              </p>
+            </article>
+            <article className="home2-info-card home2-info-card--values">
+              <p className="home2-info-title">Valori fundamentale</p>
+              <p className="home2-info-desc home2-info-desc--lead">
+                Principiile care ne ghidează în sala de clasă, în laborator și în comunitate:
+              </p>
+              <div className="home2-value-chips" aria-label="Valori fundamentale">
+                {valueTags.map((v) => (
+                  <span key={v.label} className={`home2-chip home2-chip--${v.tone}`}>
+                    {v.label}
+                  </span>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <div className="home2-about-divider" aria-hidden="true">
+          <span />
         </div>
 
-        <div className="home2-info-grid home2-info-grid--two">
-          <article className="home2-info-card">
-            <p className="home2-info-title">151 ANI</p>
-            <p className="home2-info-desc">1873 - 2024 • Tradiție, continuitate și performanță.</p>
-          </article>
-          <article className="home2-info-card">
-            <p className="home2-info-title">Valori</p>
-            <div className="home2-value-chips" aria-label="Valori fundamentale">
-              {valueTags.map((v) => (
-                <span key={v.label} className={`home2-chip home2-chip--${v.tone}`}>
-                  {v.label}
-                </span>
-              ))}
-            </div>
-          </article>
-        </div>
-      </section>
+        <section className="home2-section home2-section--kpis" aria-label="Liceul în cifre">
+          <div className="home2-block-head">
+            <span className="home2-section-eyebrow">Impact</span>
+            <h2>Liceul în cifre</h2>
+            <p className="muted">Date reale, impact concret în comunitate — elevi, spații și echipa școlii.</p>
+          </div>
 
-      <section className="home2-section home2-section--kpis" aria-label="Liceul în cifre">
-        <div className="home2-section-head home2-section-head--kpis">
-          <h2>Liceul în cifre</h2>
-          <p className="muted">Date reale, impact real în comunitate — structură completă a comunității școlare.</p>
-        </div>
-
-        <div className="home2-stats-panel">
-          <div className="home2-stats-panel-bg" aria-hidden="true" />
           <div className="home2-stats-grid">
             {statGroups.map((group) => (
               <StatGroupCard key={group.id} group={group} />
             ))}
           </div>
+        </section>
+      </div>
+
+      <section className="home2-section home2-section--discover" aria-label="Ce găsești pe portal">
+        <div className="home2-block-head home2-block-head--center">
+          <span className="home2-section-eyebrow">Portal educațional</span>
+          <h2>Ce găsești aici</h2>
+          <p className="muted">
+            Un singur loc pentru informații despre liceu — de la programe și documente, până la evenimente și
+            povestea comunității noastre.
+          </p>
+        </div>
+
+        <div className="home2-discover-grid">
+          {discoverItems.map((item) => {
+            const body = (
+              <>
+                <h3>{item.title}</h3>
+                <p className="muted">{item.desc}</p>
+                <span className="home2-discover-cta">{item.cta}</span>
+              </>
+            );
+
+            if (item.hash) {
+              return (
+                <a key={item.title} href={item.to} className="home2-discover-card">
+                  {body}
+                </a>
+              );
+            }
+
+            return (
+              <Link key={item.title} to={item.to} className="home2-discover-card">
+                {body}
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      <section className="home2-section home2-section--assets" aria-label="Informații și asset-uri necesare">
-        <article className="home2-assets-card">
-          <h2 className="home2-assets-title">Informații și Asset-uri Necesare</h2>
-          <ul className="home2-assets-list">
-            {assetItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </article>
-      </section>
-
-      <section className="home2-section" id="oferta-educationala" aria-label="Oferta educațională">
-        <div className="home2-section-head">
+      <section className="home2-section home2-section--offer" aria-label="Oferta educațională">
+        <div className="home2-block-head" id="oferta-educationala">
+          <span className="home2-section-eyebrow">Formare profesională</span>
           <h2>Oferta Educațională 2024-2025</h2>
-          <p className="muted">Profile și specializări orientate spre piața muncii.</p>
+          <p className="muted">Profile și specializări orientate spre piața muncii — practică, ateliere și competențe pentru carieră.</p>
         </div>
 
         <div className="home2-offer-grid">
           {offers.map((item) => (
-            <article key={item.title} className={`home2-offer-card${item.highlight ? ' is-highlight' : ''}`}>
-              <div className="home2-offer-icon" aria-hidden="true">
-                <OfferIcon type={item.icon} />
-              </div>
+            <article
+              key={item.title}
+              className={`home2-offer-card home2-offer-card--${item.tone}${item.featured ? ' is-featured' : ''}`}
+            >
+              <span className="home2-offer-tag">{item.tag}</span>
               <h3>{item.title}</h3>
-              <p className="muted">{item.desc}</p>
+              <p className="home2-offer-desc">{item.desc}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="home2-section home2-section--projects" aria-label="Proiecte inovatoare">
-        <div className="home2-section-head">
-          <h2>Proiecte inovatoare</h2>
-          <p className="muted">Punctul forte: spații moderne pentru învățare și practică.</p>
-        </div>
+      <div className="home2-impact-cluster">
+        <section className="home2-section home2-section--projects" aria-label="Proiecte inovatoare">
+          <div className="home2-block-head">
+            <span className="home2-section-eyebrow">Spații moderne</span>
+            <h2>Proiecte inovatoare</h2>
+            <p className="muted">Laboratoare, ateliere și hub-uri unde teoria devine practică aplicată.</p>
+          </div>
 
-        <div className="home2-projects">
-          {projects.map((p) => (
-            <article key={p.title} className="home2-project-card">
-              <div className="home2-project-media">
-                <img src={p.image} alt={p.imageAlt} className="home2-project-photo" loading="lazy" />
-              </div>
-              <div className="home2-project-body">
-                <span className="home2-badge">{p.badge}</span>
-                <h3>{p.title}</h3>
-                <p className="muted">{p.desc}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="home2-section home2-section--community" aria-label="Comunitate și dinamism">
-        <div className="home2-section-head">
-          <h2>Comunitate &amp; dinamism</h2>
-          <p className="muted">Activități extrașcolare și proiecte care dau energie școlii.</p>
-        </div>
-
-        <div className="home2-community-grid">
-          {community.map((c) => (
-            <article key={c.title} className={`home2-community-card${c.highlight ? ' is-highlight' : ''}`}>
-              {c.image ? (
-                <div className="home2-community-media">
-                  <img src={c.image} alt={c.imageAlt} loading="lazy" />
+          <div className="home2-projects">
+            {projects.map((p) => (
+              <article key={p.title} className={`home2-project-card home2-project-card--${p.tone}`}>
+                <div className="home2-project-media">
+                  <img src={p.image} alt={p.imageAlt} className="home2-project-photo" loading="lazy" />
+                  <div className="home2-project-media-scrim" aria-hidden="true" />
                 </div>
-              ) : null}
-              <div className="home2-community-body">
-                {c.logo === 'erasmus' ? (
-                  <div className="home2-community-logo">
-                    <ErasmusLogo />
-                  </div>
-                ) : null}
-                {c.logo === 'cse' ? (
-                  <div className="home2-community-logo home2-community-logo--cse">
-                    <CseLogo />
-                  </div>
-                ) : null}
-                <h3>{c.title}</h3>
-                <p className="muted">{c.desc}</p>
-              </div>
-            </article>
-          ))}
+                <div className="home2-project-body">
+                  <span className="home2-project-tag">{p.badge}</span>
+                  <h3>{p.title}</h3>
+                  <p className="home2-project-desc">{p.desc}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <div className="home2-about-divider" aria-hidden="true">
+          <span />
         </div>
-      </section>
+
+        <section className="home2-section home2-section--community" aria-label="Comunitate și dinamism">
+          <div className="home2-block-head">
+            <span className="home2-section-eyebrow">Viața școlii</span>
+            <h2>Comunitate &amp; dinamism</h2>
+            <p className="muted">Proiecte, parteneriate și inițiative care dau energie și identitate liceului.</p>
+          </div>
+
+          <div className="home2-community-grid">
+            {community.map((c) => (
+              <article
+                key={c.title}
+                className={`home2-community-card home2-community-card--${c.tone}${c.featured ? ' is-featured' : ''}`}
+              >
+                <div className="home2-community-hero">
+                  <img src={c.image} alt={c.imageAlt} loading="lazy" />
+                  <div className="home2-community-hero-scrim" aria-hidden="true" />
+                  {c.logoSrc ? (
+                    <div className="home2-community-hero-logo home2-community-hero-logo--img">
+                      <img src={c.logoSrc} alt={c.logoAlt} loading="lazy" />
+                    </div>
+                  ) : null}
+                  {c.logo === 'erasmus' ? (
+                    <div className="home2-community-hero-logo home2-community-hero-logo--erasmus">
+                      <ErasmusLogo />
+                    </div>
+                  ) : null}
+                </div>
+                <div className="home2-community-body">
+                  <h3>{c.title}</h3>
+                  <p className="home2-community-desc">{c.desc}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
     </section>
   );
 }

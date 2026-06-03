@@ -27,6 +27,7 @@ import {
 import { initSessionIdleWatch } from './utils/sessionIdle';
 import SchoolFooter from './components/SchoolFooter.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
+import AuthRoute from './components/AuthRoute.jsx';
 import PageSideOrnaments from './components/PageSideOrnaments.jsx';
 import ScrollGearCluster from './components/ScrollGearCluster.jsx';
 import SiteHeader from './components/SiteHeader.jsx';
@@ -166,7 +167,14 @@ function App() {
               <Route path="/documente/:id/edit" element={<DocumentFormPage mode="edit" />} />
               <Route path="/despre-noi" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
-              <Route path="/calendar" element={<CalendarPage />} />
+              <Route
+                path="/calendar"
+                element={
+                  <AuthRoute>
+                    <CalendarPage />
+                  </AuthRoute>
+                }
+              />
               <Route
                 path="/activitate"
                 element={

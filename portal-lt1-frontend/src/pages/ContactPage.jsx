@@ -4,6 +4,7 @@ import { hasErrors } from '../utils/documentValidation';
 import { validateContact } from '../utils/formValidation';
 import { recordActivityEvent, savePreference } from '../utils/activityCookies';
 import { apiRequest } from '../utils/apiClient';
+import { hasAuthSession } from '../utils/authSession';
 
 const contactChannels = [
   {
@@ -34,13 +35,14 @@ const contactChannels = [
   },
 ];
 
-const quickLinks = [
+const quickLinksBase = [
   { to: '/documente', label: 'Documente scolare' },
-  { to: '/calendar', label: 'Calendar evenimente' },
-  { to: '/despre-noi', label: 'Despre liceu' },
+  { to: '/calendar', label: 'Calendar evenimente', authOnly: true },
+  { to: '/despre-noi', label: 'Despre liceu' }
 ];
 
 function ContactPage() {
+  const quickLinks = quickLinksBase.filter((link) => !link.authOnly || hasAuthSession());
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState('');

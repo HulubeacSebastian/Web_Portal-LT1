@@ -46,67 +46,93 @@ export function IconStaff() {
   );
 }
 
+const offerSvg = 'home2-icon-svg home2-icon-svg--offer';
+const strokeBold = { ...stroke, strokeWidth: 2 };
+
 export function IconTourism() {
   return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="home2-icon-svg">
-      <circle cx="24" cy="24" r="14" {...stroke} />
-      <polygon points="24,14 28,26 20,22 28,22 20,26" fill="currentColor" opacity="0.35" />
-      <path d="M24 10v4M24 34v4M10 24h4M34 24h4" {...stroke} />
-      <circle cx="24" cy="24" r="3" {...stroke} />
+    <svg viewBox="0 0 48 48" aria-hidden="true" className={offerSvg}>
+      <circle cx="24" cy="25" r="12" {...stroke} />
+      <path d="M24 13v2.5M24 34.5v2.5M12 25h2.5M33.5 25h2.5" {...stroke} />
+      <path d="M16 18l1.8 1.8M32 32l1.8 1.8M32 18l-1.8 1.8M16 32l-1.8 1.8" {...stroke} />
+      <path d="M24 25V17" {...strokeBold} />
+      <path d="M24 25l4.5 3.5" {...stroke} />
+      <path d="M24 17l-1.2 3.2h2.4L24 17z" fill="currentColor" opacity="0.5" />
+      <path d="M29 11c1.8.8 2.8 2.2 3 4" {...stroke} />
+      <circle cx="31" cy="10" r="1.4" fill="currentColor" />
     </svg>
   );
 }
 
 export function IconMechanic() {
   return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="home2-icon-svg">
-      <circle cx="24" cy="24" r="10" {...stroke} />
-      <circle cx="24" cy="24" r="4" {...stroke} />
-      {[0, 45, 90, 135].map((deg) => (
-        <line
-          key={deg}
-          x1="24"
-          y1="24"
-          x2="24"
-          y2="12"
-          transform={`rotate(${deg} 24 24)`}
-          {...stroke}
-        />
-      ))}
-      <path d="M32 32l8 6M36 28l4-2" {...stroke} />
-      <rect x="34" y="34" width="8" height="6" rx="1" {...stroke} />
+    <svg viewBox="0 0 48 48" aria-hidden="true" className={offerSvg}>
+      <path
+        d="M24 12.5l2.1 4.3 4.8.7-3.5 3.4.8 4.7-4.3-2.3-4.3 2.3.8-4.7-3.5-3.4 4.8-.7 2.1-4.3z"
+        fill="currentColor"
+        opacity="0.2"
+      />
+      <path
+        d="M24 14.5l1.7 3.5 3.9.6-2.8 2.7.7 3.8-3.5-1.8-3.5 1.8.7-3.8-2.8-2.7 3.9-.6 1.7-3.5z"
+        {...stroke}
+      />
+      <circle cx="24" cy="23.5" r="4.5" {...stroke} />
+      <path d="M30 29.5l9.5 7.5" {...strokeBold} />
+      <path d="M37.5 35l3.5-2-2-3.5-3.5 2 2 3.5z" fill="currentColor" opacity="0.38" {...stroke} />
+      <rect x="8" y="27" width="8" height="7" rx="1.2" {...stroke} />
+      <path d="M10 30.5h4" {...stroke} />
     </svg>
   );
 }
 
 export function IconHospitality() {
   return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="home2-icon-svg">
-      <path d="M14 20c0-6 4-10 10-10s10 4 10 10v4H14v-4z" {...stroke} />
-      <ellipse cx="24" cy="20" rx="10" ry="4" {...stroke} />
-      <path d="M12 24h24v4c0 8-6 12-12 12s-12-4-12-12v-4z" {...stroke} />
-      <path d="M18 14l2-4h8l2 4" {...stroke} />
+    <svg viewBox="0 0 48 48" aria-hidden="true" className={offerSvg}>
+      <path d="M15 21c0-6.5 4-10.5 9-10.5s9 4 9 10.5c0 1.8-.4 3.2-1.2 4.2" {...stroke} />
+      <path d="M13.5 25.5c1.4 5.5 5.5 8.5 10.5 8.5s9.1-3 10.5-8.5" {...stroke} />
+      <path d="M14 26h20" {...stroke} />
+      <path d="M17 17.5c1.8-1.8 4.5-2.5 7-2.5s5.2.7 7 2.5" {...stroke} />
+      <path d="M19 14.5c1.2-1 3-1.5 5-1.5s3.8.5 5 1.5" {...stroke} />
+      <path d="M21 12c.8-.7 2-1 3-1s2.2.3 3 1" {...stroke} />
+      <path d="M20 31h8v2.5c0 1.8-1.8 2.5-4 2.5s-4-.7-4-2.5V31z" fill="currentColor" opacity="0.2" />
+      <path d="M20 31h8v2.5c0 1.8-1.8 2.5-4 2.5s-4-.7-4-2.5V31z" {...stroke} />
+      <path d="M30 33h4v3h-4zM14 33h4v3h-4z" {...stroke} />
     </svg>
   );
 }
 
 export function IconDual() {
   return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="home2-icon-svg">
-      <path d="M10 28c6-10 14-14 14-14s8 4 14 14" {...stroke} />
-      <path d="M16 24h16M20 20l4 8 4-8" {...stroke} />
-      <rect x="14" y="30" width="20" height="10" rx="3" {...stroke} />
-      <path d="M18 34h12" {...stroke} />
+    <svg viewBox="0 0 48 48" aria-hidden="true" className={offerSvg}>
+      <rect x="7" y="17" width="13" height="17" rx="2" fill="currentColor" opacity="0.12" />
+      <rect x="7" y="17" width="13" height="17" rx="2" {...stroke} />
+      <path d="M7 23h13M10 17v-4h7v4" {...stroke} />
+      <rect x="28" y="20" width="13" height="17" rx="2" fill="currentColor" opacity="0.12" />
+      <rect x="28" y="20" width="13" height="17" rx="2" {...stroke} />
+      <path d="M31 25h7M31 29h7M31 33h5" {...stroke} />
+      <path d="M20 27h8" {...strokeBold} />
+      <path d="M17.5 27.5c2-3 4.5-4.5 6.5-4.5S27 24.5 28.5 27.5" {...stroke} />
+      <path d="M30.5 27.5c-2-3-4.5-4.5-6.5-4.5S21 24.5 19.5 27.5" {...stroke} />
+      <circle cx="24" cy="28" r="2.5" {...stroke} />
     </svg>
   );
 }
 
 export function IconConstruction() {
   return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="home2-icon-svg">
-      <path d="M8 36h32M12 36V20l12-8 12 8v16" {...stroke} />
-      <path d="M20 28h8v8h-8zM28 20h6v16h-6z" {...stroke} />
-      <path d="M22 12l2-6 2 6" {...stroke} />
+    <svg viewBox="0 0 48 48" aria-hidden="true" className={offerSvg}>
+      <path d="M7 38h34" {...strokeBold} />
+      <path d="M13 38V23l11-8 11 8v15" fill="currentColor" opacity="0.12" />
+      <path d="M13 38V23l11-8 11 8v15" {...stroke} />
+      <path d="M19 38V29h10v9" {...stroke} />
+      <path d="M29 38V25h7v13" {...stroke} />
+      <path d="M21.5 15l2.5-8 2.5 8" {...stroke} />
+      <path d="M9 31l4.5-3.5L18 31" {...stroke} />
+      <path d="M31 13l7 4.5v5L31 27l-7-4.5v-5L31 13z" fill="currentColor" opacity="0.18" />
+      <path d="M31 13l7 4.5v5L31 27l-7-4.5v-5L31 13z" {...stroke} />
+      <path d="M31 17.5v5.5M28 20.5h6" {...stroke} />
+      <path d="M33.5 34.5l6.5 5" {...strokeBold} />
+      <path d="M38 37.5l2.5-2.5-2.5-2.5-2.5 2.5 2.5 2.5z" fill="currentColor" opacity="0.4" {...stroke} />
     </svg>
   );
 }
@@ -206,15 +232,22 @@ export function BreakdownIcon({ type }) {
 
 export function ErasmusLogo() {
   return (
-    <svg viewBox="0 0 80 32" aria-hidden="true" className="home2-partner-logo">
-      <circle cx="16" cy="16" r="12" fill="#003399" />
+    <svg
+      viewBox="0 0 108 36"
+      width="108"
+      height="36"
+      aria-hidden="true"
+      className="home2-partner-logo"
+      overflow="visible"
+    >
+      <circle cx="18" cy="18" r="13" fill="#003399" />
       {[...Array(12)].map((_, i) => {
         const a = ((i * 30 - 90) * Math.PI) / 180;
-        const x = 16 + 7 * Math.cos(a);
-        const y = 16 + 7 * Math.sin(a);
-        return <circle key={i} cx={x} cy={y} r="1.2" fill="#FFCC00" />;
+        const x = 18 + 7.5 * Math.cos(a);
+        const y = 18 + 7.5 * Math.sin(a);
+        return <circle key={i} cx={x} cy={y} r="1.25" fill="#FFCC00" />;
       })}
-      <text x="34" y="20" fill="currentColor" fontSize="11" fontWeight="800" fontFamily="system-ui,sans-serif">
+      <text x="38" y="22" fill="currentColor" fontSize="12" fontWeight="800" fontFamily="system-ui,sans-serif">
         ERASMUS+
       </text>
     </svg>

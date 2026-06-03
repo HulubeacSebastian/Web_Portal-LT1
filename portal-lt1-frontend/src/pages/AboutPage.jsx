@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { hasAuthSession } from '../utils/authSession';
 
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
 
@@ -522,7 +523,11 @@ function AboutPage() {
             <AboutSectionHead
               eyebrow="Contact"
               title="Hai sa discutam"
-              lead="Consulta documentele, calendarul sau trimite-ne un mesaj — suntem aici pentru tine."
+              lead={
+                hasAuthSession()
+                  ? 'Consulta documentele, calendarul sau trimite-ne un mesaj — suntem aici pentru tine.'
+                  : 'Consulta documentele sau trimite-ne un mesaj — suntem aici pentru tine.'
+              }
             />
           </div>
           <div className="about-cta-actions">
@@ -530,10 +535,12 @@ function AboutPage() {
               <span>Documente scolare</span>
               <small>Admitere, regulamente, formulare</small>
             </Link>
-            <Link to="/calendar" className="about-cta-btn">
-              <span>Calendar evenimente</span>
-              <small>Activitati si date importante</small>
-            </Link>
+            {hasAuthSession() ? (
+              <Link to="/calendar" className="about-cta-btn">
+                <span>Calendar evenimente</span>
+                <small>Activitati si date importante</small>
+              </Link>
+            ) : null}
             <Link to="/contact" className="about-cta-btn is-accent">
               <span>Contacteaza-ne</span>
               <small>Raspundem in cel mai scurt timp</small>

@@ -54,3 +54,15 @@ export function clearQueue() {
   replaceQueue([]);
 }
 
+/** Scoate din coada operatiile deja aplicate pe server pentru un document. */
+export function dequeueDocumentOps(docId, types = ['update', 'delete']) {
+  const allowed = new Set(types);
+  replaceQueue(
+    loadQueue().filter((op) => {
+      if (!allowed.has(op.type)) return true;
+      if (op.type === 'update' || op.type === 'delete') return op.id !== docId;
+      return true;
+    })
+  );
+}
+

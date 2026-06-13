@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDocuments } from '../store/DocumentsContext';
-import { getCookie } from '../utils/cookies';
+import { hasPermission } from '../utils/authSession';
+import { resolveDocumentFileUrl } from '../utils/documentFileUrl';
 
 function DocumentDetailPage() {
   const { id } = useParams();
@@ -8,9 +9,8 @@ function DocumentDetailPage() {
   const { getDocumentById, deleteDocument } = useDocuments();
 
   const document = getDocumentById(id);
-  // UI actions are available locally even when offline/unauthenticated.
-  // Server-side auth is enforced during sync via JWT.
-  const _isLoggedIn = Boolean(getCookie('portal_user'));
+  const canUpdate = hasPermission('documents:update');
+  const canDelete = hasPermission('documents:delete');
 
   if (!document) {
     return (
@@ -34,9 +34,11 @@ function DocumentDetailPage() {
     navigate('/documente');
   };
 
-  const fileHref = document.file?.dataUrl || document.fileUrl || '';
-  const fileName = document.file?.name || 'document';
-  const isPdf = (document.file?.type || '').toLowerCase() === 'application/pdf' || fileHref.toLowerCase().includes('.pdf');
+  const fileHref = resolveDocumentFileUrl(document);
+  const fileName = document.file?.name || document.file_path?.split('/').pop() || 'document';
+  const isPdf =
+    (document.file?.type || '').toLowerCase() === 'application/pdf' ||
+    fileHref.toLowerCase().includes('.pdf');
 
   return (
     <section className="page-stack documents-page">
@@ -45,14 +47,20 @@ function DocumentDetailPage() {
           <p className="eyebrow">Document</p>
           <h2>{document.title}</h2>
         </div>
-        <div className="actions">
-          <Link to={`/documente/${document.id}/edit`} className="btn secondary">
-            Editeaza
-          </Link>
-          <button type="button" className="danger" onClick={handleDelete}>
-            Sterge
-          </button>
-        </div>
+        {canUpdate || canDelete ? (
+          <div className="actions">
+            {canUpdate ? (
+              <Link to={`/documente/${document.id}/edit`} className="btn secondary">
+                Editeaza
+              </Link>
+            ) : null}
+            {canDelete ? (
+              <button type="button" className="danger" onClick={handleDelete}>
+                Sterge
+              </button>
+            ) : null}
+          </div>
+        ) : null}
       </article>
 
       <article className="card detail-grid">

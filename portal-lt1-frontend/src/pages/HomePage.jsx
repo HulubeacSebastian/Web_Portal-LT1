@@ -147,8 +147,8 @@ const community = [
     title: 'Proiectul ECLESSIA',
     desc: 'Tradiție, solidaritate și voluntariat — implicare activă în viața spirituală și socială a comunității.',
     tone: 'eclessia',
-    image: photoUrl('WhatsApp Image 2026-05-26 at 21.09.48.jpeg'),
-    imageAlt: 'Activități de voluntariat ECLESSIA'
+    image: photoUrl('eclessia-comunitate.png'),
+    imageAlt: 'Comunitate ECLESSIA — activități tradiționale la Liceul Tehnologic Nr. 1'
   },
   {
     title: 'Consiliul Școlar al Elevilor (CȘE)',

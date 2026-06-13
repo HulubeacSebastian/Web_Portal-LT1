@@ -69,7 +69,7 @@ function ContactPage() {
 
     try {
       savePreference('lastContactEmail', formData.email.trim());
-      await apiRequest('/api/contact', {
+      const result = await apiRequest('/api/contact', {
         method: 'POST',
         auth: false,
         body: {
@@ -79,15 +79,25 @@ function ContactPage() {
         }
       });
       recordActivityEvent('contact_success');
-      setStatusMessage('Mesajul a fost trimis cu succes.');
-      setFormData({ name: '', email: '', message: '' });
+      if (result?.email_sent === false) {
+        setStatusMessage(
+          'Mesajul a fost salvat, dar emailul catre secretariat nu a putut fi trimis. Contactati-ne direct la liceultehnologic1cm@yahoo.ro sau la +40 230 311 382.'
+        );
+      } else {
+        setStatusMessage('Mesajul a fost trimis cu succes.');
+        setFormData({ name: '', email: '', message: '' });
+      }
     } catch (error) {
       recordActivityEvent('contact_failed_network');
       setStatusMessage(error?.message || 'Nu se poate trimite mesajul momentan.');
     }
   };
 
-  const statusClassName = statusMessage.includes('succes') ? ' is-success' : ' is-error';
+  const statusClassName = statusMessage.includes('succes')
+    ? ' is-success'
+    : statusMessage.includes('salvat')
+      ? ' is-warning'
+      : ' is-error';
 
   return (
     <section className="page-shell contact-page">

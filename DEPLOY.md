@@ -23,13 +23,13 @@ Rulează din **PowerShell pe Windows** (nu din interiorul unui SSH deja deschis)
 ### Backend (API)
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26.key" ubuntu@92.5.127.137
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26.key" ubuntu@92.5.127.137
 ```
 
 ### Frontend (site)
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152
 ```
 
 ---
@@ -41,7 +41,7 @@ Codul API rulează pe VM-ul backend. Repo-ul trebuie clonat pe server (ex. `~/We
 ### 1. Conectare + update cod
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26.key" ubuntu@92.5.127.137
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26.key" ubuntu@92.5.127.137
 ```
 
 Pe server:
@@ -49,6 +49,7 @@ Pe server:
 ```bash
 cd ~/Web_Portal-LT1
 git pull
+# Nu rula `git restore` pe dev.db — sterge documentele si conturile adaugate pe server.
 
 cd portal-lt1-backend
 npm install
@@ -63,6 +64,8 @@ curl http://127.0.0.1:3000/health
 
 În browser: **https://api-lt1.duckdns.org/health**
 
+**Chat (WebSocket):** pe VM backend, Nginx trebuie headere `Upgrade`/`Connection` (vezi [deploy/nginx-api-with-websocket.conf](./deploy/nginx-api-with-websocket.conf)) și **MongoDB pornit**: `sudo systemctl enable --now mongod`.
+
 ### Variabile `.env` pe server (backend)
 
 Fișier: `~/Web_Portal-LT1/portal-lt1-backend/.env`
@@ -70,6 +73,8 @@ Fișier: `~/Web_Portal-LT1/portal-lt1-backend/.env`
 Minim + **reset parolă prin email** (linkul din mail merge la site-ul public, nu la localhost):
 
 ```env
+NODE_ENV=production
+PORTAL_PRODUCTION=true
 DATABASE_URL="file:./prisma/dev.db"
 PORT=3000
 ALLOWED_ORIGINS=https://portal-lt1.duckdns.org
@@ -84,6 +89,7 @@ SMTP_SECURE=false
 SMTP_USER=portal.lt1.suport@gmail.com
 SMTP_PASS=PAROLA_APP_GMAIL
 MAIL_FROM="Portal LT1 <portal.lt1.suport@gmail.com>"
+MAIL_CONTACT_TO=portal.lt1.suport@gmail.com
 AUTH_EXPOSE_DEV_CODES=false
 ```
 
@@ -118,9 +124,9 @@ Select-String -Path dist\assets\*.js -Pattern "92.5.127"
 ### 2. Upload pe server
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152 "rm -rf /tmp/portal-dist && mkdir -p /tmp/portal-dist"
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152 "rm -rf /tmp/portal-dist && mkdir -p /tmp/portal-dist"
 
-scp -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" -r dist/* ubuntu@130.61.121.152:/tmp/portal-dist/
+scp -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" -r dist/* ubuntu@130.61.121.152:/tmp/portal-dist/
 ```
 
 Folosește `dist/*` (nu `dist` singur) ca să nu creezi `/tmp/portal-dist/dist/` dublu.
@@ -128,7 +134,7 @@ Folosește `dist/*` (nu `dist` singur) ca să nu creezi `/tmp/portal-dist/dist/`
 ### 3. Publicare pe site (SSH frontend)
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152
 ```
 
 Pe server:
@@ -149,8 +155,11 @@ sudo chmod -R 755 /var/www/portal
 `portal-lt1-frontend/.env.production` (în Git):
 
 ```env
-VITE_API_BASE_URL=https://api-lt1.duckdns.org
+VITE_API_BASE_URL=
+VITE_WS_BASE_URL=https://api-lt1.duckdns.org
 ```
+
+Pe VM-ul **frontend**, Nginx trebuie să proxy-eze `/api` către backend (evită erori CORS la Activitate/Contact). Exemplu complet: [deploy/nginx-portal-with-api.conf](./deploy/nginx-portal-with-api.conf). După editare: `sudo nginx -t && sudo systemctl reload nginx`.
 
 ---
 
@@ -166,15 +175,15 @@ npm run build
 ### Pas 2 — Upload frontend (PC)
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152 "rm -rf /tmp/portal-dist && mkdir -p /tmp/portal-dist"
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152 "rm -rf /tmp/portal-dist && mkdir -p /tmp/portal-dist"
 
-scp -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" -r dist/* ubuntu@130.61.121.152:/tmp/portal-dist/
+scp -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" -r dist/* ubuntu@130.61.121.152:/tmp/portal-dist/
 ```
 
 ### Pas 3 — Update backend (SSH)
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26.key" ubuntu@92.5.127.137
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26.key" ubuntu@92.5.127.137
 ```
 
 ```bash
@@ -190,7 +199,7 @@ exit
 ### Pas 4 — Publish frontend (SSH)
 
 ```powershell
-ssh -i "C:\Users\Sebi\Downloads\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152
+ssh -i "C:\Users\Sebi\Desktop\ssh-key-2026-05-26_1.key" ubuntu@130.61.121.152
 ```
 
 ```bash
@@ -240,6 +249,9 @@ Dacă `grep` dă *Permission denied*, folosește `sudo` sau rulează `sudo chmod
 | Login: `http://92.5.127.137:3000` | Build vechi sau `dist` copiat greșit | Rebuild + `scp dist/*` + `cp` din `/tmp/portal-dist/` |
 | `assets/` gol sau 403 | Permisiuni greșite | `chown www-data` + `chmod -R 755` |
 | CORS la login | `ALLOWED_ORIGINS` greșit pe backend | `https://portal-lt1.duckdns.org` + `pm2 restart` |
+| Contact: „succes” dar fără email | Lipsește `MAIL_CONTACT_TO` în `.env` pe backend | Adaugă `MAIL_CONTACT_TO=portal.lt1.suport@gmail.com` + `pm2 restart backend` |
+| Chat: „Nu s-a putut conecta la wss://api-lt1…” | Nginx fără WebSocket upgrade sau MongoDB oprit | [nginx-api-with-websocket.conf](./deploy/nginx-api-with-websocket.conf) + `sudo systemctl start mongod` |
+| „Nu se poate contacta serverul” pe Activitate | `dev-network*.env` pe server sau backend oprit | `NODE_ENV=production` în `.env`, redenumește `dev-network*.env` → `.bak`, `pm2 restart backend` |
 | `nginx -t` failed: `portal` | Config frontend pe VM backend | Șterge symlink greșit; folosește `sites-available/api` |
 
 ---

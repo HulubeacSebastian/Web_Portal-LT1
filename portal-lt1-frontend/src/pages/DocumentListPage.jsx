@@ -18,7 +18,8 @@ function isMobileViewport() {
 }
 
 function DocumentListPage() {
-  const { documents, deleteDocument, generator, isOffline, startGenerator, stopGenerator } = useDocuments();
+  const { documents, documentsReady, deleteDocument, generator, isOffline, startGenerator, stopGenerator } =
+    useDocuments();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Toate');
   const [page, setPage] = useState(1);
@@ -145,6 +146,16 @@ function DocumentListPage() {
       setGeneratorBusy(false);
     }
   };
+
+  if (!documentsReady) {
+    return (
+      <section className="page-shell documents-page">
+        <article className="card">
+          <p className="muted">Se incarca documentele de pe server...</p>
+        </article>
+      </section>
+    );
+  }
 
   return (
     <section className="page-shell documents-page">

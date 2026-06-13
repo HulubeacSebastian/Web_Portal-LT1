@@ -52,7 +52,7 @@ function ActivityInsightsPage() {
     setDetailsLoading(true);
     setDetailsError('');
     try {
-      const data = await apiRequest(`/api/users/${userId}`);
+      const data = await apiRequest(`/api/users/${encodeURIComponent(userId)}`);
       setDetails(data || null);
       setDraftRole(data?.role || '');
     } catch (err) {
@@ -69,7 +69,7 @@ function ActivityInsightsPage() {
     setSavingRole(true);
     setDetailsError('');
     try {
-      const updated = await apiRequest(`/api/users/${selectedUserId}/role`, {
+      const updated = await apiRequest(`/api/users/${encodeURIComponent(selectedUserId)}/role`, {
         method: 'PATCH',
         body: { role: draftRole }
       });

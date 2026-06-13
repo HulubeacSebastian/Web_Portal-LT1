@@ -5,7 +5,7 @@ import AuthStatusMessage from '../components/AuthStatusMessage.jsx';
 import AuthSubmitButton from '../components/AuthSubmitButton.jsx';
 import PasswordField from '../components/PasswordField.jsx';
 import { apiRequest } from '../utils/apiClient';
-import { validateRegister } from '../utils/formValidation';
+import { validateResetPassword } from '../utils/formValidation';
 import { hasErrors } from '../utils/documentValidation';
 
 const highlightsFromLink = [
@@ -48,23 +48,15 @@ function ResetPasswordPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const nextErrors = validateRegister({
-      name: 'Reset',
-      email: 'reset@lt1.ro',
-      password: formData.password,
-      confirmPassword: formData.confirmPassword
-    });
-    const filtered = {
-      password: nextErrors.password,
-      confirmPassword: nextErrors.confirmPassword
-    };
-    if (!formData.resetToken.trim() || !formData.token.trim()) {
-      filtered.resetToken = hasResetLink
-        ? 'Linkul de resetare este invalid sau a expirat.'
-        : 'Tokenul de resetare este obligatoriu.';
+    setMessage('');
+    setMessageStatus(null);
+
+    const nextErrors = validateResetPassword(formData);
+    if (hasResetLink && nextErrors.resetToken) {
+      nextErrors.resetToken = 'Linkul de resetare este invalid sau a expirat.';
     }
-    setErrors(filtered);
-    if (hasErrors(filtered)) return;
+    setErrors(nextErrors);
+    if (hasErrors(nextErrors)) return;
 
     setLoading(true);
     try {

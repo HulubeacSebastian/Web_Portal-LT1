@@ -4,6 +4,13 @@ import { AUTH_TOKEN_KEY, getWsOrigin } from '../utils/apiClient';
 import { loadAuthSession } from '../utils/authSession';
 import { getCookie } from '../utils/cookies';
 
+function chatRoleClass(role) {
+  const value = String(role || '').toLowerCase();
+  if (value === 'admin' || value === 'administrator') return 'admin';
+  if (value === 'profesor' || value === 'teacher') return 'profesor';
+  return 'elev';
+}
+
 function ChatPage() {
   const [authVersion, setAuthVersion] = useState(0);
   const session = useMemo(() => loadAuthSession(), [authVersion]);
@@ -90,7 +97,11 @@ function ChatPage() {
 
     ws.onerror = () => {
       if (cancelled || ws.readyState === WebSocket.OPEN) return;
-      setError(`Nu s-a putut conecta la ${wsUrl}. Verifica backend-ul (port 3000) si firewall-ul Windows.`);
+      setError(
+        import.meta.env.PROD
+          ? `Nu s-a putut conecta la chat (${wsUrl}). Reincarca pagina (Ctrl+Shift+R) sau incearca alt browser/retea.`
+          : `Nu s-a putut conecta la ${wsUrl}. Verifica backend-ul (port 3000) si firewall-ul Windows.`
+      );
       setStatus('Eroare');
     };
 
@@ -218,7 +229,7 @@ function ChatPage() {
           {messages.map((item) => (
             <li
               key={item.id}
-              className={`chat-message chat-message--${item.role}${
+              className={`chat-message chat-message--${chatRoleClass(item.role)}${
                 item.userId && session?.id && item.userId === session.id ? ' chat-message--me' : ''
               }`}
             >

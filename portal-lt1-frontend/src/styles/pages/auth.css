@@ -22,12 +22,6 @@
   margin: 0 auto;
   padding: 0.15rem 0 1.25rem;
   flex: 1;
-  transition: margin-top 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Când sulul e deschis, împinge conținutul în jos ca să nu acopere titlurile */
-html.tassel-scroll-open .layout > .content {
-  margin-top: var(--tassel-content-offset, 0);
 }
 
 .auth-page {
@@ -655,14 +649,18 @@ html.tassel-scroll-open .layout > .content {
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.auth-password-toggle:hover {
+.auth-password-toggle:hover,
+.auth-password-toggle:active {
   color: var(--auth-accent);
   background: rgba(74, 44, 164, 0.08);
+  transform: translateY(-50%);
+  filter: none;
 }
 
 .auth-password-toggle:focus-visible {
   outline: 2px solid var(--auth-accent);
   outline-offset: 2px;
+  transform: translateY(-50%);
 }
 
 .auth-status {
@@ -834,6 +832,21 @@ html.tassel-scroll-open .layout > .content {
   pointer-events: none;
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.content--wip {
+  position: relative;
+}
+
+.content--wip .wip-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+}
+
+.wip-screen--blocking {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .wip-screen-label {

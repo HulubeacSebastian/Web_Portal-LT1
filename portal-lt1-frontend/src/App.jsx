@@ -33,27 +33,19 @@ import ScrollGearCluster from './components/ScrollGearCluster.jsx';
 import SiteHeader from './components/SiteHeader.jsx';
 import { DocumentsProvider } from './store/DocumentsContext';
 import { deleteCookie, getCookie, setCookie } from './utils/cookies';
-import {
-  getActivitySnapshot,
-  getPreferences,
-  recordActivityEvent,
-  savePreference,
-  trackPageVisit
-} from './utils/activityCookies';
+import { recordActivityEvent, savePreference, trackPageVisit } from './utils/activityCookies';
 
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [cookieConsent, setCookieConsent] = useState(Boolean(getCookie('portal_cookie_consent')));
-  const [activity, setActivity] = useState(() => getActivitySnapshot());
   const [authSession, setAuthSession] = useState(() => loadAuthSession());
   const visitorLabel = getCookie('portal_user') || 'Vizitator';
 
   useEffect(() => {
     if (cookieConsent) {
       setCookie('portal_last_path', location.pathname, { maxAge: 60 * 60 * 24 * 30 });
-      const snapshot = trackPageVisit(location.pathname);
-      setActivity(snapshot);
+      trackPageVisit(location.pathname);
       savePreference('lastVisitedPath', location.pathname);
       recordActivityEvent('route_change', { path: location.pathname });
     }
@@ -107,6 +99,12 @@ function App() {
 
   const isLoggedIn = hasAuthSession();
   const userIsAdmin = isLoggedIn && isAdmin();
+  const showCalendarWip =
+    cookieConsent &&
+    isLoggedIn &&
+    !userIsAdmin &&
+    import.meta.env.PROD &&
+    location.pathname === '/calendar';
   const displayName = useMemo(
     () => (isLoggedIn ? getDisplayName(authSession) : visitorLabel),
     [authSession, isLoggedIn, visitorLabel]
@@ -117,8 +115,6 @@ function App() {
     setCookieConsent(true);
     recordActivityEvent('cookie_consent_accepted');
   };
-
-  const preferenceCount = Object.keys(getPreferences()).length;
 
   return (
     <DocumentsProvider>
@@ -142,21 +138,12 @@ function App() {
           </div>
         ) : null}
 
-        {cookieConsent && userIsAdmin && import.meta.env.DEV && location.pathname === '/calendar' ? (
-          <>
-            <div className="wip-screen" aria-hidden="true">
+        <main className={`content${showCalendarWip ? ' content--wip' : ''}`}>
+          {showCalendarWip ? (
+            <div className="wip-screen wip-screen--blocking" role="status" aria-live="polite">
               <div className="wip-screen-label">IN LUCRU</div>
             </div>
-            <div className="cookie-banner cookie-banner--wip" aria-label="In lucru">
-              <span>
-                Monitorizare activa: {activity.totalVisits} navigari, ultima pagina {activity.lastPath}, preferinte salvate{' '}
-                {preferenceCount}.
-              </span>
-            </div>
-          </>
-        ) : null}
-
-        <main className="content">
+          ) : null}
           <div className="page-transition" key={location.pathname}>
             <Routes location={location}>
               <Route path="/" element={<HomePage />} />

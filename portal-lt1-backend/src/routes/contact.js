@@ -24,6 +24,10 @@ router.post('/', async function (req, res, next) {
         sentAt: created.sent_at
       });
       emailSent = true;
+    } else {
+      console.warn(
+        '[contact] Mesaj salvat dar email neexpediat: configureaza MAIL_CONTACT_TO (si SMTP_*) in .env'
+      );
     }
 
     return res.status(201).json({ ...created, email_sent: emailSent });

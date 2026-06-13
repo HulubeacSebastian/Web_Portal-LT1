@@ -1,4 +1,5 @@
 var express = require('express');
+var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
@@ -44,9 +45,11 @@ app.use(function (req, res, next) {
   return next();
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: false, limit: '20mb' }));
 app.use(cookieParser());
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', function (req, res) {
   res.json({
@@ -80,6 +83,9 @@ app.use(function (req, res) {
 
 app.use(function (err, req, res, next) {
   console.error(err);
+  if (err && err.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'Cererea este prea mare (fisier sau date prea voluminoase).' });
+  }
   res.status(500).json({ message: 'Eroare interna de server.' });
 });
 

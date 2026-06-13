@@ -85,7 +85,10 @@ router.get('/:id', requireAuth, requireAdmin, async function (req, res, next) {
     if (!user) {
       return res.status(404).json({ message: 'Utilizatorul nu a fost gasit.' });
     }
-    return res.json(toProfile(user));
+    return res.json({
+      ...toProfile(user),
+      last_login_at: user.last_login_at || null
+    });
   } catch (error) {
     return next(error);
   }

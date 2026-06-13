@@ -859,21 +859,6 @@
 .home2-offer-card--construction {
   background: linear-gradient(145deg, #7a4e12 0%, #b87318 48%, #e8b04a 100%);
   border-color: rgba(232, 176, 74, 0.5);
-  color: #1a1208;
-}
-
-.home2-offer-card--construction .home2-offer-tag {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-}
-
-.home2-offer-card--construction h3 {
-  color: #1a1208;
-}
-
-.home2-offer-card--construction .home2-offer-desc {
-  color: rgba(26, 18, 8, 0.82);
 }
 
 .home2-offer-tag {

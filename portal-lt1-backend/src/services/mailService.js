@@ -19,7 +19,8 @@ function isMailConfigured() {
 }
 
 function getContactMailTo() {
-  const raw = process.env.MAIL_CONTACT_TO || process.env.MAIL_TO || '';
+  const raw =
+    process.env.MAIL_CONTACT_TO || process.env.MAIL_TO || process.env.SMTP_USER || '';
   return raw
     .split(',')
     .map((value) => value.trim())

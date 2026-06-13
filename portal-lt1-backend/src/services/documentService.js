@@ -89,6 +89,12 @@ async function removeDocument(id) {
   return store.deleteDocument(id);
 }
 
+async function attachDocumentFile(id, fileInput) {
+  const fileStorage = require('./documentFileStorage');
+  const paths = await fileStorage.saveDocumentFile(id, fileInput);
+  return store.updateDocument(id, paths);
+}
+
 async function buildStatistics() {
   const [totalDocuments, statusGroups, categoryGroups] = await Promise.all([
     prisma.document.count(),
@@ -133,5 +139,6 @@ module.exports = {
   addUploadedDocument,
   editDocument,
   removeDocument,
+  attachDocumentFile,
   buildStatistics
 };

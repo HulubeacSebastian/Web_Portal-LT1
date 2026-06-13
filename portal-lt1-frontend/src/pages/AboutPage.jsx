@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { hasAuthSession } from '../utils/authSession';
 
@@ -167,7 +168,6 @@ const GALLERY_PHOTOS = [
   "WhatsApp Image 2026-05-26 at 21.17.21 (5).jpeg",
   "WhatsApp Image 2026-05-26 at 21.17.21.jpeg",
   "WhatsApp Image 2026-05-26 at 21.17.22 (1).jpeg",
-  "WhatsApp Image 2026-05-26 at 21.17.22.jpeg",
   "WhatsApp Image 2026-05-26 at 21.17.23 (1).jpeg",
   "WhatsApp Image 2026-05-26 at 21.17.23 (2).jpeg",
   "WhatsApp Image 2026-05-26 at 21.17.23 (3).jpeg",
@@ -499,15 +499,6 @@ function AboutPage() {
                   aria-label={`Deschide imaginea: ${item.alt}`}
                 >
                   <img src={item.src} alt={item.alt} loading="lazy" />
-                  <span className="about-gallery-overlay">
-                    <span className="about-gallery-expand" aria-hidden="true">
-                      +
-                    </span>
-                    <span className="about-gallery-caption">
-                      <strong>{item.category}</strong>
-                      <em>{item.alt}</em>
-                    </span>
-                  </span>
                 </button>
               </figure>
             ))}
@@ -549,30 +540,30 @@ function AboutPage() {
         </section>
       </div>
 
-      {lightboxImage ? (
-        <div
-          className="about-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label={lightboxImage.alt}
-          onClick={() => setLightboxImage(null)}
-        >
-          <button
-            type="button"
-            className="about-lightbox-close"
-            aria-label="Inchide imaginea"
-            onClick={() => setLightboxImage(null)}
-          >
-            ×
-          </button>
-          <figure className="about-lightbox-frame" onClick={(event) => event.stopPropagation()}>
-            <img src={lightboxImage.src} alt={lightboxImage.alt} />
-            <figcaption>
-              <strong>{lightboxImage.category}</strong> — {lightboxImage.alt}
-            </figcaption>
-          </figure>
-        </div>
-      ) : null}
+      {lightboxImage
+        ? createPortal(
+            <div
+              className="about-lightbox"
+              role="dialog"
+              aria-modal="true"
+              aria-label={lightboxImage.category}
+              onClick={() => setLightboxImage(null)}
+            >
+              <button
+                type="button"
+                className="about-lightbox-close"
+                aria-label="Inchide imaginea"
+                onClick={() => setLightboxImage(null)}
+              >
+                ×
+              </button>
+              <figure className="about-lightbox-frame" onClick={(event) => event.stopPropagation()}>
+                <img src={lightboxImage.src} alt={lightboxImage.category} />
+              </figure>
+            </div>,
+            document.body
+          )
+        : null}
     </section>
   );
 }

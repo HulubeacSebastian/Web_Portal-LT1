@@ -77,6 +77,9 @@ SMTP_USER=portal.lt1.suport@gmail.com
 SMTP_PASS=PAROLA_APP_16_CARACTERE_FARA_SPATII
 MAIL_FROM="Portal LT1 <portal.lt1.suport@gmail.com>"
 
+# Formular contact — obligatoriu pe server, altfel mesajul se salvează dar nu primești email
+MAIL_CONTACT_TO=portal.lt1.suport@gmail.com
+
 # Producție: nu mai afișa token în UI
 AUTH_EXPOSE_DEV_CODES=false
 ```
@@ -99,6 +102,18 @@ Flux:
 **Mailurile vechi** (trimise când lipsea `PUBLIC_APP_URL`) au încă `localhost` în link — cere din nou resetarea după ce ai configurat serverul.
 
 Butonul **Trimite link de resetare** apelează `POST /api/auth/forgot-password`. Fără SMTP, tokenul poate apărea în UI doar dacă `AUTH_EXPOSE_DEV_CODES=true`.
+
+## Email — formular contact
+
+Pe lângă `SMTP_*` și `MAIL_FROM`, formularul de contact necesită **`MAIL_CONTACT_TO`** (adresa unde ajung mesajele de la vizitatori). Fără ea, API-ul răspunde tot cu succes (`email_sent: false`) și mesajul rămâne doar în baza de date.
+
+Exemplu pe server:
+
+```env
+MAIL_CONTACT_TO=portal.lt1.suport@gmail.com
+```
+
+După adăugare: `pm2 restart backend`. Test: trimite un mesaj de pe site — în răspunsul API trebuie `"email_sent": true`.
 
 Alternativ la Gmail: Brevo, SendGrid, Mailgun — aceleași variabile `SMTP_*` și `MAIL_FROM`.
 

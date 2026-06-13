@@ -54,5 +54,5 @@ export function validateDocument(input) {
 }
 
 export function hasErrors(errors) {
-  return Object.keys(errors).length > 0;
+  return Object.values(errors).some((value) => Boolean(value));
 }

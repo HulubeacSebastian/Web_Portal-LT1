@@ -5,9 +5,16 @@
  */
 
 require('../scripts/load-dotenv').loadAppEnv();
-require('../scripts/load-dev-network-env').loadDevNetworkEnv();
 
-if (process.env.CLIENT_IP) {
+var nodeEnv = String(process.env.NODE_ENV || '').toLowerCase();
+var isProductionDeploy =
+  nodeEnv === 'production' || process.env.PORTAL_PRODUCTION === 'true';
+
+if (!isProductionDeploy) {
+  require('../scripts/load-dev-network-env').loadDevNetworkEnv();
+}
+
+if (!isProductionDeploy && process.env.CLIENT_IP) {
   var clientOrigin = 'https://' + process.env.CLIENT_IP.trim() + ':5173';
   var origins = (process.env.ALLOWED_ORIGINS || '')
     .split(',')

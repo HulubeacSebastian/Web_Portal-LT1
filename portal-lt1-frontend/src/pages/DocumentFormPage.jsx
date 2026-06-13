@@ -77,7 +77,7 @@ function DocumentFormPage({ mode }) {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const normalizedData = {
       ...formData,
@@ -95,13 +95,21 @@ function DocumentFormPage({ mode }) {
     }
 
     if (mode === 'edit') {
-      updateDocument(id, normalizedData);
-      navigate(`/documente/${id}`);
+      try {
+        await updateDocument(id, normalizedData);
+        navigate(`/documente/${id}`);
+      } catch {
+        setErrors({ submit: 'Nu s-a putut actualiza documentul. Verifica conexiunea si incearca din nou.' });
+      }
       return;
     }
 
-    const newId = addDocument(normalizedData);
-    navigate(`/documente/${newId}`);
+    try {
+      const newId = await addDocument(normalizedData);
+      navigate(`/documente/${newId}`);
+    } catch {
+      setErrors({ submit: 'Nu s-a putut salva documentul. Verifica conexiunea si incearca din nou.' });
+    }
   };
 
   return (
@@ -255,6 +263,8 @@ function DocumentFormPage({ mode }) {
               </div>
             ) : null}
           </div>
+
+          {errors.submit ? <p className="error">{errors.submit}</p> : null}
 
           <div className="row mt-12">
             <button type="submit" className="btn documents-action-accent">

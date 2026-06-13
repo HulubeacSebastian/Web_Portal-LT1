@@ -94,32 +94,28 @@
   }
 
   .site-header-scroll-paper {
-    width: min(14.5rem, 22rem);
+    width: min(15.5rem, 24rem);
   }
 
   .site-header-scroll-inner {
-    padding: 0.95rem 0.9rem 0.75rem;
+    padding: 1rem 1rem 0.85rem;
   }
 
-  .site-header-scroll-greeting {
-    font-size: 1.12rem;
+  .site-header-daily-badge {
+    font-size: 0.66rem;
   }
 
   .site-header-scroll-body {
-    font-size: 0.82rem;
-  }
-
-  .site-header-tassel-svg {
-    width: 1.85rem;
+    font-size: 0.88rem;
   }
 
   .site-header-scroll-measure,
   .site-header-scroll-paper {
-    width: min(14.5rem, 22rem);
+    width: min(15.5rem, 24rem);
   }
 
-  .site-header-tassel-tab-text {
-    font-size: 0.72rem;
+  .site-header-daily-tab__label {
+    font-size: 0.74rem;
   }
 }
 

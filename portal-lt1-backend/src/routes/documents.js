@@ -3,8 +3,13 @@ const service = require('../services/documentService');
 const { validateDocument, validatePagination } = require('../validation/documentValidation');
 const { requireAuth } = require('../middleware/auth');
 const { requirePermission } = require('../middleware/permissions');
+const hub = require('../realtime/wsHub');
 
 const router = express.Router();
+
+function notifyDocumentsChanged(id, action) {
+  hub.broadcast({ type: 'document_changed', id: String(id), action });
+}
 
 router.get('/', async function (req, res, next) {
   try {
@@ -22,6 +27,32 @@ router.get('/', async function (req, res, next) {
 
     return res.json(result);
   } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/:id/file', requireAuth, requirePermission('documents:upload'), async function (req, res, next) {
+  try {
+    const existing = await service.getDocument(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ message: 'Documentul nu a fost gasit.' });
+    }
+
+    const dataUrl = req.body?.dataUrl;
+    const name = req.body?.name;
+    const type = req.body?.type;
+
+    if (!dataUrl || typeof dataUrl !== 'string') {
+      return res.status(400).json({ message: 'Fisierul este obligatoriu (dataUrl).' });
+    }
+
+    const updated = await service.attachDocumentFile(String(req.params.id), { dataUrl, name, type });
+    notifyDocumentsChanged(req.params.id, 'file');
+    return res.json(updated);
+  } catch (error) {
+    if (error.statusCode === 400) {
+      return res.status(400).json({ message: error.message });
+    }
     return next(error);
   }
 });
@@ -47,6 +78,7 @@ router.post('/', requireAuth, requirePermission('documents:create'), async funct
     }
 
     const created = await service.addDocument(sanitized);
+    notifyDocumentsChanged(created.id, 'create');
     return res.status(201).json(created);
   } catch (error) {
     return next(error);
@@ -66,6 +98,7 @@ router.put('/:id', requireAuth, requirePermission('documents:update'), async fun
     }
 
     const updated = await service.editDocument(req.params.id, sanitized);
+    notifyDocumentsChanged(req.params.id, 'update');
     return res.json(updated);
   } catch (error) {
     return next(error);
@@ -79,6 +112,7 @@ router.delete('/:id', requireAuth, requirePermission('documents:delete'), async 
       return res.status(404).json({ message: 'Documentul nu a fost gasit.' });
     }
 
+    notifyDocumentsChanged(req.params.id, 'delete');
     return res.status(204).send();
   } catch (error) {
     return next(error);

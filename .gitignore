@@ -33,6 +33,10 @@ portal-lt1-backend/certs/
 portal-lt1-backend/prisma/*.db
 portal-lt1-backend/prisma/*.db-journal
 
+# Document uploads (PDF etc. on server)
+portal-lt1-backend/uploads/*
+!portal-lt1-backend/uploads/.gitkeep
+
 # OS / editor
 .DS_Store
 .vscode/*

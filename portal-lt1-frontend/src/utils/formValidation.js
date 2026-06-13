@@ -58,6 +58,35 @@ export function validateRegister(input) {
   return errors;
 }
 
+export function validateResetPassword(input) {
+  const errors = {};
+  const password = input.password ?? '';
+  const confirmPassword = input.confirmPassword ?? '';
+  const resetToken = text(input.resetToken);
+  const token = text(input.token);
+
+  if (!resetToken) {
+    errors.resetToken = 'Tokenul de resetare este obligatoriu.';
+  }
+  if (!token) {
+    errors.token = 'Codul din link este obligatoriu.';
+  }
+
+  if (!password.trim()) {
+    errors.password = 'Parola este obligatorie.';
+  } else if (password.length < 6) {
+    errors.password = 'Parola trebuie sa aiba minimum 6 caractere.';
+  }
+
+  if (!confirmPassword.trim()) {
+    errors.confirmPassword = 'Confirmarea parolei este obligatorie.';
+  } else if (password !== confirmPassword) {
+    errors.confirmPassword = 'Parolele nu coincid.';
+  }
+
+  return errors;
+}
+
 export function validateContact(input) {
   const errors = {};
   const name = text(input.name);

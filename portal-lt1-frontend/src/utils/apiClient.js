@@ -33,18 +33,57 @@ export function getApiOrigin() {
     return configured.replace(/\/$/, '');
   }
 
-  if (import.meta.env.DEV && typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:3000`;
+  if (typeof window !== 'undefined') {
+    if (import.meta.env.DEV) {
+      const { protocol, hostname } = window.location;
+      return `${protocol}//${hostname}:3000`;
+    }
+    // Productie: nginx pe portal proxy-eaza /api (acelasi domeniu, fara CORS)
+    return window.location.origin;
   }
 
   return 'http://localhost:3000';
+}
+
+/** Baza URL pentru fisiere (/uploads) — pe serverul API, nu proxy-ul portal. */
+export function getFilesOrigin() {
+  const filesBase = import.meta.env.VITE_FILES_BASE_URL?.trim();
+  if (filesBase) {
+    return filesBase.replace(/\/$/, '');
+  }
+  const apiBase = import.meta.env.VITE_API_BASE_URL?.trim();
+  if (apiBase) {
+    return apiBase.replace(/\/$/, '');
+  }
+  if (import.meta.env.PROD) {
+    return 'https://api-lt1.duckdns.org';
+  }
+  return getApiOrigin();
 }
 
 export function getWsOrigin() {
   if (useDevProxy()) {
     const serverIp = import.meta.env.VITE_SERVER_IP || '127.0.0.1';
     return `ws://${serverIp}:3000`;
+  }
+
+  const wsConfigured = import.meta.env.VITE_WS_BASE_URL?.trim();
+  if (wsConfigured) {
+    const base = new URL(wsConfigured);
+    base.protocol = base.protocol === 'https:' ? 'wss:' : 'ws:';
+    return base.origin;
+  }
+
+  if (typeof window !== 'undefined') {
+    const apiConfigured = import.meta.env.VITE_API_BASE_URL?.trim();
+    if (import.meta.env.PROD && !apiConfigured) {
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${proto}//${window.location.host}/ws`;
+    }
+    if (import.meta.env.DEV) {
+      const { hostname } = window.location;
+      return `ws://${hostname}:3000`;
+    }
   }
 
   const base = new URL(getApiOrigin());
@@ -131,13 +170,17 @@ export async function apiRequest(path, options = {}) {
   let response;
   try {
     response = await fetch(url, init);
-  } catch {
+  } catch (networkErr) {
+    const apiOrigin = getApiOrigin();
     const error = new Error(
       useDevProxy()
         ? 'Nu se poate contacta serverul. Verifica ca backend-ul ruleaza (npm start in portal-lt1-backend).'
-        : `Nu se poate contacta serverul (${getApiOrigin()}/health). Porneste backend-ul sau activeaza proxy-ul Vite (VITE_USE_DEV_PROXY).`
+        : import.meta.env.PROD
+          ? `Serverul API nu raspunde (${apiOrigin}). Verifica ca backend-ul ruleaza pe server si incearca din nou.`
+          : `Nu se poate contacta serverul (${apiOrigin}/health). Porneste backend-ul sau activeaza proxy-ul Vite (VITE_USE_DEV_PROXY).`
     );
     error.status = 0;
+    error.cause = networkErr;
     throw error;
   }
   const contentType = response.headers.get('content-type') || '';

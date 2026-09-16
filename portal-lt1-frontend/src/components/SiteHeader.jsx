@@ -12,12 +12,14 @@ const NAV_ICONS = {
   calendar: '/assets/icons/calendar-svgrepo-com.svg',
   activity: '/assets/icons/activity-svgrepo-com.svg',
   chat: '/assets/icons/chat-unread-svgrepo-com.svg',
-  menu: '/assets/icons/burger-menu-svgrepo-com.svg'
+  menu: '/assets/icons/burger-menu-svgrepo-com.svg',
+  projects: '/assets/icons/trophy-svgrepo-com.svg'
 };
 
 const NAV_ITEMS = [
   { to: '/', end: true, label: 'Acasă', icon: NAV_ICONS.home },
-  { to: '/documente', label: 'Documente', icon: NAV_ICONS.documents },
+  { to: '/proiecte', label: 'Proiecte', icon: NAV_ICONS.projects },
+  { to: '/documente', label: 'Documente', icon: NAV_ICONS.documents, authOnly: true },
   { to: '/despre-noi', label: 'Despre Noi', icon: NAV_ICONS.about },
   { to: '/contact', label: 'Contact', icon: NAV_ICONS.contact },
   { to: '/calendar', label: 'Calendar', icon: NAV_ICONS.calendar, authOnly: true },

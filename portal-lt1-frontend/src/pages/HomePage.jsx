@@ -62,6 +62,12 @@ const portalDiscover = [
     cta: 'Vezi programele'
   },
   {
+    title: 'Proiecte de impact',
+    desc: 'Fonduri europene și naționale, spații moderne și parteneriate — povestea antreprenorială a liceului.',
+    to: '/proiecte',
+    cta: 'Vezi proiectele'
+  },
+  {
     title: 'Documente școlare',
     desc: 'Regulamente, planuri de învățământ și informări pentru elevi, părinți și cadre didactice.',
     to: '/documente',
@@ -248,7 +254,7 @@ function StatGroupCard({ group }) {
 
 function HomePage() {
   const discoverItems = portalDiscover.filter(
-    (item) => item.to !== '/calendar' || hasAuthSession()
+    (item) => (item.to !== '/calendar' && item.to !== '/documente') || hasAuthSession()
   );
 
   return (
@@ -288,11 +294,11 @@ function HomePage() {
               </p>
 
               <div className="home2-hero-actions">
-                <a className="btn home2-btn-primary" href="#oferta-educationala" aria-label="Oferta Educațională 2024-2025">
-                  Oferta Educațională 2024-2025
-                </a>
-                <Link className="btn home2-btn-secondary" to="/despre-noi" aria-label="Află mai multe">
-                  Află mai multe
+                <Link className="btn home2-btn-primary" to="/proiecte" aria-label="Proiectele liceului">
+                  Proiectele liceului
+                </Link>
+                <Link className="btn home2-btn-secondary" to="/despre-noi" aria-label="Despre liceu și evoluție">
+                  Despre liceu și evoluție
                 </Link>
               </div>
             </div>
@@ -415,7 +421,7 @@ function HomePage() {
 
       <div className="home2-impact-cluster">
         <section className="home2-section home2-section--projects" aria-label="Proiecte inovatoare">
-          <div className="home2-block-head">
+          <div className="home2-block-head" id="proiecte-inovatoare">
             <span className="home2-section-eyebrow">Spații moderne</span>
             <h2>Proiecte inovatoare</h2>
             <p className="muted">Laboratoare, ateliere și hub-uri unde teoria devine practică aplicată.</p>
@@ -435,6 +441,12 @@ function HomePage() {
                 </div>
               </article>
             ))}
+          </div>
+
+          <div className="home2-projects-cta">
+            <Link to="/proiecte" className="btn home2-btn-secondary">
+              Vezi toate proiectele și cifrele de impact
+            </Link>
           </div>
         </section>
 

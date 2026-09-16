@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
+import ProjectsPage from './pages/ProjectsPage.jsx';
 import DocumentListPage from './pages/DocumentListPage.jsx';
 import DocumentAnalyticsPage from './pages/DocumentAnalyticsPage.jsx';
 import DocumentDetailPage from './pages/DocumentDetailPage.jsx';
@@ -147,11 +148,47 @@ function App() {
           <div className="page-transition" key={location.pathname}>
             <Routes location={location}>
               <Route path="/" element={<HomePage />} />
-              <Route path="/documente" element={<DocumentListPage />} />
-              <Route path="/documente2" element={<DocumentAnalyticsPage />} />
-              <Route path="/documente/adauga" element={<DocumentFormPage mode="create" />} />
-              <Route path="/documente/:id" element={<DocumentDetailPage />} />
-              <Route path="/documente/:id/edit" element={<DocumentFormPage mode="edit" />} />
+              <Route path="/proiecte" element={<ProjectsPage />} />
+              <Route
+                path="/documente"
+                element={
+                  <AuthRoute>
+                    <DocumentListPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="/documente2"
+                element={
+                  <AuthRoute>
+                    <DocumentAnalyticsPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="/documente/adauga"
+                element={
+                  <AuthRoute>
+                    <DocumentFormPage mode="create" />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="/documente/:id"
+                element={
+                  <AuthRoute>
+                    <DocumentDetailPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="/documente/:id/edit"
+                element={
+                  <AuthRoute>
+                    <DocumentFormPage mode="edit" />
+                  </AuthRoute>
+                }
+              />
               <Route path="/despre-noi" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route

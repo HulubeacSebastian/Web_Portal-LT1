@@ -11,6 +11,17 @@ function notifyDocumentsChanged(id, action) {
   hub.broadcast({ type: 'document_changed', id: String(id), action });
 }
 
+// Vercel: filesystem-ul functiilor serverless nu pastreaza fisiere intre request-uri.
+// Uploadul e dezactivat temporar pana la migrarea pe un storage extern (ex. Vercel Blob).
+function blockFileUploadOnServerless(req, res, next) {
+  if (process.env.VERCEL) {
+    return res.status(503).json({
+      message: 'Incarcarea de fisiere este temporar indisponibila pe acest mediu de gazduire.'
+    });
+  }
+  return next();
+}
+
 router.get('/', async function (req, res, next) {
   try {
     const { errors, page, limit } = validatePagination(req.query.page, req.query.limit);
@@ -31,7 +42,7 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-router.post('/:id/file', requireAuth, requirePermission('documents:upload'), async function (req, res, next) {
+router.post('/:id/file', requireAuth, requirePermission('documents:upload'), blockFileUploadOnServerless, async function (req, res, next) {
   try {
     const existing = await service.getDocument(req.params.id);
     if (!existing) {
@@ -119,7 +130,7 @@ router.delete('/:id', requireAuth, requirePermission('documents:delete'), async 
   }
 });
 
-router.post('/upload', requireAuth, requirePermission('documents:upload'), async function (req, res, next) {
+router.post('/upload', requireAuth, requirePermission('documents:upload'), blockFileUploadOnServerless, async function (req, res, next) {
   try {
     const { file, title, category } = req.body || {};
     const errors = {};

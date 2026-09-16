@@ -32,6 +32,8 @@ portal-lt1-backend/certs/
 # SQLite databases (schema via Prisma migrations)
 portal-lt1-backend/prisma/*.db
 portal-lt1-backend/prisma/*.db-journal
+portal-lt1-backend/prisma/prisma/
+portal-lt1-backend/schema.sql
 
 # Document uploads (PDF etc. on server)
 portal-lt1-backend/uploads/*

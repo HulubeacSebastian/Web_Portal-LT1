@@ -12,13 +12,16 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "node prisma/seed.js",
-    "db:reset": "prisma migrate reset --force"
+    "db:reset": "prisma migrate reset --force",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
+    "@libsql/client": "^0.14.0",
+    "@prisma/adapter-libsql": "^6.8.2",
     "@prisma/client": "^6.8.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "~1.4.4",

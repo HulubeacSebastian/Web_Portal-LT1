@@ -29,7 +29,7 @@ describe('Auth API', () => {
     expect(verifyStep.statusCode).toBe(200);
     expect(verifyStep.body.token).toBeDefined();
     expect(verifyStep.body.refreshToken).toBeDefined();
-    expect(verifyStep.body.user.role).toBe('user');
+    expect(verifyStep.body.user.role).toBe('elev');
     expect(verifyStep.body.user.permissions).toEqual(
       expect.arrayContaining(['documents:read', 'chat:use'])
     );
@@ -99,7 +99,7 @@ describe('Auth API', () => {
       password: 'profesor123'
     });
     expect(loginResponse.statusCode).toBe(200);
-    expect(loginResponse.body.user.role).toBe('user');
+    expect(loginResponse.body.user.role).toBe('profesor');
 
     const badCredentials = await request(app).post('/api/auth/login').send({
       email: 'profesor@lt1.ro',

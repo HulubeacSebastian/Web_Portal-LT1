@@ -18,7 +18,7 @@ describe('Assignment 4 — 3-way auth and password recovery', () => {
 
     const user = await loginWithOtp(app, { email: 'profesor@lt1.ro', password: 'profesor123' });
     expect(user.statusCode).toBe(200);
-    expect(user.body.user.role).toBe('user');
+    expect(user.body.user.role).toBe('profesor');
     expect(user.body.user.permissions).toContain('chat:use');
     expect(user.body.user.permissions).not.toContain('documents:create');
   });

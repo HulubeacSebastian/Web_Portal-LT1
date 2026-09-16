@@ -17,7 +17,7 @@ describe('Silver — roles and permissions', () => {
     expect(response.statusCode).toBe(200);
 
     const admin = response.body.find((role) => role.name === 'admin');
-    const user = response.body.find((role) => role.name === 'user');
+    const user = response.body.find((role) => role.name === 'profesor');
 
     expect(admin.permissions.length).toBeGreaterThan(user.permissions.length);
     expect(admin.permissions.some((item) => item.code === 'documents:create')).toBe(true);
@@ -45,7 +45,7 @@ describe('Silver — roles and permissions', () => {
 
     const userLogin = await login('profesor@lt1.ro', 'profesor123');
     expect(userLogin.statusCode).toBe(200);
-    expect(userLogin.body.user.role).toBe('user');
+    expect(userLogin.body.user.role).toBe('profesor');
     expect(userLogin.body.user.permissions).not.toContain('documents:create');
 
     const userCreate = await request(app)

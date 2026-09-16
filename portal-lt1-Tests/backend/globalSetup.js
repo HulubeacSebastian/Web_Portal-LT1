@@ -7,7 +7,9 @@ const { MongoMemoryServer } = require(path.join(backendRoot, 'node_modules/mongo
 let mongod;
 
 module.exports = async function globalSetup() {
-  process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./prisma/test.db';
+  // Calea e relativa la portal-lt1-backend/prisma/ (unde e schema.prisma) — asa
+  // rezolva Prisma orice cale "file:" relativa, indiferent de cwd al procesului.
+  process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./test.db';
   process.env.NODE_ENV = 'test';
 
   mongod = await MongoMemoryServer.create();

@@ -1,10 +1,8 @@
 const path = require('path');
-const { PrismaClient } = require('@prisma/client');
 const { seedDocuments } = require('../src/data/seedDocuments');
 const { PERMISSIONS, ROLE_DEFINITIONS } = require('../src/permissions/catalog');
 const { hashPassword } = require('../src/auth/password');
-
-const prisma = new PrismaClient();
+const { prisma } = require('../src/db/prisma');
 const STATUSES = ['Activ', 'Revizie', 'Arhivat'];
 const POST_CATEGORIES = [
   { id: 'news', name: 'Noutati' },
@@ -27,7 +25,7 @@ const USERS = [
     password: 'profesor123',
     fullName: 'Profesor LT1',
     nickname: 'ProfLT1',
-    role: 'user'
+    role: 'profesor'
   }
 ];
 

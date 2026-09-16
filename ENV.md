@@ -14,6 +14,19 @@ Două medii separate. **Nu copia `.env` de pe PC pe server** (și invers).
 | `dev-network.local.env` | Nu | PC offline | Proxy → localhost:3000 |
 | `dev-network.env` | Da | PC → API cloud | Backend pe Oracle din local |
 
+## DATABASE_URL (SQLite)
+
+Calea dintr-un `DATABASE_URL="file:./dev.db"` e relativă la folderul
+`portal-lt1-backend/prisma/` (unde e `schema.prisma`) — **nu** la rădăcina
+proiectului și **nu** la directorul din care rulezi comanda. Așa rezolvă Prisma
+orice cale `file:` relativă, indiferent de motor (CLI nativ sau adaptorul libSQL
+folosit de `src/db/prisma.js`).
+
+Nu scrie `file:./prisma/dev.db` — cu "prisma/" în plus, ai ajunge la
+`prisma/prisma/dev.db`, un fișier diferit (gol, cel mai probabil), fără datele
+reale. Exact asta s-a întâmplat o dată în acest proiect; fișierul vechi a rămas
+ca backup: `portal-lt1-backend/prisma/prisma/dev.db.stale-pre-libsql-backup`.
+
 ## PC — prima configurare
 
 ```powershell
@@ -59,7 +72,7 @@ Fișier pe VM-ul **backend** (`api-lt1`): `~/Web_Portal-LT1/portal-lt1-backend/.
 **Nu copia `.env` de pe PC.** Pe server pui variabilele de mai jos (inclusiv email).
 
 ```env
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="file:./dev.db"
 PORT=3000
 ALLOWED_ORIGINS=https://portal-lt1.duckdns.org
 PORTAL_DEV_HTTP=true

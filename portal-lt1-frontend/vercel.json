@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://INLOCUIESTE-CU-URL-BACKEND-VERCEL.vercel.app/api/$1"
+    }
+  ]
+}

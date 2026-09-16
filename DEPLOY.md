@@ -50,7 +50,15 @@ Pe server:
 cd ~/Web_Portal-LT1
 git pull
 # Nu rula `git restore` pe dev.db — sterge documentele si conturile adaugate pe server.
+```
 
+**Important, o singura data, la primul `git pull` dupa migrarea Prisma pe adaptorul
+libSQL:** verifica `DATABASE_URL` din `.env`-ul de pe acest VM. Daca e in continuare
+`file:./prisma/dev.db` (formatul vechi), schimba-l in `file:./dev.db` **inainte** de
+`pm2 restart backend` — altfel backend-ul porneste cu o baza de date goala. Vezi
+explicatia completa in [ENV.md](./ENV.md#database_url-sqlite).
+
+```bash
 cd portal-lt1-backend
 npm install
 npx prisma migrate deploy
@@ -75,7 +83,7 @@ Minim + **reset parolă prin email** (linkul din mail merge la site-ul public, n
 ```env
 NODE_ENV=production
 PORTAL_PRODUCTION=true
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="file:./dev.db"
 PORT=3000
 ALLOWED_ORIGINS=https://portal-lt1.duckdns.org
 PORTAL_DEV_HTTP=true

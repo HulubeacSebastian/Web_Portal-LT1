@@ -6,12 +6,12 @@ import { hasAuthSession } from '../utils/authSession';
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
 
 const stats = [
-  { label: 'Elevi 👩‍🎓', value: '607', hint: 'Comunitate scholara activa' },
-  { label: 'Liceu zilnic 🎓', value: '103', hint: 'Clasele IX-XII' },
-  { label: 'Liceu seral 📚', value: '361', hint: 'Clasele IX-XIII' },
+  { label: 'Elevi 👩‍🎓', value: '920', hint: 'Elevi + preșcolari' },
+  { label: 'Elevi 🎓', value: '606', hint: 'Elevi din învățământul liceal' },
+  { label: 'Preșcolari 🧒', value: '314', hint: 'Preșcolari + antepreșcolari' },
   { label: 'Profesional & dual 🔧', value: '43', hint: 'Programe practice' },
-  { label: 'Promovabilitate 📊', value: '95%', hint: 'Rata generala de promovare' },
-  { label: 'Rata BAC 🎯', value: '49%', hint: 'Admis la examenul de bacalaureat' },
+  { label: 'Promovabilitate 📊', value: '98%', hint: 'EX. Național de certificare profesională' },
+  { label: 'Rata BAC 🎯', value: '60%', hint: 'Admis la examenul de bacalaureat' },
 ];
 
 const timeline = [

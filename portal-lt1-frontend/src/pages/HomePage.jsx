@@ -14,22 +14,22 @@ const HERO_IMAGE = photoUrl('home-hero.jpg');
 const statGroups = [
   {
     id: 'elevi',
-    value: 607,
-    unit: 'elevi',
+    value: 920,
+    unit: 'elevi + preșcolari',
     icon: 'students',
     breakdown: [
-      { value: 103, label: 'liceu zilnic (IX-XII)', icon: 'graduation' },
-      { value: 464, label: 'liceu seral & profesional', icon: 'backpack' }
+      { value: 606, label: 'elevi', icon: 'graduation' },
+      { value: 314, label: 'preșcolari + antepreșcolari', icon: 'backpack' }
     ]
   },
   {
     id: 'promovabilitate',
-    value: 95,
+    value: 98,
     unit: '%',
     icon: 'rooms',
     breakdown: [
-      { value: 95, label: 'promovabilitate generală', icon: 'classroom' },
-      { value: 49, label: 'rata BAC', icon: 'lab' }
+      { value: 98, label: 'EX. Național de certificare profesională', icon: 'classroom' },
+      { value: 60, label: 'rata BAC', icon: 'lab' }
     ]
   },
   {
@@ -37,6 +37,7 @@ const statGroups = [
     value: 83,
     unit: '%',
     icon: 'staff',
+    hideMainValue: true,
     breakdown: [
       { value: 84, label: 'părinți satisfăcuți', icon: 'teacher' },
       { value: 81, label: 'elevi mulțumiți', icon: 'auxiliary' }
@@ -89,10 +90,23 @@ const portalDiscover = [
 
 const offers = [
   {
-    title: 'Tehnician în turism',
-    desc: 'Comunicare, ospitalitate, ghidaj și organizare.',
+    title: 'Învățământ liceal tehnologic dual',
+    desc: 'Carieră sigură și susținere prin practică și parteneriate educaționale.',
+    tone: 'dual',
+    tag: 'Dual',
+    featured: true
+  },
+  {
+    title: 'Tehnician în turism, gastronomie',
+    desc: 'Comunicare, ospitalitate, ghidaj și organizare în servicii turistice și gastronomie.',
     tone: 'tourism',
     tag: 'Turism'
+  },
+  {
+    title: 'Ospătar / Vânzător în unități de alimentație și turism',
+    desc: 'Meserii căutate, lucru cu publicul și abilități reale în servicii de alimentație și turism.',
+    tone: 'hospitality',
+    tag: 'HoReCa'
   },
   {
     title: 'Tehnician mecanic',
@@ -101,23 +115,16 @@ const offers = [
     tag: 'Mecanică'
   },
   {
-    title: 'Ospătar / Vânzător',
-    desc: 'Meserii căutate, lucru cu publicul și abilități reale.',
-    tone: 'hospitality',
-    tag: 'HoReCa'
-  },
-  {
-    title: 'Învățământ Profesional Dual',
-    desc: 'Carieră sigură și susținere prin practică și parteneriate.',
-    tone: 'dual',
-    tag: 'Dual',
-    featured: true
-  },
-  {
-    title: 'Maistru în construcții civile (postliceal)',
+    title: 'Măistru în construcții civile (postliceal)',
     desc: 'Specializare avansată și competențe de coordonare.',
     tone: 'construction',
     tag: 'Construcții'
+  },
+  {
+    title: 'Electrician panouri fotovoltaice',
+    desc: 'Competențe practice în instalații electrice, energie regenerabilă și soluții moderne pentru eficiență energetică.',
+    tone: 'energy',
+    tag: 'Energie'
   }
 ];
 
@@ -216,17 +223,21 @@ function StatGroupCard({ group }) {
 
   return (
     <article ref={ref} className="home2-stat-card">
-      <header className="home2-stat-card-head">
-        <div className="home2-stat-card-icon" aria-hidden="true">
-          <BreakdownIcon type={group.icon} />
-        </div>
-        <div className="home2-stat-card-total">
-          <strong className="home2-stat-card-value">{formatNum(values[0])}</strong>
-          <span className="home2-stat-card-unit">{group.unit}</span>
-        </div>
-      </header>
+      {!group.hideMainValue ? (
+        <>
+          <header className="home2-stat-card-head">
+            <div className="home2-stat-card-icon" aria-hidden="true">
+              <BreakdownIcon type={group.icon} />
+            </div>
+            <div className="home2-stat-card-total">
+              <strong className="home2-stat-card-value">{formatNum(values[0])}</strong>
+              <span className="home2-stat-card-unit">{group.unit}</span>
+            </div>
+          </header>
 
-      <div className="home2-stat-card-divider" aria-hidden="true" />
+          <div className="home2-stat-card-divider" aria-hidden="true" />
+        </>
+      ) : null}
 
        <ul className="home2-stat-breakdown">
          {group.breakdown.map((item, index) => (
@@ -293,6 +304,9 @@ function HomePage() {
                 <Link className="btn home2-btn-secondary" to="/despre-noi" aria-label="Despre liceu și evoluție">
                   Despre liceu și evoluție
                 </Link>
+                <Link className="btn home2-btn-tertiary" to="/despre-noi#album-foto" aria-label="Album foto">
+                  Album foto
+                </Link>
               </div>
             </div>
           </div>
@@ -339,10 +353,10 @@ function HomePage() {
           <span />
         </div>
 
-        <section className="home2-section home2-section--kpis" aria-label="Liceul în cifre">
+        <section className="home2-section home2-section--kpis" aria-label="Instituția în cifre">
           <div className="home2-block-head">
             <span className="home2-section-eyebrow">Impact</span>
-            <h2>Liceul în cifre</h2>
+            <h2>Instituția în cifre</h2>
             <p className="muted">Date reale, impact concret în comunitate — elevi, spații și echipa școlii.</p>
           </div>
 

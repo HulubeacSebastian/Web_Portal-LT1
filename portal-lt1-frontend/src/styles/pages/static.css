@@ -11,6 +11,14 @@
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
+/* Grid items default to min-width:auto, which lets content refuse to shrink
+   below its intrinsic width and silently overflow (clipped by overflow:hidden
+   above) on narrow screens. Every direct section of a page needs to be able
+   to shrink to the viewport. */
+.page-shell > * {
+  min-width: 0;
+}
+
 .about-page {
   background: #fff;
 }

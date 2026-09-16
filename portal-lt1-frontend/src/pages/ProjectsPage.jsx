@@ -5,7 +5,7 @@ const RESTAURANT_IMAGE = '/assets/restaurant.jpeg';
 const MANSARDA_IMAGE = '/assets/pod.jpeg';
 
 const GRAND_TOTAL_LEI = 17400000;
-const GRAND_TOTAL_ITEMS = 3192;
+const GRAND_TOTAL_ITEMS = 3200;
 
 const patrimoniuCategories = [
   {
@@ -116,11 +116,13 @@ const megaProjectPillars = [
 const heroPhotos = [
   {
     src: '/assets/proiecte/hero-1-clasa-tematica.jpg',
-    alt: 'Clasă tematică modernă, cu mese portocalii și pereți decorați cu personalități culturale românești'
+    alt: 'Clasă tematică modernă, cu mese portocalii și pereți decorați cu personalități culturale românești',
+    caption: 'Săli moderne, gata pentru învățarea de mâine.'
   },
   {
     src: '/assets/proiecte/hero-2-fatada.jpg',
-    alt: 'Fațada liceului într-o zi însorită, cu grădină amenajată'
+    alt: 'Fațada liceului într-o zi însorită, cu grădină amenajată',
+    caption: 'Clădirea școlii, revitalizată și pregătită pentru viitor.'
   },
   {
     src: '/assets/proiecte/hero-3-eveniment.jpg',
@@ -330,7 +332,7 @@ function GrandTotalBanner() {
         POCU și dotări didactice
       </p>
       <p className="proj-grand-total-sub">
-        <strong>{formatter.format(totalItems)}</strong> bunuri inventariate, în liceu, grădiniță și creșă
+        <strong>{formatter.format(totalItems)}+</strong> bunuri inventariate, în liceu, grădiniță și creșă
       </p>
     </section>
   );
@@ -380,19 +382,6 @@ function ProjectsPage() {
         </svg>
       </header>
 
-      <div className="proj-ribbon">
-        <svg className="proj-ribbon-shape" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="projRibbonGold" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#c9a032" />
-              <stop offset="50%" stopColor="#e8c04a" />
-              <stop offset="100%" stopColor="#c9a032" />
-            </linearGradient>
-          </defs>
-          <path d="M0,40 Q720,0 1440,40 L1440,90 Q720,60 0,90 Z" fill="url(#projRibbonGold)" />
-        </svg>
-        <p className="proj-ribbon-text">Liceul Tehnologic Nr. 1 · Câmpulung Moldovenesc</p>
-      </div>
 
       <div className="proj-body">
         <section className="proj-showcase">

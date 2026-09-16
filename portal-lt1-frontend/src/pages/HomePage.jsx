@@ -31,17 +31,6 @@ const statGroups = [
       { value: 98, label: 'EX. Național de certificare profesională', icon: 'classroom' },
       { value: 60, label: 'rata BAC', icon: 'lab' }
     ]
-  },
-  {
-    id: 'satisfactie',
-    value: 83,
-    unit: '%',
-    icon: 'staff',
-    hideMainValue: true,
-    breakdown: [
-      { value: 84, label: 'părinți satisfăcuți', icon: 'teacher' },
-      { value: 81, label: 'elevi mulțumiți', icon: 'auxiliary' }
-    ]
   }
 ];
 

@@ -4,15 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { hasAuthSession } from '../utils/authSession';
 
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
-
-const stats = [
-  { label: 'Elevi 👩‍🎓', value: '920', hint: 'Elevi + preșcolari' },
-  { label: 'Elevi 🎓', value: '606', hint: 'Elevi din învățământul liceal' },
-  { label: 'Preșcolari 🧒', value: '314', hint: 'Preșcolari + antepreșcolari' },
-  { label: 'Profesional & dual 🔧', value: '43', hint: 'Programe practice' },
-  { label: 'Promovabilitate 📊', value: '98%', hint: 'EX. Național de certificare profesională' },
-  { label: 'Rata BAC 🎯', value: '60%', hint: 'Admis la examenul de bacalaureat' },
-];
+const cresaPhotoUrl = (filename) => encodeURI(`/assets/Poze_cresa/${filename}`);
 
 const timeline = [
   {
@@ -45,17 +37,6 @@ const timeline = [
     title: 'Liceul Tehnologic Nr. 1',
     text: 'Modernizare, diversificarea programelor si orientare spre formare profesionala de calitate.',
   },
-];
-
-const visualTimeline = [
-  { year: '1873', label: 'Scoala profesionala de stat', image: encodeURI('/assets/poza_liceu_1873.png') },
-  { year: '1895', label: 'Scoala de lemnarit', image: photoUrl('WhatsApp Image 2026-05-26 at 21.13.06.jpeg') },
-  { year: '1927', label: 'Scoala de arte si meserii', image: photoUrl('WhatsApp Image 2026-05-26 at 21.09.21.jpeg') },
-  { year: '1936', label: 'Gimnaziul industrial', image: photoUrl('WhatsApp Image 2026-05-26 at 21.11.17.jpeg') },
-  { year: '1945', label: 'Stabilire la Campulung Moldovenesc', image: photoUrl('WhatsApp Image 2026-05-26 at 21.15.17.jpeg') },
-  { year: '1955', label: 'Ucenici – Constructii', image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.21.jpeg') },
-  { year: '1974', label: 'Grup scolar de constructii', image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.22.jpeg') },
-  { year: '2012', label: 'Liceul Tehnologic Nr. 1', image: photoUrl('WhatsApp Image 2026-05-26 at 21.17.23.jpeg') },
 ];
 
 const pillars = [
@@ -110,7 +91,7 @@ const schoolNoua = [
   },
 ];
 
-const galleryFilters = ['Toate', 'Ateliere', 'Evenimente', 'Sport', 'Scoala'];
+const galleryFilters = ['Toate', 'Liceu', 'Creșă'];
 
 const GALLERY_PHOTOS = [
   "WhatsApp Image 2026-05-26 at 21.08.55.jpeg",
@@ -181,16 +162,66 @@ const GALLERY_PHOTOS = [
   "WhatsApp Image 2026-ss05-26 at 21.17.22.jpeg",
   "WhatsApp Image 202ss-05-26 at 21.12.34.jpeg",
   "WhatsApps Image 2026-05-26 at 21.17.22.jpeg",
-  "WhatsssApp Image 2026-05-26 at 21.17.22.jpeg"
+  "WhatsssApp Image 2026-05-26 at 21.17.22.jpeg",
+  "clasa-tematica.jpeg",
+  "fatada-scoala.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.44.07.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.44.08.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.44.09.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.44n.08.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.49.29.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.49.31.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.50.43.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.50.44 (1).jpeg",
+  "WhatsApp Image 2026-09-16 at 15.50.44 (3).jpeg",
+  "WhatsApp Image 2026-09-16 at 15.50.44.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.52.31.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.53.31 (1).jpeg",
+  "WhatsApp Image 2026-09-16 at 15.53.31.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.56.53 (1).jpeg",
+  "WhatsApp Image 2026-09-16 at 15.56.53 (2).jpeg",
+  "WhatsApp Image 2026-09-16 at 15.56.53 (3).jpeg",
+  "WhatsApp Image 2026-09-16 at 15.56.53.jpeg",
+  "WhatsApp Image 2026-09-16 at 15.j49.31.jpeg",
+  "WhatsApp Image 2026-09-16 at 1j5.49.30.jpeg",
+  "WhatsApp Image 2026-09-16 at 1j5.49.31.jpeg",
+  "WhatsApp Image 2026-09-16 at 1n5.44.09.jpeg",
+  "WhatsApp Image 2026-09-16 at 22.40.36 (3).jpeg",
+  "WhatsApp Image 2026-09-16 at 22.40.36 (4).jpeg",
+  "WhatsApp Image 2026-09-16 at 22.40.36 (5).jpeg",
+  "WhatsApp Image 2026-09-16 at 22.40.36 (6).jpeg"
 ];
 
-const galleryCategories = ['Scoala', 'Ateliere', 'Evenimente', 'Sport'];
+const CRESA_PHOTOS = [
+  'cresa-01.jpg',
+  'cresa-02.jpg',
+  'cresa-03.jpg',
+  'cresa-04.jpg',
+  'cresa-05.jpg',
+  'cresa-06.jpg',
+  'cresa-07.jpg',
+  'cresa-08.jpg',
+  'cresa-09.jpg',
+  'cresa-10.jpg',
+  'cresa-11.jpg',
+  'cresa-12.jpg',
+  'cresa-13.jpg',
+  'cresa-14.jpg',
+  'cresa-15.jpg'
+];
 
-const galleryItems = GALLERY_PHOTOS.map((filename, index) => ({
-  src: photoUrl(filename),
-  alt: filename.replace(/\.(jpe?g|png|webp)$/i, ''),
-  category: galleryCategories[index % galleryCategories.length]
-}));
+const galleryItems = [
+  ...GALLERY_PHOTOS.map((filename) => ({
+    src: photoUrl(filename),
+    alt: filename.replace(/\.(jpe?g|png|webp)$/i, ''),
+    category: 'Liceu'
+  })),
+  ...CRESA_PHOTOS.map((filename) => ({
+    src: cresaPhotoUrl(filename),
+    alt: 'Creșă — spații de joacă și odihnă pentru cei mici',
+    category: 'Creșă'
+  }))
+];
 
 function AboutSectionHead({ eyebrow, title, lead }) {
   return (
@@ -336,11 +367,7 @@ function AboutPage() {
           </div>
 
           <div className="about-story-copy">
-            <AboutSectionHead
-              eyebrow="Identitate"
-              title="Cine suntem"
-              lead="Cea mai veche institutie de invatamant profesional si tehnic din Campulung Moldovenesc, cu traditie din 1873."
-            />
+            <AboutSectionHead eyebrow="Identitate" title="Cine suntem" />
             <p>
               Liceul Tehnologic Nr. 1 are o istorie bogata si ramane un punct de referinta pentru educatia
               tehnica din zona noastra. De-a lungul timpului, institutia a evoluat si s-a adaptat
@@ -392,40 +419,12 @@ function AboutPage() {
           </div>
         </section>
 
-        <section className="about-metrics about-reveal" aria-label="Indicatori liceu">
-          <div className="about-metrics-grid">
-            {stats.map((item) => (
-              <article key={item.label} className="about-metric-card">
-                <strong>{item.value}</strong>
-                <p>{item.label}</p>
-                <span>{item.hint}</span>
-              </article>
-            ))}
-          </div>
-        </section>
-
         <section className="about-timeline-wrap about-reveal" id="istoric">
           <AboutSectionHead
             eyebrow="Evolutie"
             title="Istoricul nostru"
             lead="Repere care arata cum am crescut impreuna cu comunitatea locala."
           />
-          <div className="about-visual-timeline" aria-label="Istoric vizual">
-            <ol className="about-visual-track">
-              {visualTimeline.map((item) => (
-                <li key={item.year} className="about-visual-node">
-                  <div className="about-visual-ring" aria-hidden="true" />
-                  <figure className="about-visual-photo">
-                    <img src={item.image} alt="" loading="lazy" />
-                  </figure>
-                  <div className="about-visual-meta">
-                    <strong>{item.year}</strong>
-                    <span>{item.label}</span>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
           <ol className="about-timeline-track">
             {timeline.map((item, index) => (
               <li key={item.year} className="about-timeline-entry">

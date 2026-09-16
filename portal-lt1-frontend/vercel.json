@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://INLOCUIESTE-CU-URL-BACKEND-VERCEL.vercel.app/api/$1"
+      "destination": "https://web-portal-lt1-api.vercel.app/api/$1"
     }
   ]
 }

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const RESTAURANT_IMAGE = '/assets/restaurant.jpeg';
 const MANSARDA_IMAGE = '/assets/pod.jpeg';
 
-const GRAND_TOTAL_LEI = 17434406;
+const GRAND_TOTAL_LEI = 17400000;
 const GRAND_TOTAL_ITEMS = 3192;
 
 const patrimoniuCategories = [
@@ -322,9 +322,8 @@ function GrandTotalBanner() {
 
   return (
     <section ref={ref} className="proj-grand-total" aria-label="Valoarea totală a investițiilor">
-      <span className="proj-eyebrow proj-grand-total-eyebrow">Patrimoniu instituțional</span>
       <p className="proj-grand-total-value">
-        {formatter.format(totalLei)} <span>lei</span>
+        {formatter.format(totalLei)}+ <span>lei</span>
       </p>
       <p className="proj-grand-total-label">
         valoarea totală a investițiilor și bunurilor inventariate — construcții, PNRR, echipamente,
@@ -350,6 +349,12 @@ function ProjectsPage() {
   return (
     <section className="page-shell projects-page">
       <header className="proj-hero" aria-labelledby="proj-hero-title">
+        <img
+          src="/assets/proiecte/zero-1-arhiva.jpg"
+          alt=""
+          className="proj-hero-media"
+          aria-hidden="true"
+        />
         <div className="proj-hero-scrim" aria-hidden="true" />
         <div className="proj-hero-pattern" aria-hidden="true" />
         <div className="proj-hero-content">
@@ -370,23 +375,45 @@ function ProjectsPage() {
           </div>
         </div>
 
-        <div className="proj-hero-photos">
-          {heroPhotos.map((photo) => (
-            <figure key={photo.src} className="proj-hero-photo">
-              <img src={photo.src} alt={photo.alt} loading="eager" />
-              {photo.caption ? <figcaption>{photo.caption}</figcaption> : null}
-            </figure>
-          ))}
-        </div>
-
-        <GrandTotalBanner />
-
         <svg className="proj-hero-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0,32 C320,64 720,0 1080,24 C1260,36 1380,44 1440,40 L1440,60 L0,60 Z" fill="#fff" />
         </svg>
       </header>
 
+      <div className="proj-ribbon">
+        <svg className="proj-ribbon-shape" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="projRibbonGold" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#c9a032" />
+              <stop offset="50%" stopColor="#e8c04a" />
+              <stop offset="100%" stopColor="#c9a032" />
+            </linearGradient>
+          </defs>
+          <path d="M0,40 Q720,0 1440,40 L1440,90 Q720,60 0,90 Z" fill="url(#projRibbonGold)" />
+        </svg>
+        <p className="proj-ribbon-text">Liceul Tehnologic Nr. 1 · Câmpulung Moldovenesc</p>
+      </div>
+
       <div className="proj-body">
+        <section className="proj-showcase">
+          <svg className="proj-showcase-wave-top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+            <path
+              d="M0,20 C320,55 720,5 1080,35 C1260,48 1380,55 1440,45 L1440,0 L0,0 Z"
+              fill="#fff"
+            />
+          </svg>
+          <div className="proj-hero-photos">
+            {heroPhotos.map((photo) => (
+              <figure key={photo.src} className="proj-hero-photo">
+                <img src={photo.src} alt={photo.alt} loading="eager" />
+                {photo.caption ? <figcaption>{photo.caption}</figcaption> : null}
+              </figure>
+            ))}
+          </div>
+
+          <GrandTotalBanner />
+        </section>
+
         <section className="proj-metrics proj-reveal" aria-label="Cifre de impact">
           <div className="proj-metrics-grid">
             {impactStats.map((item) => (

@@ -6,12 +6,12 @@ import { hasAuthSession } from '../utils/authSession';
 const photoUrl = (filename) => encodeURI(`/assets/Poze_liceu/${filename}`);
 
 const stats = [
-  { label: 'Elevi 👩‍🎓', value: '800', hint: 'Comunitate scolara activa' },
-  { label: 'Liceeni 🎓', value: '581', hint: 'Invatamant liceal' },
-  { label: 'Prescolari 🧒', value: '219', hint: 'Invatamant prescolar' },
-  { label: 'Sali 🏫', value: '33', hint: '23 sali de clasa' },
-  { label: 'Lab & ateliere 🔧', value: '10', hint: 'Spatii pentru invatare aplicata' },
-  { label: 'Angajati 👥', value: '76', hint: '45 cadre didactice + 31 personal suport' },
+  { label: 'Elevi 👩‍🎓', value: '607', hint: 'Comunitate scholara activa' },
+  { label: 'Liceu zilnic 🎓', value: '103', hint: 'Clasele IX-XII' },
+  { label: 'Liceu seral 📚', value: '361', hint: 'Clasele IX-XIII' },
+  { label: 'Profesional & dual 🔧', value: '43', hint: 'Programe practice' },
+  { label: 'Promovabilitate 📊', value: '95%', hint: 'Rata generala de promovare' },
+  { label: 'Rata BAC 🎯', value: '49%', hint: 'Admis la examenul de bacalaureat' },
 ];
 
 const timeline = [
@@ -287,11 +287,11 @@ function AboutPage() {
 
               <div className="about-heritage-badges" aria-label="Repere de traditie">
                 <span className="about-heritage-badge">
-                  <strong>151</strong>
+                  <strong>153</strong>
                   <em>ani</em>
                 </span>
                 <span className="about-heritage-badge is-gold">
-                  <strong>1873–2024</strong>
+                  <strong>1873–2026</strong>
                   <em>repere</em>
                 </span>
               </div>

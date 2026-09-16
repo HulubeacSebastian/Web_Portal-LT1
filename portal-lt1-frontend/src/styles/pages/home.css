@@ -1058,7 +1058,7 @@
 
 .home2-community-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(1rem, 2.2vw, 1.25rem);
 }
 

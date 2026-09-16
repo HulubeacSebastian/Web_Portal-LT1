@@ -18,8 +18,30 @@
 .proj-hero {
   position: relative;
   overflow: hidden;
-  padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  min-height: clamp(260px, 34vw, 380px);
+  display: flex;
+  align-items: center;
   background: linear-gradient(165deg, #0f1f3d 0%, #1a3270 42%, #4a2ca4 100%);
+}
+
+.proj-hero-media {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: clamp(260px, 42vw, 560px);
+  height: 100%;
+  object-fit: cover;
+  object-position: 65% 30%;
+  opacity: 0.3;
+  mix-blend-mode: luminosity;
+  -webkit-mask-image: linear-gradient(to left, black 45%, transparent 100%);
+  mask-image: linear-gradient(to left, black 45%, transparent 100%);
+}
+
+@media (max-width: 720px) {
+  .proj-hero-media {
+    width: 78vw;
+  }
 }
 
 .proj-hero-scrim {
@@ -50,21 +72,7 @@
   z-index: 2;
   width: 100%;
   max-width: 46rem;
-  margin-inline: auto;
-  padding: clamp(2rem, 5vw, 3.25rem) clamp(1.1rem, 3vw, 2.4rem) clamp(1.5rem, 3.5vw, 2.25rem);
-  text-align: center;
-}
-
-.proj-hero-content .proj-hero-badge {
-  margin-inline: auto;
-}
-
-.proj-hero-content .proj-hero-lead {
-  margin-inline: auto;
-}
-
-.proj-hero-content .proj-hero-chips {
-  justify-content: center;
+  padding: clamp(2rem, 5vw, 3.25rem) clamp(1.1rem, 3vw, 2.4rem) clamp(3rem, 6.5vw, 4.5rem);
 }
 
 .proj-hero-badge {
@@ -125,15 +133,44 @@
   text-transform: uppercase;
 }
 
+.proj-showcase {
+  position: relative;
+  max-width: none !important;
+  margin-inline: 0 !important;
+  padding: clamp(1.75rem, 4vw, 2.5rem) var(--proj-gutter) clamp(0.5rem, 2vw, 1rem);
+  background: linear-gradient(165deg, #0f1f3d 0%, #1a3270 42%, #4a2ca4 100%);
+}
+
+.proj-showcase-wave-top {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: clamp(28px, 4vw, 44px);
+}
+
 .proj-hero-photos {
   position: relative;
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.6rem, 1.6vw, 1rem);
+  gap: clamp(0.5rem, 1.4vw, 0.85rem);
   max-width: var(--proj-rail-max);
   margin-inline: auto;
-  padding: 0 var(--proj-gutter);
+  padding: clamp(0.6rem, 1.6vw, 0.9rem);
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(212, 160, 61, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 20px 40px rgba(8, 14, 32, 0.25);
+}
+
+@media (max-width: 720px) {
+  .proj-hero-photos {
+    padding: 0.6rem;
+    border-radius: 18px;
+  }
 }
 
 .proj-hero-photo {
@@ -141,15 +178,16 @@
   margin: 0;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 16px 32px rgba(8, 14, 32, 0.35);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 160, 61, 0.3);
+  box-shadow: 0 10px 22px rgba(58, 31, 92, 0.32);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .proj-hero-photo:hover {
   transform: translateY(-4px);
-  box-shadow: 0 22px 40px rgba(8, 14, 32, 0.45);
+  border-color: rgba(212, 160, 61, 0.55);
+  box-shadow: 0 16px 30px rgba(58, 31, 92, 0.42);
 }
 
 .proj-hero-photo img {
@@ -300,10 +338,6 @@
   background: linear-gradient(90deg, transparent 0%, var(--proj-gold) 50%, transparent 100%);
 }
 
-.proj-grand-total-eyebrow {
-  color: #c8b6ff;
-}
-
 .proj-grand-total-value {
   margin: 0.2rem 0 0;
   color: #fff;
@@ -364,10 +398,46 @@
 }
 
 .proj-hero-wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
   display: block;
   width: 100%;
   height: clamp(24px, 4vw, 44px);
-  margin-top: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.proj-ribbon {
+  position: relative;
+  width: 100%;
+  height: clamp(56px, 8vw, 92px);
+  background: #fff;
+}
+
+.proj-ribbon-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.proj-ribbon-text {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 1rem;
+  color: #3a1f5c;
+  font-weight: 800;
+  font-size: clamp(0.7rem, 1.9vw, 1.05rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .proj-patrimoniu-footnote {

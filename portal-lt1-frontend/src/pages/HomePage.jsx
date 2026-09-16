@@ -14,32 +14,32 @@ const HERO_IMAGE = photoUrl('home-hero.jpg');
 const statGroups = [
   {
     id: 'elevi',
-    value: 800,
+    value: 607,
     unit: 'elevi',
     icon: 'students',
     breakdown: [
-      { value: 581, label: 'liceeni', icon: 'graduation' },
-      { value: 219, label: 'preșcolari', icon: 'backpack' }
+      { value: 103, label: 'liceu zilnic (IX-XII)', icon: 'graduation' },
+      { value: 464, label: 'liceu seral & profesional', icon: 'backpack' }
     ]
   },
   {
-    id: 'sali',
-    value: 33,
-    unit: 'săli',
+    id: 'promovabilitate',
+    value: 95,
+    unit: '%',
     icon: 'rooms',
     breakdown: [
-      { value: 23, label: 'săli de clasă', icon: 'classroom' },
-      { value: 10, label: 'laboratoare și ateliere', icon: 'lab' }
+      { value: 95, label: 'promovabilitate generală', icon: 'classroom' },
+      { value: 49, label: 'rata BAC', icon: 'lab' }
     ]
   },
   {
-    id: 'angajati',
-    value: 76,
-    unit: 'angajați',
+    id: 'satisfactie',
+    value: 83,
+    unit: '%',
     icon: 'staff',
     breakdown: [
-      { value: 45, label: 'cadre didactice', icon: 'teacher' },
-      { value: 31, label: 'personal nedidactic și auxiliar', icon: 'auxiliary' }
+      { value: 84, label: 'părinți satisfăcuți', icon: 'teacher' },
+      { value: 81, label: 'elevi mulțumiți', icon: 'auxiliary' }
     ]
   }
 ];
@@ -56,7 +56,7 @@ const valueTags = [
 const portalDiscover = [
   {
     title: 'Oferta educațională',
-    desc: 'Specializări, ateliere moderne și trasee de formare pentru piața muncii — anul 2024-2025.',
+    desc: 'Specializări, ateliere moderne și trasee de formare pentru piața muncii — anul 2026-2027.',
     to: '#oferta-educationala',
     hash: true,
     cta: 'Vezi programele'
@@ -150,13 +150,6 @@ const community = [
     imageAlt: 'Elevi în activitate Erasmus+'
   },
   {
-    title: 'Proiectul ECLESSIA',
-    desc: 'Tradiție, solidaritate și voluntariat — implicare activă în viața spirituală și socială a comunității.',
-    tone: 'eclessia',
-    image: photoUrl('eclessia-comunitate.png'),
-    imageAlt: 'Comunitate ECLESSIA — activități tradiționale la Liceul Tehnologic Nr. 1'
-  },
-  {
     title: 'Consiliul Școlar al Elevilor (CȘE)',
     desc: 'Când elevii prind curaj, școala prinde viață! Vocea elevilor în deciziile care îi privesc.',
     tone: 'cse',
@@ -235,19 +228,19 @@ function StatGroupCard({ group }) {
 
       <div className="home2-stat-card-divider" aria-hidden="true" />
 
-      <ul className="home2-stat-breakdown">
-        {group.breakdown.map((item, index) => (
-          <li key={item.label} className="home2-stat-break-item">
-            <span className="home2-stat-break-icon" aria-hidden="true">
-              <BreakdownIcon type={item.icon} />
-            </span>
-            <span className="home2-stat-break-copy">
-              <strong>{formatNum(values[index + 1])}</strong>
-              <em>{item.label}</em>
-            </span>
-          </li>
-        ))}
-      </ul>
+       <ul className="home2-stat-breakdown">
+         {group.breakdown.map((item, index) => (
+           <li key={item.label} className="home2-stat-break-item">
+             <span className="home2-stat-break-icon" aria-hidden="true">
+               <BreakdownIcon type={item.icon} />
+             </span>
+             <span className="home2-stat-break-copy">
+               <strong>{formatNum(values[index + 1])}{group.unit === '%' ? '%' : ''}</strong>
+               <em>{item.label}</em>
+             </span>
+           </li>
+         ))}
+       </ul>
     </article>
   );
 }
@@ -289,8 +282,8 @@ function HomePage() {
                 <span className="home2-hero-title-city">Câmpulung Moldovenesc</span>
               </h1>
 
-              <p className="home2-hero-heritage" aria-label="151 ani de tradiție">
-                151 ani de tradiție · 1873 – 2024
+              <p className="home2-hero-heritage" aria-label="153 ani de tradiție">
+                153 ani de tradiție · 1873 – 2026
               </p>
 
               <div className="home2-hero-actions">
@@ -319,8 +312,8 @@ function HomePage() {
 
           <div className="home2-info-grid home2-info-grid--two">
             <article className="home2-info-card home2-info-card--history">
-              <p className="home2-info-kicker">1873 – 2024</p>
-              <p className="home2-info-title">151 ani de istorie</p>
+              <p className="home2-info-kicker">1873 – 2026</p>
+              <p className="home2-info-title">153 ani de istorie</p>
               <p className="home2-info-desc">
                 De la primele școli profesionale din Bucovina la programe moderne pentru piața muncii — continuitate,
                 seriozitate și performanță pentru fiecare generație de elevi.
@@ -401,7 +394,7 @@ function HomePage() {
       <section className="home2-section home2-section--offer" aria-label="Oferta educațională">
         <div className="home2-block-head" id="oferta-educationala">
           <span className="home2-section-eyebrow">Formare profesională</span>
-          <h2>Oferta Educațională 2024-2025</h2>
+          <h2>Oferta Educațională 2026-2027</h2>
           <p className="muted">Profile și specializări orientate spre piața muncii — practică, ateliere și competențe pentru carieră.</p>
         </div>
 
@@ -420,39 +413,6 @@ function HomePage() {
       </section>
 
       <div className="home2-impact-cluster">
-        <section className="home2-section home2-section--projects" aria-label="Proiecte inovatoare">
-          <div className="home2-block-head" id="proiecte-inovatoare">
-            <span className="home2-section-eyebrow">Spații moderne</span>
-            <h2>Proiecte inovatoare</h2>
-            <p className="muted">Laboratoare, ateliere și hub-uri unde teoria devine practică aplicată.</p>
-          </div>
-
-          <div className="home2-projects">
-            {projects.map((p) => (
-              <article key={p.title} className={`home2-project-card home2-project-card--${p.tone}`}>
-                <div className="home2-project-media">
-                  <img src={p.image} alt={p.imageAlt} className="home2-project-photo" loading="lazy" />
-                  <div className="home2-project-media-scrim" aria-hidden="true" />
-                </div>
-                <div className="home2-project-body">
-                  <span className="home2-project-tag">{p.badge}</span>
-                  <h3>{p.title}</h3>
-                  <p className="home2-project-desc">{p.desc}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="home2-projects-cta">
-            <Link to="/proiecte" className="btn home2-btn-secondary">
-              Vezi toate proiectele și cifrele de impact
-            </Link>
-          </div>
-        </section>
-
-        <div className="home2-about-divider" aria-hidden="true">
-          <span />
-        </div>
 
         <section className="home2-section home2-section--community" aria-label="Comunitate și dinamism">
           <div className="home2-block-head">

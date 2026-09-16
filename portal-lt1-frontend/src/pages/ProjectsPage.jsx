@@ -115,14 +115,12 @@ const megaProjectPillars = [
 
 const heroPhotos = [
   {
-    src: '/assets/proiecte/hero-1-aerian-noapte.jpg',
-    alt: 'Liceul Tehnologic Nr. 1 văzut din dronă, cu Munții Bucovinei în fundal',
-    caption: 'Clădirea istorică, azi — readusă la standarde europene, în inima Câmpulungului Moldovenesc.'
+    src: '/assets/proiecte/hero-1-clasa-tematica.jpg',
+    alt: 'Clasă tematică modernă, cu mese portocalii și pereți decorați cu personalități culturale românești'
   },
   {
-    src: '/assets/proiecte/hero-2-lobby.jpg',
-    alt: 'Holul de la intrarea în liceu, cu scară din fier forjat și reliefuri istorice',
-    caption: 'Prima impresie contează: eleganță, patrimoniu și funcționalitate din primul pas în clădire.'
+    src: '/assets/proiecte/hero-2-fatada.jpg',
+    alt: 'Fațada liceului într-o zi însorită, cu grădină amenajată'
   },
   {
     src: '/assets/proiecte/hero-3-eveniment.jpg',
@@ -376,7 +374,7 @@ function ProjectsPage() {
           {heroPhotos.map((photo) => (
             <figure key={photo.src} className="proj-hero-photo">
               <img src={photo.src} alt={photo.alt} loading="eager" />
-              <figcaption>{photo.caption}</figcaption>
+              {photo.caption ? <figcaption>{photo.caption}</figcaption> : null}
             </figure>
           ))}
         </div>

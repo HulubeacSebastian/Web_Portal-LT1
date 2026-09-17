@@ -229,6 +229,10 @@
   margin-bottom: 0;
 }
 
+.proj-timeline-block--goahead {
+  margin-top: clamp(1.5rem, 3vw, 2.1rem);
+}
+
 .proj-timeline-head {
   display: flex;
   align-items: flex-start;
@@ -282,6 +286,21 @@
 .proj-photo-grid--two {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   max-width: 46rem;
+}
+
+@media (min-width: 900px) {
+  .proj-photo-grid--goahead {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.proj-photo-card--contain {
+  background: #fff;
+}
+
+.proj-photo-card--contain img {
+  object-fit: contain;
+  padding: 0.6rem;
 }
 
 .proj-photo-card {

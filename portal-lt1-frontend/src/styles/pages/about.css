@@ -78,6 +78,7 @@
 }
 
 .about-timeline-wrap,
+.about-archive,
 .about-principles,
 .about-gallery-wrap {
   padding: clamp(1.5rem, 4vw, 2.25rem) var(--about-gutter);
@@ -91,6 +92,7 @@
 .about-story,
 .about-school-new,
 .about-timeline-wrap,
+.about-archive,
 .about-principles,
 .about-gallery-wrap,
 .about-cta-panel {

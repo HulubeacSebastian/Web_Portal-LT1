@@ -39,6 +39,30 @@ const timeline = [
   },
 ];
 
+const archivePhotos = [
+  {
+    src: '/assets/istoric/scoala-arte-meserii-facada.jpg',
+    alt: 'Fotografie de arhivă a clădirii Școlii de Arte și Meserii din Câmpulung Moldovenesc, cu un grup de bărbați în fața gardului',
+    era: 'Arhivă',
+    title: 'Școala de Arte și Meserii',
+    text: 'Clădirea de altădată a școlii, în Câmpulung Moldovenesc — precursoarea instituțională a formării tehnice de azi.'
+  },
+  {
+    src: '/assets/istoric/scoala-arte-meserii-1941.jpg',
+    alt: 'Fotografie de arhivă din 1941 a clădirii Școlii de Arte și Meserii, iarna, acoperită de zăpadă',
+    era: '1941',
+    title: 'La început de război',
+    text: 'Aceeași clădire, iarna anului 1941 — cu puțin timp înainte ca războiul să schimbe cursul școlii.'
+  },
+  {
+    src: '/assets/istoric/scoala-arte-meserii-bombardata.jpg',
+    alt: 'Fotografie de arhivă a clădirii Școlii de Arte și Meserii distruse de bombardamente în timpul celui de-al Doilea Război Mondial',
+    era: 'Război',
+    title: 'Școala, bombardată',
+    text: 'Urmările războiului asupra clădirii — momentul care a impus relocarea activității școlare din 1944–1945.'
+  }
+];
+
 const pillars = [
   {
     icon: '01',
@@ -439,6 +463,28 @@ function AboutPage() {
               </li>
             ))}
           </ol>
+        </section>
+
+        <section className="about-archive about-reveal" id="arhiva-foto">
+          <AboutSectionHead
+            eyebrow="Fotografii de arhivă"
+            title="Cum arăta școala în trecut"
+            lead="Imagini de arhivă cu clădirea Școlii de Arte și Meserii — de la anii de dinainte de război, până la urmările pe care le-a lăsat asupra ei."
+          />
+          <div className="about-archive-grid">
+            {archivePhotos.map((photo) => (
+              <figure key={photo.src} className="about-archive-card">
+                <div className="about-archive-media">
+                  <img src={photo.src} alt={photo.alt} loading="lazy" />
+                  <span className="about-archive-badge">{photo.era}</span>
+                </div>
+                <figcaption>
+                  <h3>{photo.title}</h3>
+                  <p>{photo.text}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </section>
 
         <section className="about-principles about-reveal" id="misiune">

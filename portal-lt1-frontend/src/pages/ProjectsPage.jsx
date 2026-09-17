@@ -277,6 +277,47 @@ const mobilityProjects = [
   }
 ];
 
+const goAheadHighlights = [
+  { value: '304', label: 'Beneficiari direcți', hint: 'Consiliere, dezvoltare personală și orientare profesională' },
+  { value: '8', label: 'Licee tehnologice', hint: 'Rețea națională de implementare a proiectului' },
+  { value: '1.400+', label: 'Participanți DREAM XPERIENCE 2026', hint: '31 martie 2026 · Universitatea Politehnica București' },
+  { value: '50+', label: 'Speakeri și profesioniști', hint: 'Inspirație și orientare profesională pentru elevi' }
+];
+
+const goAheadPhotos = [
+  {
+    src: '/assets/proiecte/goahead-1-echipa-isb.jpg',
+    alt: 'Elevi ai liceului la standul Facultății de Inginerie a Sistemelor Biotehnice, Universitatea Politehnica București',
+    caption: 'Delegația liceului, la Universitatea Politehnica București, gazda conferinței DREAM XPERIENCE.'
+  },
+  {
+    src: '/assets/proiecte/goahead-2-laborator-robotica.jpg',
+    alt: 'Elevi vizitând un laborator de robotică și mecatronică, în fața unui covor demonstrativ pentru roboți',
+    caption: 'Vizită la laboratoarele de robotică și mecatronică ale Politehnicii — orientare profesională la firul ierbii.'
+  },
+  {
+    src: '/assets/proiecte/goahead-4-echipa-mecatronica.jpg',
+    alt: 'Grup de elevi în holul Facultății de Inginerie Mecanică și Mecatronică',
+    caption: 'Elevii liceului, prezenți la Facultatea de Inginerie Mecanică și Mecatronică.'
+  },
+  {
+    src: '/assets/proiecte/goahead-5-targul-de-joburi.jpg',
+    alt: 'Grup de elevi și coordonator la Târgul de Joburi din cadrul conferinței DREAM XPERIENCE',
+    caption: 'La standurile Târgului de Joburi — primul contact direct cu angajatori reali.'
+  },
+  {
+    src: '/assets/proiecte/goahead-6-scena-dream-xperience.jpg',
+    alt: 'Elevi și coordonatori pe scena conferinței DREAM XPERIENCE 2026',
+    caption: 'Pe scena DREAM XPERIENCE 2026, sub mesajul „YOU ARE A HERO, YOU ARE UNSTOPPABLE”.'
+  },
+  {
+    src: '/assets/proiecte/goahead-3-afis-sponsori.jpg',
+    alt: 'Afișul oficial cu organizatorii, partenerii și sponsorii conferinței DREAM XPERIENCE 2026',
+    caption: 'Amploarea evenimentului: zeci de parteneri instituționali, sponsori și organizații implicate.',
+    fit: 'contain'
+  }
+];
+
 function useCountUpGroup(targets, duration = 2200) {
   const ref = useRef(null);
   const [values, setValues] = useState(() => targets.map(() => 0));
@@ -339,8 +380,9 @@ function GrandTotalBanner() {
 }
 
 function PhotoCard({ photo }) {
+  const cardClass = photo.fit === 'contain' ? 'proj-photo-card proj-photo-card--contain' : 'proj-photo-card';
   return (
-    <figure className="proj-photo-card">
+    <figure className={cardClass}>
       <img src={photo.src} alt={photo.alt} loading="lazy" />
       <figcaption>{photo.caption}</figcaption>
     </figure>
@@ -630,6 +672,54 @@ function ProjectsPage() {
                 <p>{item.text}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="proj-section proj-reveal" aria-label="Îndrăznește să Mergi Mai Departe și DREAM XPERIENCE 2026">
+          <header className="proj-section-head">
+            <span className="proj-eyebrow">Parteneriat asociativ · Asociația GO-AHEAD</span>
+            <h2>„Îndrăznește să Mergi Mai Departe” &amp; DREAM XPERIENCE 2026</h2>
+            <p className="proj-section-lead">
+              „Îndrăznește să Mergi Mai Departe” este un proiect al Asociației GO-AHEAD, susținut de
+              Fundația Dacia pentru România prin programul „Mobilitatea Contează”. Derulat în 8 licee
+              tehnologice din țară, proiectul a sprijinit 304 de beneficiari prin consiliere, dezvoltare
+              personală și socio-emoțională, orientare profesională, educație financiară și pentru
+              sănătate. Scopul principal: mai multă încredere în sine, o perspectivă mai clară asupra
+              viitorului și susținerea elevilor pentru a-și continua studiile.
+            </p>
+          </header>
+
+          <div className="proj-metrics-grid">
+            {goAheadHighlights.map((item) => (
+              <article key={item.label} className="proj-metric-card">
+                <strong>{item.value}</strong>
+                <p>{item.label}</p>
+                <span>{item.hint}</span>
+              </article>
+            ))}
+          </div>
+
+          <div className="proj-timeline-block proj-timeline-block--goahead">
+            <div className="proj-timeline-head">
+              <div>
+                <h3>DREAM XPERIENCE 2026 — a treia ediție</h3>
+                <p>
+                  Conferința educațională GO-AHEAD s-a desfășurat pe 31 martie 2026 la Universitatea
+                  Politehnica București și a reunit peste 1.400 de participanți, peste 50 de speakeri și
+                  numeroase activități interactive dedicate elevilor din învățământul profesional și
+                  tehnic. Sub mesajul „YOU ARE A HERO, YOU ARE UNSTOPPABLE”, conferința a pus accent pe
+                  inspirație, orientare profesională, întâlnirea cu profesioniști din diverse domenii și
+                  încrederea tinerilor în propriul drum.
+                </p>
+              </div>
+            </div>
+
+            <h4 className="proj-photo-subhead">Echipa liceului, la conferință</h4>
+            <div className="proj-photo-grid proj-photo-grid--goahead">
+              {goAheadPhotos.map((photo) => (
+                <PhotoCard key={photo.src} photo={photo} />
+              ))}
+            </div>
           </div>
         </section>
 

@@ -318,6 +318,34 @@ const goAheadPhotos = [
   }
 ];
 
+const transformarePhotos = [
+  {
+    src: '/assets/proiecte/transformare-ave-sesiune.jpg',
+    alt: 'Sesiune de comunitate cu elevi, profesori și părinți, organizată de Asociația pentru Valori în Educație la Liceul Tehnologic Nr. 1',
+    caption: 'Sesiune de comunitate AVE România — elevi, profesori și părinți, împreună în procesul de transformare a școlii.'
+  },
+  {
+    src: '/assets/proiecte/transformare-ave-4-audienta.jpg',
+    alt: 'Elevi, profesori și părinți în sala plină, la sesiunea de comunitate AVE România',
+    caption: 'Sala plină — elevi, profesori și părinți, aduși împreună la aceeași masă de discuție.'
+  },
+  {
+    src: '/assets/proiecte/transformare-ave-2-prezentare.jpg',
+    alt: 'Coordonatoare AVE România prezentând programul de transformare, cu sigla liceului pe ecran',
+    caption: 'Prezentarea programului de transformare, direct în fața comunității școlare.'
+  },
+  {
+    src: '/assets/proiecte/transformare-ave-3-ateliere.jpg',
+    alt: 'Colaj cu ateliere de lucru: elevi și profesori completând postere despre nevoi și soluții pentru școală',
+    caption: 'Ateliere de lucru — nevoi, provocări și soluții, gândite împreună pe hârtie.'
+  },
+  {
+    src: '/assets/proiecte/transformare-ave-5-echipa.jpg',
+    alt: 'Echipa de conducere a liceului alături de reprezentanții AVE România, în fața bannerului Liceul Tehnologic Nr. 1',
+    caption: 'Echipa de conducere a liceului, alături de reprezentanții AVE România.'
+  }
+];
+
 function useCountUpGroup(targets, duration = 2200) {
   const ref = useRef(null);
   const [values, setValues] = useState(() => targets.map(() => 0));
@@ -720,6 +748,26 @@ function ProjectsPage() {
                 <PhotoCard key={photo.src} photo={photo} />
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="proj-section proj-reveal" aria-label="Programul de Transformare a Școlilor din România">
+          <header className="proj-section-head">
+            <span className="proj-eyebrow">Parteneriat instituțional · Asociația pentru Valori în Educație (AVE)</span>
+            <h2>Programul de Transformare a Școlilor din România</h2>
+            <p className="proj-section-lead">
+              Suntem singura unitate de învățământ din regiune înscrisă, din anul școlar trecut, în
+              Programul de Transformare a Școlilor derulat de AVE România. Pe baza unui raport de
+              descoperire realizat de analiști educaționali, construim un Plan de Acțiune 2025–2028 axat pe
+              calitatea actului didactic, starea de bine a comunității școlare și deschiderea liceului către
+              comunitate.
+            </p>
+          </header>
+
+          <div className="proj-photo-grid proj-photo-grid--goahead">
+            {transformarePhotos.map((photo) => (
+              <PhotoCard key={photo.src} photo={photo} />
+            ))}
           </div>
         </section>
 
